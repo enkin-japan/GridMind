@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+<div class="auth-card">
+  <h1>設定</h1>
+
+  <% if (saved === '1') { %><p class="notice ok">保存しました。</p><% } %>
+  <% if (saved === 'cleared') { %><p class="notice ok">APIキーを削除しました。</p><% } %>
+
+  <form action="/settings" method="post" class="note-form">
+    <h2>OpenAI API キー</h2>
+    <p class="muted">
+      現在の状態：<strong><%= hasKey ? '設定済み（••••）' : '未設定' %></strong><br>
+      キーは <strong>暗号化して保存</strong>され、画面に再表示されません。AI 整理のときだけ内部で使われます。
+      アカウントに紐づくので、別の端末でもログインすれば使えます。
+    </p>
+    <label>APIキー<%= hasKey ? '（変更する場合のみ入力）' : '' %>
+      <input type="password" name="api_key" placeholder="sk-..." autocomplete="off">
+    </label>
+    <label>モデル（安価なものから。既定: gpt-4o-mini）
+      <input type="text" name="api_model" value="<%= model %>">
+    </label>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">保存</button>
+    </div>
+  </form>
+
+  <% if (hasKey) { %>
+    <form action="/settings/clear" method="post" class="clear-form"
+          onsubmit="return confirm('保存済みのAPIキーを削除しますか？');">
+      <button class="btn danger" type="submit">APIキーを削除</button>
+    </form>
+  <% } %>
+</div>
+
+<%- include('partials/footer') %>

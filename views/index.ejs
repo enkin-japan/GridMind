@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+
+<% if (tag) { %>
+  <p class="filter-note">タグ「<strong><%= tag %></strong>」で絞り込み中 — <a href="/">解除</a></p>
+<% } %>
+
+<% if (allTags && allTags.length) { %>
+  <div class="tag-cloud">
+    <% allTags.forEach(function (t) { %>
+      <a class="tag-chip<%= tag === t.name ? ' active' : '' %>" href="/?tag=<%= encodeURIComponent(t.name) %>"><%= t.name %> <span class="count"><%= t.count %></span></a>
+    <% }) %>
+  </div>
+<% } %>
+
+<% if (rows.length === 0) { %>
+  <div class="empty">
+    <p>ノートがまだありません。</p>
+    <a class="btn" href="/notes/new">最初のノートを作成する</a>
+  </div>
+<% } else { %>
+  <div class="card-grid">
+    <% rows.forEach(function (note) { %>
+      <a class="card" href="/notes/<%= note.id %>">
+        <h2><%= note.title %></h2>
+        <% if (note.summary) { %><p class="summary"><%= note.summary %></p><% } %>
+        <% if (note.tags && note.tags.length) { %>
+          <div class="card-tags">
+            <% note.tags.forEach(function (t) { %><span class="tag-chip small"><%= t %></span><% }) %>
+          </div>
+        <% } %>
+        <time><%= note.created_at.slice(0, 10) %></time>
+      </a>
+    <% }) %>
+  </div>
+
+  <% if (pages > 1) { %>
+    <nav class="pager">
+      <% for (let p = 1; p <= pages; p++) { %>
+        <a class="page<%= p === page ? ' active' : '' %>"
+           href="/?<%= q ? 'q=' + encodeURIComponent(q) + '&' : '' %><%= tag ? 'tag=' + encodeURIComponent(tag) + '&' : '' %>page=<%= p %>"><%= p %></a>
+      <% } %>
+    </nav>
+  <% } %>
+<% } %>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+
+<div class="auth-card">
+  <h1>新規登録</h1>
+  <% if (errors && errors.length) { %>
+    <ul class="errors"><% errors.forEach(function (e) { %><li><%= e.msg %></li><% }) %></ul>
+  <% } %>
+  <form action="/register" method="post" class="note-form">
+    <label>ユーザー名（3文字以上）
+      <input type="text" name="username" value="<%= values.username || '' %>" required autofocus>
+    </label>
+    <label>パスワード（6文字以上）
+      <input type="password" name="password" required>
+    </label>
+    <div class="form-actions">
+      <button class="btn primary" type="submit">登録してはじめる</button>
+    </div>
+  </form>
+  <p class="muted">すでにアカウントがある場合は <a href="/login">ログイン</a></p>
+</div>
+
+<%- include('../partials/footer') %>

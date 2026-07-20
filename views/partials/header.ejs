@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | GridMind</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">▦ GridMind</a>
+    <% if (user) { %>
+      <form class="search" action="/" method="get">
+        <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="タイトル・本文で検索">
+        <button type="submit">検索</button>
+      </form>
+      <a class="btn-new" href="/notes/import">⇪ 取り込み</a>
+      <a class="btn-new" href="/notes/new">＋ 新規</a>
+      <a class="icon-btn" href="/settings" title="設定">⚙</a>
+      <span class="user-box">
+        <span class="username"><%= user.username %></span>
+        <form action="/logout" method="post" class="logout-form">
+          <button class="link-btn" type="submit">ログアウト</button>
+        </form>
+      </span>
+    <% } else { %>
+      <span class="header-spacer"></span>
+      <a class="btn-new" href="/login">ログイン</a>
+      <a class="btn-new" href="/register">新規登録</a>
+    <% } %>
+  </header>
+  <main class="container">

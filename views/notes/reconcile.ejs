@@ -1,0 +1,37 @@
+<%- include('../partials/header') %>
+
+<div class="reconcile">
+  <h1>関連する知識が見つかりました</h1>
+  <p class="muted">
+    取り込んだ知識が、既存のノート「<strong><%= old.title %></strong>」と関連しています。どうしますか？
+  </p>
+
+  <div class="compare">
+    <section class="pane pane-new">
+      <div class="pane-label">新規（取り込み）</div>
+      <h3><%= staged.title %></h3>
+      <div class="markdown-body"><%- newHtml %></div>
+    </section>
+    <section class="pane pane-old">
+      <div class="pane-label">既存ノート</div>
+      <h3><%= old.title %></h3>
+      <div class="markdown-body"><%- oldHtml %></div>
+    </section>
+  </div>
+
+  <div class="reconcile-actions">
+    <form action="/notes/reconcile/link" method="post">
+      <button class="btn primary" type="submit">🔗 関連づけて保存</button>
+      <span class="hint">別々のノートとして保存し、相互にリンクします</span>
+    </form>
+    <form action="/notes/reconcile/merge" method="post">
+      <button class="btn" type="submit">⤵ 統合する（プレビュー）</button>
+      <span class="hint">既存ノートに統合。AI が重複を除いてまとめ、確認後に保存します</span>
+    </form>
+    <form action="/notes/reconcile/plain" method="post">
+      <button class="btn ghost" type="submit">リンクせず保存</button>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

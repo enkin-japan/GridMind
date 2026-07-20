@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+
+<article class="note">
+  <div class="note-head">
+    <h1><%= note.title %></h1>
+    <div class="actions">
+      <a class="btn" href="/notes/<%= note.id %>/edit">編集</a>
+      <form action="/notes/<%= note.id %>/delete" method="post" onsubmit="return confirm('このノートを削除しますか？');">
+        <button class="btn danger" type="submit">削除</button>
+      </form>
+    </div>
+  </div>
+
+  <% if (note.tags && note.tags.length) { %>
+    <div class="note-tags">
+      <% note.tags.forEach(function (t) { %><a class="tag-chip" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a><% }) %>
+    </div>
+  <% } %>
+
+  <% if (note.summary) { %>
+    <div class="summary-box"><strong>要約：</strong><%= note.summary %></div>
+  <% } %>
+
+  <% if (html && html.trim()) { %>
+    <div class="markdown-body"><%- html %></div>
+  <% } else { %>
+    <div class="markdown-body muted">（このドキュメントからは知識点を抽出できませんでした）</div>
+  <% } %>
+
+  <section class="backlinks">
+    <h3>被リンク（このノートを参照しているノート）</h3>
+    <% if (backlinks.length === 0) { %>
+      <p class="muted">まだありません。</p>
+    <% } else { %>
+      <ul>
+        <% backlinks.forEach(function (b) { %><li><a href="/notes/<%= b.id %>"><%= b.title %></a></li><% }) %>
+      </ul>
+    <% } %>
+  </section>
+
+  <p class="meta">作成: <%= note.created_at.slice(0,16).replace('T',' ') %> ／ 更新: <%= note.updated_at.slice(0,16).replace('T',' ') %></p>
+</article>
+
+<%- include('../partials/footer') %>
