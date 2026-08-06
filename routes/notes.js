@@ -7,11 +7,11 @@ const fs = require('fs');
 const multer = require('multer');
 const { body, validationResult } = require('express-validator');
 const notes = require('../models/notes');
-const users = require('../models/users');
 const links = require('../services/links');
 const ai = require('../services/ai');
 const ingest = require('../services/ingest');
 const relate = require('../services/relate');
+const quota = require('../services/quota');
 const { renderMarkdown } = require('../services/render');
 
 const upload = multer({
@@ -53,22 +53,40 @@ router.post('/new', validate, async (req, res, next) => {
 // --- 取り込み画面 ---
 router.get('/import', async (req, res, next) => {
   try {
-    const hasKey = await users.hasApiKey(req.session.userId);
-    res.render('notes/import', { title: '取り込み', hasKey });
+    const user = res.locals.user;
+    const q = await quota.check(user, 0);
+    res.render('notes/import', {
+      title: '取り込み',
+      plan: q.plan,
+      usage: q.usage,
+      languages: ai.LANGUAGES,
+      defaultLang: user.out_lang || 'auto',
+    });
   } catch (e) {
     next(e);
   }
 });
 
 // --- 取り込み実行（fetch から呼ばれ JSON を返す）---
-// キーはログインユーザーの DB 保存分（復号）を使う。未設定なら AI をスキップして生データ保存。
+// API キーはサービス側が持つ。利用者はプランの範囲内で使う。
 router.post('/ingest', upload.single('file'), async (req, res, next) => {
-  const userId = req.session.userId;
+  const user = res.locals.user;
+  const userId = user.id;
   try {
+    // 1) 回数の上限を先に見る（変換の費用を払う前に断る）。
+    const pre = await quota.check(user, 0);
+    if (!pre.ok) return res.status(429).json({ error: pre.message, reason: pre.reason });
+
+    // 2) ファイル → Markdown（元ファイルは必ず消す）。
     let markdown = '';
     if (req.file) {
       try {
         markdown = await ingest.fileToMarkdown(req.file.path);
+      } catch (e) {
+        if (e.message === 'BRIDGE_BUSY') {
+          return res.status(503).json({ error: 'ただいま混み合っています。少し待ってからお試しください。' });
+        }
+        return res.status(422).json({ error: 'このファイルは読み取れませんでした。' });
       } finally {
         fs.unlink(req.file.path, () => {});
       }
@@ -77,20 +95,27 @@ router.post('/ingest', upload.single('file'), async (req, res, next) => {
     }
     if (!markdown.trim()) return res.status(400).json({ error: '内容が空です。' });
 
-    const { key, model } = await users.getApiKey(userId);
+    // 3) 文字数の上限を見る（変換してからでないと本当の長さが分からない）。
+    const post = await quota.check(user, markdown.length);
+    if (!post.ok) return res.status(413).json({ error: post.message, reason: post.reason });
+
+    // 4) AI 整理。出力言語は指定があればそれ、無ければアカウントの既定。
+    const lang = req.body.lang || user.out_lang || 'auto';
     let data;
     let aiUsed = false;
-    if (key) {
-      try {
-        data = await ai.structure(markdown, { key, model });
-        aiUsed = true;
-      } catch (e) {
-        data = null;
-      }
+    try {
+      data = await ai.structure(markdown, { lang });
+      aiUsed = true;
+      await quota.record(userId, { kind: 'ingest', docChars: markdown.length, usage: data.usage });
+    } catch (e) {
+      console.error('[ingest] AI 整理に失敗:', e.message);
+      data = null;
     }
-    if (!data) {
+    if (!data || !data.body_md) {
+      // AI が使えない／知識が無いと判断された場合は、変換したテキストをそのまま残す。
       const firstLine = markdown.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 60);
       data = { title: firstLine || '無題', body_md: markdown, summary: null, tags: [] };
+      aiUsed = false;
     }
 
     const staged = {
@@ -201,14 +226,13 @@ router.post('/reconcile/merge', async (req, res, next) => {
   try {
     const old = await notes.findById(p.topId, userId);
     if (!old) return res.redirect('/notes/reconcile');
-    const { key, model } = await users.getApiKey(userId);
     let merged = null;
-    if (key) {
-      try {
-        merged = await ai.merge(old, p.note, { key, model });
-      } catch (e) {
-        merged = null;
-      }
+    try {
+      merged = await ai.merge(old, p.note, { lang: res.locals.user.out_lang || 'auto' });
+      await quota.record(userId, { kind: 'merge', docChars: 0, usage: merged.usage });
+    } catch (e) {
+      console.error('[merge] 統合に失敗:', e.message);
+      merged = null;
     }
     if (!merged) {
       // フォールバック：単純連結

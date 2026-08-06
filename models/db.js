@@ -39,14 +39,14 @@ async function columnExists(table, col) {
 // --- スキーマ初期化 ---
 // ARCHITECTURE.md §6 のデータモデルに対応。起動時に一度だけ実行する。
 async function init() {
-  // ユーザー（アカウント）。api_key_enc は AES-256-GCM 暗号化済みの OpenAI キー。
+  // ユーザー（アカウント）。OpenAI の API キーはサービス側が持つので、ここには保存しない。
   await run(`
     CREATE TABLE IF NOT EXISTS users (
       id            INTEGER PRIMARY KEY AUTOINCREMENT,
       username      TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
-      api_key_enc   TEXT,                         -- 暗号化された OpenAI キー（未設定なら NULL）
-      api_model     TEXT DEFAULT 'gpt-4o-mini',
+      plan          TEXT NOT NULL DEFAULT 'free',  -- 'free' | 'pro'
+      out_lang      TEXT NOT NULL DEFAULT 'auto',  -- 既定の出力言語
       created_at    TEXT NOT NULL
     )
   `);
@@ -82,11 +82,36 @@ async function init() {
       target_note_id INTEGER                    -- 一致するノートがあれば解決した id
     )
   `);
+  // 利用実績（プランの上限判定と、費用の把握に使う）。
+  // period は JST の "YYYY-MM"。月ごとの集計をここで行う。
+  await run(`
+    CREATE TABLE IF NOT EXISTS usage_log (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id    INTEGER NOT NULL,
+      period     TEXT NOT NULL,               -- 'YYYY-MM'（JST）
+      kind       TEXT NOT NULL,               -- 'ingest' | 'merge'
+      doc_chars  INTEGER DEFAULT 0,           -- 取り込んだ資料の文字数
+      in_tokens  INTEGER DEFAULT 0,
+      out_tokens INTEGER DEFAULT 0,
+      calls      INTEGER DEFAULT 0,
+      created_at TEXT NOT NULL
+    )
+  `);
+  await run('CREATE INDEX IF NOT EXISTS idx_usage_user_period ON usage_log (user_id, period)');
+
   // embeddings テーブルは DEFERRED（ARCHITECTURE §7）。MVP では作成しない。
 
   // --- マイグレーション：既存の notes に user_id を追加（マルチユーザー化）---
   if (!(await columnExists('notes', 'user_id'))) {
     await run('ALTER TABLE notes ADD COLUMN user_id INTEGER');
+  }
+  // --- マイグレーション：料金プラン（'free' | 'pro'）---
+  if (!(await columnExists('users', 'plan'))) {
+    await run("ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'");
+  }
+  // --- マイグレーション：既定の出力言語（'auto' | 'ja' | 'en' | 'zh' | 'ko'）---
+  if (!(await columnExists('users', 'out_lang'))) {
+    await run("ALTER TABLE users ADD COLUMN out_lang TEXT NOT NULL DEFAULT 'auto'");
   }
 }
 

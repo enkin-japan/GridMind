@@ -58,10 +58,9 @@ const demoNotes = [
     let u = await users.findByUsername(DEMO.username);
     const demoId = u ? u.id : await users.create(DEMO.username, DEMO.password);
 
-    // テスト用にデモの API キーを .env の開発キーから設定（暗号化保存）
-    if (process.env.OPENAI_API_KEY) {
-      await users.setApiKey(demoId, process.env.OPENAI_API_KEY, process.env.OPENAI_MODEL || 'gpt-4o-mini');
-      console.log('demo の API キーを .env から設定しました');
+    // API キーはサービス側（.env）が持つので、アカウントごとの設定は不要。
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn('※ .env に OPENAI_API_KEY がありません。AI 整理は動きません。');
     }
 
     // 既存の所有者なしノートをデモに引き取る

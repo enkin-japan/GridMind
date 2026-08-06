@@ -5,12 +5,12 @@
   <p class="muted">
     ファイル（PDF / docx / pptx / xlsx / html / txt）か、貼り付けたテキストを AI が整理してノート化します。
   </p>
-  <% if (!hasKey) { %>
-    <p class="notice warn">
-      APIキーが未設定です。<a href="/settings">⚙ 設定</a>で登録すると AI 整理が有効になります。
-      （未設定でも、変換したテキストはそのまま保存されます）
-    </p>
-  <% } %>
+
+  <p class="muted small">
+    今月の取り込み：<strong><%= usage.ingests %> / <%= plan.monthlyIngests %> 回</strong>
+    （<%= plan.label %>プラン・1ファイル <%= plan.maxDocChars.toLocaleString() %> 文字まで）
+    　<a href="/settings">設定</a>
+  </p>
 
   <label>ファイルを選択（複数選べます）
     <input type="file" id="import-file" name="file" multiple
@@ -22,6 +22,17 @@
 
   <label>テキストを貼り付け
     <textarea id="import-text" name="text" rows="10" placeholder="ここにテキストを貼り付け…"></textarea>
+  </label>
+
+  <label>知識の出力言語
+    <select id="import-lang" name="lang">
+      <% Object.keys(languages).forEach(function (k) { %>
+        <option value="<%= k %>" <%= k === defaultLang ? 'selected' : '' %>><%= languages[k].label %></option>
+      <% }); %>
+    </select>
+    <small class="muted">
+      英語の資料を日本語のノートにする、といった使い方ができます。「原文のまま」なら翻訳しません。
+    </small>
   </label>
 
   <div class="form-actions">
