@@ -18,7 +18,7 @@ __pycache__/
 
 # --- course materials & personal files (not part of the open-source app) ---
 instruction/
-nodeJS/
+testFiles/
 templates/
 screenshots/
 docs/
