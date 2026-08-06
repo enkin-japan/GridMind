@@ -10,7 +10,7 @@ const OpenAI = require('openai');
 
 // サービス側の既定キーとモデル。
 const SERVER_KEY = process.env.OPENAI_API_KEY || null;
-const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-luna';
 // まとめ直し（と単発整理）に使うモデル。
 // 図の多い資料では文字の取り出しが崩れ、ラベルと数値が入れちがったまま
 // もっともらしい文が出てくる。これに気づけるかはモデルの力に依るため、
