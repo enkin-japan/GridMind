@@ -11,6 +11,26 @@ const OpenAI = require('openai');
 // サービス側の既定キーとモデル。
 const SERVER_KEY = process.env.OPENAI_API_KEY || null;
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+// まとめ直し（と単発整理）に使うモデル。
+// 図の多い資料では文字の取り出しが崩れ、ラベルと数値が入れちがったまま
+// もっともらしい文が出てくる。これに気づけるかはモデルの力に依るため、
+// 最後の1回だけ上位モデルを使えるようにしておく（入力は抽出済みの知識点だけなので安い）。
+const FINAL_MODEL = process.env.AI_FINAL_MODEL || null;
+
+// モデルごとの価格（100万トークンあたりの米ドル）。
+// 抽出とまとめ直しで別のモデルを使えるようにしたため、トークン数だけでは
+// 費用が出せない。ここで実際の金額まで計算して記録する。
+const PRICES = {
+  'gpt-4o-mini': { in: 0.15, out: 0.6 },
+  'gpt-4o': { in: 2.5, out: 10 },
+  'gpt-4.1-mini': { in: 0.4, out: 1.6 },
+  'gpt-4.1': { in: 2, out: 8 },
+};
+const FALLBACK_PRICE = { in: 0.15, out: 0.6 };
+
+function priceOf(model) {
+  return PRICES[model] || PRICES[String(model).replace(/-\d{4}-\d{2}-\d{2}$/, '')] || FALLBACK_PRICE;
+}
 
 // 1回の呼び出しに入れる本文の上限。これを超える資料は分割して処理する。
 const CHUNK_SIZE = Number(process.env.AI_CHUNK_SIZE) || 12000;
@@ -35,6 +55,62 @@ async function mapWithLimit(items, limit, fn) {
   });
   await Promise.all(runners);
   return out;
+}
+
+// 本文を書かせる呼び出しの末尾に付ける、短い確認事項。
+// 規則をシステムプロンプトに足すほど、後ろの方の指示が守られにくくなる。
+// 見落としやすいものだけを、いちばん最後にもう一度置いて効かせる。
+const TAIL_CHECKLIST = [
+  '',
+  'Before you answer, check these three things:',
+  '1. Every line states a fact a reader could learn. Delete agenda, task instructions, and topic-only pointers.',
+  '2. No fragment, and no number that contradicts another number in the same note. When two figures cannot both be true, keep only one.',
+  '3. No LaTeX delimiters. Write formulas as plain text.',
+].join('\n');
+
+// 見出しの下に内容が1つしかないセクションは、見出しを外す。
+//
+// 「1項目だけの見出しを作るな」と指示しても守られないことが多いため、
+// 出力を受け取ってから機械的に直す。見た目の規則は、頼むより直した方が確実。
+function tidyHeadings(md) {
+  const lines = String(md).split('\n');
+  const blocks = [];
+  let cur = { heading: null, lines: [] };
+  for (const line of lines) {
+    if (/^#{2,6}\s+\S/.test(line)) {
+      blocks.push(cur);
+      cur = { heading: line, lines: [] };
+    } else {
+      cur.lines.push(line);
+    }
+  }
+  blocks.push(cur);
+
+  // 入れ子でない（行頭が空白でない）中身の行を数える。
+  const contentCount = (ls) => ls.filter((l) => l.trim() && !/^\s/.test(l)).length;
+
+  const out = [];
+  for (const b of blocks) {
+    if (b.heading && contentCount(b.lines) >= 2) out.push(b.heading);
+    // 見出しを外す場合も中身はそのまま残す（知識は消さない）。
+    out.push(...b.lines);
+  }
+
+  // 見出しを外すと箇条書きの間に空行が残る。そのままだと Markdown が
+  // 「ゆるいリスト」として各項目を段落で包み、かえって間延びして見えるので詰める。
+  const isBullet = (l) => /^[-*]\s+\S/.test(l || '');
+  const tight = [];
+  for (let i = 0; i < out.length; i += 1) {
+    const line = out[i];
+    if (!line.trim()) {
+      const prev = tight[tight.length - 1];
+      let j = i;
+      while (j < out.length && !out[j].trim()) j += 1;
+      if (isBullet(prev) && isBullet(out[j])) continue; // 箇条書き同士の間の空行は落とす
+    }
+    tight.push(line);
+  }
+  return tight.join('\n').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 // 応答全体が ```markdown ... ``` で包まれていた場合に外す。
@@ -85,8 +161,24 @@ const FINAL_FILTER_RULES = [
   '- an instruction telling the reader to do something (create a project, install X, implement Y yourself)',
   '- an exercise/assignment description, or an output string required by an exercise',
   '- a pointer that names a topic without stating the fact itself',
+  '- a fragment, or a statement whose numbers/units are implausible',
   '- otherwise not knowledge (logistics, grading, schedule, presenter, page furniture)',
+  'Then check the headings: if a section is left with only ONE point, remove that heading and',
+  'merge the point into a related section (or drop the heading entirely if the note is short).',
   'Then output only what remains. Deleting such lines is REQUIRED, not optional.',
+].join('\n');
+
+// 資料が図中心のスライドだと、文字の取り出しが崩れて断片や桁の壊れた数字が混ざる。
+// モデルはそれを「作り話」ではなく「忠実な転記」として書いてしまうため、
+// 明らかにおかしいものは書かずに捨てるよう、はっきり指示する。
+const COHERENCE_RULES = [
+  'SOURCE MAY BE GARBLED — the text was extracted from slides and can be broken:',
+  '- If a sentence is fragmentary, incoherent, or cut off mid-thought, DROP it. Never present a fragment as a complete fact.',
+  '- If a number, unit, or magnitude is implausible for what it describes (a national budget in the millions, a percentage above 100, a truncated figure), DROP that statement. Do NOT repair it by guessing the intended value.',
+  '- Cross-check numbers against each other. If the same quantity appears twice with magnitudes that cannot both be true',
+  '  (e.g. one line says a national budget is 106兆6097億円 and another says it is 8億4700万円), keep only the line that is',
+  '  consistent with the rest of the note and DELETE the other. Never keep both.',
+  '- Being faithful to broken text is NOT a virtue here. A missing point is better than a wrong one.',
 ].join('\n');
 
 // 「話題を挙げただけ」の中身のない項目を禁じる。
@@ -122,6 +214,8 @@ const DENSITY_RULES = [
   '- Never state the same fact twice in different words.',
   '- Prefer "term — short definition" lines over prose paragraphs.',
   '- Do not insert decorative blank lines; one blank line between blocks is enough.',
+  '- Formulas: write them in plain text (sin^2 θ + cos^2 θ = 1) or inline code. NEVER use LaTeX',
+  '  delimiters such as \\( \\), \\[ \\], or $$ — the reader\'s view does not render LaTeX and they show as-is.',
 ].join('\n');
 
 // 出力言語の指示文を作る。
@@ -154,6 +248,8 @@ function singleBodyPrompt(langKey) {
     EXTRACTION_RULES,
     '',
     FIDELITY_RULES,
+    '',
+    COHERENCE_RULES,
     '',
     POINT_QUALITY_RULES,
     '',
@@ -203,6 +299,8 @@ function chunkPrompt(langKey) {
     '',
     FIDELITY_RULES,
     '',
+    COHERENCE_RULES,
+    '',
     POINT_QUALITY_RULES,
     '',
     'OUTPUT FORMAT for this stage:',
@@ -231,6 +329,8 @@ function consolidatePrompt(langKey) {
     '',
     'The earlier stage was imperfect, so filter again now.',
     FINAL_FILTER_RULES,
+    '',
+    COHERENCE_RULES,
     '',
     POINT_QUALITY_RULES,
     '',
@@ -295,11 +395,17 @@ async function callRaw({ key, model, system, user, maxTokens, json }) {
   });
   const choice = res.choices[0];
   const u = res.usage || {};
+  const used = model || DEFAULT_MODEL;
   return {
     text: choice.message.content || '',
     // finish_reason が 'length' なら出力が途中で切られている。
     truncated: choice.finish_reason === 'length',
-    usage: { input: u.prompt_tokens || 0, output: u.completion_tokens || 0, calls: 1 },
+    usage: {
+      input: u.prompt_tokens || 0,
+      output: u.completion_tokens || 0,
+      calls: 1,
+      byModel: { [used]: { input: u.prompt_tokens || 0, output: u.completion_tokens || 0, calls: 1 } },
+    },
   };
 }
 
@@ -336,10 +442,30 @@ async function callText({ key, model, system, user, maxTokens = 8000 }) {
 }
 
 function addUsage(a, b) {
-  return { input: a.input + b.input, output: a.output + b.output, calls: a.calls + b.calls };
+  const byModel = { ...(a.byModel || {}) };
+  for (const [m, u] of Object.entries(b.byModel || {})) {
+    const cur = byModel[m] || { input: 0, output: 0, calls: 0 };
+    byModel[m] = { input: cur.input + u.input, output: cur.output + u.output, calls: cur.calls + u.calls };
+  }
+  return {
+    input: a.input + b.input,
+    output: a.output + b.output,
+    calls: a.calls + b.calls,
+    byModel,
+  };
 }
 
-const ZERO_USAGE = { input: 0, output: 0, calls: 0 };
+const ZERO_USAGE = { input: 0, output: 0, calls: 0, byModel: {} };
+
+// モデル別の内訳から実際の費用（米ドル）を求める。
+function costOf(usage) {
+  let total = 0;
+  for (const [model, u] of Object.entries((usage && usage.byModel) || {})) {
+    const p = priceOf(model);
+    total += (u.input * p.in + u.output * p.out) / 1e6;
+  }
+  return total;
+}
 
 // ---------------------------------------------------------------------------
 // 長い資料の分割
@@ -398,14 +524,15 @@ async function structure(markdown, opts = {}) {
     const r = await callText({
       key,
       model,
+      model: FINAL_MODEL || model,
       system: singleBodyPrompt(lang),
       user:
         'Extract ONLY knowledge points from the following document.\n' +
-        '<document>\n' + source + '\n</document>',
+        '<document>\n' + source + '\n</document>' + TAIL_CHECKLIST,
       maxTokens: 8000,
     });
     usage = addUsage(usage, r.usage);
-    bodyMd = stripFence(r.text).trim();
+    bodyMd = tidyHeadings(stripFence(r.text));
   } else {
     // --- 長い資料：分割して抽出 → まとめ直す ---
     const parts = splitIntoChunks(source);
@@ -451,14 +578,15 @@ async function structure(markdown, opts = {}) {
     const r2 = await callText({
       key,
       model,
+      model: FINAL_MODEL || model,
       system: consolidatePrompt(lang),
       user:
         'Organize these knowledge points, extracted from consecutive parts of one document, into a single note body.\n\n' +
-        collected.map((p, i) => `<part-${i + 1}>\n${p}\n</part-${i + 1}>`).join('\n\n'),
+        collected.map((p, i) => `<part-${i + 1}>\n${p}\n</part-${i + 1}>`).join('\n\n') + TAIL_CHECKLIST,
       maxTokens: 12000,
     });
     usage = addUsage(usage, r2.usage);
-    bodyMd = stripFence(r2.text).trim() || collected.join('\n');
+    bodyMd = tidyHeadings(stripFence(r2.text)) || collected.join('\n');
   }
 
   // 知識が無いと判断された場合は、そのまま空のノートを返す（水増ししない）。
@@ -594,6 +722,9 @@ module.exports = {
   merge,
   detectLang,
   splitIntoChunks,
+  costOf,
+  priceOf,
+  tidyHeadings,
   LANGUAGES,
   MAX_DOC_CHARS,
   SINGLE_CALL_LIMIT,

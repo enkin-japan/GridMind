@@ -5,6 +5,7 @@
 // 回数だけだと巨大なファイルで費用が跳ね上がり、文字数だけだと回数で押し切られるため、
 // 両方そろえて初めて費用の上限が読める（例：フリーは 30回 × 2万字 = 月60万字が最悪値）。
 const { run, get, all } = require('../models/db');
+const ai = require('./ai');
 
 const PLANS = {
   free: {
@@ -55,7 +56,8 @@ async function usageFor(userId) {
     `SELECT COUNT(*) AS ingests,
             COALESCE(SUM(doc_chars), 0)  AS chars,
             COALESCE(SUM(in_tokens), 0)  AS in_tokens,
-            COALESCE(SUM(out_tokens), 0) AS out_tokens
+            COALESCE(SUM(out_tokens), 0) AS out_tokens,
+            COALESCE(SUM(cost_usd), 0)   AS cost_usd
        FROM usage_log
       WHERE user_id = ? AND period = ? AND kind = 'ingest'`,
     [userId, period]
@@ -66,6 +68,7 @@ async function usageFor(userId) {
     chars: (row && row.chars) || 0,
     inTokens: (row && row.in_tokens) || 0,
     outTokens: (row && row.out_tokens) || 0,
+    costUsd: (row && row.cost_usd) || 0,
   };
 }
 
@@ -107,8 +110,8 @@ async function check(user, docChars = 0) {
 // 実際に使った分を記録する（費用の把握と、上限判定の材料になる）。
 async function record(userId, { kind = 'ingest', docChars = 0, usage = {} } = {}) {
   await run(
-    `INSERT INTO usage_log (user_id, period, kind, doc_chars, in_tokens, out_tokens, calls, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO usage_log (user_id, period, kind, doc_chars, in_tokens, out_tokens, calls, cost_usd, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       userId,
       currentPeriod(),
@@ -117,6 +120,7 @@ async function record(userId, { kind = 'ingest', docChars = 0, usage = {} } = {}
       usage.input || 0,
       usage.output || 0,
       usage.calls || 0,
+      ai.costOf(usage),
       nowJst(),
     ]
   );
@@ -129,11 +133,12 @@ async function totals(period = currentPeriod()) {
             COUNT(*) AS ingests,
             SUM(doc_chars) AS chars,
             SUM(in_tokens) AS in_tokens,
-            SUM(out_tokens) AS out_tokens
+            SUM(out_tokens) AS out_tokens,
+            SUM(cost_usd) AS cost_usd
        FROM usage_log
       WHERE period = ?
       GROUP BY user_id
-      ORDER BY in_tokens DESC`,
+      ORDER BY cost_usd DESC`,
     [period]
   );
 }

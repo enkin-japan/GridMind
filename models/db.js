@@ -94,6 +94,7 @@ async function init() {
       in_tokens  INTEGER DEFAULT 0,
       out_tokens INTEGER DEFAULT 0,
       calls      INTEGER DEFAULT 0,
+      cost_usd   REAL DEFAULT 0,                -- 実際にかかった費用（モデル別の価格で計算）
       created_at TEXT NOT NULL
     )
   `);
@@ -121,6 +122,10 @@ async function init() {
   // --- マイグレーション：料金プラン（'free' | 'pro'）---
   if (!(await columnExists('users', 'plan'))) {
     await run("ALTER TABLE users ADD COLUMN plan TEXT NOT NULL DEFAULT 'free'");
+  }
+  // --- マイグレーション：利用実績に費用を追加（モデルを使い分けるため）---
+  if (!(await columnExists('usage_log', 'cost_usd'))) {
+    await run('ALTER TABLE usage_log ADD COLUMN cost_usd REAL DEFAULT 0');
   }
   // --- マイグレーション：既定の出力言語（'auto' | 'ja' | 'en' | 'zh' | 'ko'）---
   if (!(await columnExists('users', 'out_lang'))) {

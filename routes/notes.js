@@ -15,10 +15,28 @@ const quota = require('../services/quota');
 const embed = require('../services/embed');
 const { renderMarkdown } = require('../services/render');
 
+// 実測では図の多い講義資料が 15MB 近くまで行く（1件は上限まで残り 3KB だった）。
+// 余裕を持たせつつ、際限なく受けないよう上限は残す。
+const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB) || 40;
 const upload = multer({
   dest: path.join(__dirname, '..', 'uploads'),
-  limits: { fileSize: 15 * 1024 * 1024 },
+  limits: { fileSize: MAX_UPLOAD_MB * 1024 * 1024 },
 });
+
+// multer 自身のエラー（サイズ超過など）を JSON で返す。
+// 取り込みは fetch から呼ばれるため、HTML のエラーページを返すと表示できない。
+function uploadSingle(req, res, next) {
+  upload.single('file')(req, res, (err) => {
+    if (!err) return next();
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(413).json({
+        error: `ファイルが大きすぎます（上限 ${MAX_UPLOAD_MB}MB）。`,
+        reason: 'FILE_TOO_LARGE',
+      });
+    }
+    return res.status(400).json({ error: 'ファイルを受け取れませんでした。' });
+  });
+}
 
 function parseTags(str = '') {
   return String(str).split(/[,、]/).map((s) => s.trim()).filter(Boolean);
@@ -70,7 +88,7 @@ router.get('/import', async (req, res, next) => {
 
 // --- 取り込み実行（fetch から呼ばれ JSON を返す）---
 // API キーはサービス側が持つ。利用者はプランの範囲内で使う。
-router.post('/ingest', upload.single('file'), async (req, res, next) => {
+router.post('/ingest', uploadSingle, async (req, res, next) => {
   const user = res.locals.user;
   const userId = user.id;
   try {
