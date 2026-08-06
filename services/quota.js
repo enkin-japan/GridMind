@@ -57,6 +57,7 @@ async function usageFor(userId) {
             COALESCE(SUM(doc_chars), 0)  AS chars,
             COALESCE(SUM(in_tokens), 0)  AS in_tokens,
             COALESCE(SUM(out_tokens), 0) AS out_tokens,
+            COALESCE(SUM(cached_in), 0)  AS cached_in,
             COALESCE(SUM(cost_usd), 0)   AS cost_usd
        FROM usage_log
       WHERE user_id = ? AND period = ? AND kind = 'ingest'`,
@@ -68,6 +69,7 @@ async function usageFor(userId) {
     chars: (row && row.chars) || 0,
     inTokens: (row && row.in_tokens) || 0,
     outTokens: (row && row.out_tokens) || 0,
+    cachedIn: (row && row.cached_in) || 0,
     costUsd: (row && row.cost_usd) || 0,
   };
 }
@@ -110,8 +112,8 @@ async function check(user, docChars = 0) {
 // 実際に使った分を記録する（費用の把握と、上限判定の材料になる）。
 async function record(userId, { kind = 'ingest', docChars = 0, usage = {} } = {}) {
   await run(
-    `INSERT INTO usage_log (user_id, period, kind, doc_chars, in_tokens, out_tokens, calls, cost_usd, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO usage_log (user_id, period, kind, doc_chars, in_tokens, out_tokens, calls, cached_in, cost_usd, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       userId,
       currentPeriod(),
@@ -120,6 +122,7 @@ async function record(userId, { kind = 'ingest', docChars = 0, usage = {} } = {}
       usage.input || 0,
       usage.output || 0,
       usage.calls || 0,
+      usage.cached || 0,
       ai.costOf(usage),
       nowJst(),
     ]

@@ -20,16 +20,17 @@ const FINAL_MODEL = process.env.AI_FINAL_MODEL || null;
 // モデルごとの価格（100万トークンあたりの米ドル）。
 // 抽出とまとめ直しで別のモデルを使えるようにしたため、トークン数だけでは
 // 費用が出せない。ここで実際の金額まで計算して記録する。
+// cached はプロンプトキャッシュに当たった入力の単価。共通の前置きはここに乗る。
 const PRICES = {
-  'gpt-4o-mini': { in: 0.15, out: 0.6 },
-  'gpt-4o': { in: 2.5, out: 10 },
-  'gpt-4.1-mini': { in: 0.4, out: 1.6 },
-  'gpt-4.1': { in: 2, out: 8 },
-  'gpt-5.6-luna': { in: 0.2, out: 1.2 },
-  'gpt-5.6-terra': { in: 2, out: 12 },
-  'gpt-5.6-sol': { in: 5, out: 30 },
+  'gpt-4o-mini': { in: 0.15, cached: 0.075, out: 0.6 },
+  'gpt-4o': { in: 2.5, cached: 1.25, out: 10 },
+  'gpt-4.1-mini': { in: 0.4, cached: 0.1, out: 1.6 },
+  'gpt-4.1': { in: 2, cached: 0.5, out: 8 },
+  'gpt-5.6-luna': { in: 0.2, cached: 0.02, out: 1.2 },
+  'gpt-5.6-terra': { in: 2, cached: 0.2, out: 12 },
+  'gpt-5.6-sol': { in: 5, cached: 0.5, out: 30 },
 };
-const FALLBACK_PRICE = { in: 0.15, out: 0.6 };
+const FALLBACK_PRICE = { in: 0.15, cached: 0.075, out: 0.6 };
 
 function priceOf(model) {
   return PRICES[model] || PRICES[String(model).replace(/-\d{4}-\d{2}-\d{2}$/, '')] || FALLBACK_PRICE;
@@ -243,22 +244,39 @@ function languageRule(langKey) {
 // 1回で処理する場合のプロンプト（本文だけを Markdown で出させる）。
 // 本文を JSON の中に入れると、モデルが途中でオブジェクトを閉じてしまい
 // 「JSON としては正しいが中身が切れている」状態を検知できないため、本文は素のテキストで受け取る。
+// 知識を扱うすべてのプロンプトの先頭に、まったく同じ文面・同じ順序で置く共通ブロック。
+//
+// 【なぜ先頭にそろえるか】
+// プロンプトキャッシュは「前から共通している部分」だけが対象で、
+// しかも 1024 トークン以上ないと働かない。
+// 以前は各プロンプトが別々の一文で始まっていたため、そこで前置きが分かれてしまい、
+// 実測でも 分割抽出 937 / まとめ直し 1023 トークンと、どちらも基準に届かなかった
+// （まとめ直しは 1 トークン足りないだけだった）。
+// 共通の規則をそのまま先頭にそろえることで、4種類の呼び出しが同じ前置きを共有できる。
+const COMMON_PREFIX = [
+  'You are a strict knowledge assistant for a personal knowledge base.',
+  'Your job is always the same: keep the knowledge, drop everything else, and write it densely.',
+  '',
+  EXTRACTION_RULES,
+  '',
+  FIDELITY_RULES,
+  '',
+  COHERENCE_RULES,
+  '',
+  POINT_QUALITY_RULES,
+  '',
+  DENSITY_RULES,
+].join('\n');
+
+// 出力言語の指示は各プロンプトの最後に置く。
+// 言語ごとに文面が変わるため、途中に入れるとそこから先が言語ごとに別扱いになり、
+// 共有できる前置きが短くなってしまう。
 function singleBodyPrompt(langKey) {
   return [
-    'You are a strict knowledge-extraction assistant for a personal knowledge base.',
-    'From the given text, extract ONLY the substantive knowledge worth studying or referencing later, and organize it into a clean, structured Markdown note body.',
+    COMMON_PREFIX,
     '',
-    EXTRACTION_RULES,
-    '',
-    FIDELITY_RULES,
-    '',
-    COHERENCE_RULES,
-    '',
-    POINT_QUALITY_RULES,
-    '',
-    DENSITY_RULES,
-    '',
-    languageRule(langKey),
+    '--- TASK ---',
+    'From the given document, extract the knowledge and write it as ONE Markdown note body.',
     '',
     'STRUCTURE:',
     '- If there are 8 or more points, group them under 3-8 topical "##" headings, ordered logically.',
@@ -272,6 +290,8 @@ function singleBodyPrompt(langKey) {
     FINAL_FILTER_RULES,
     '',
     'Output the note body as raw Markdown only. No JSON, no title line, no commentary, no code fence around the whole answer.',
+    '',
+    languageRule(langKey),
   ].join('\n');
 }
 
@@ -295,59 +315,48 @@ function metaPrompt(langKey) {
 // 分割処理の第1段：断片から知識点だけを拾う（整形はまだしない）。
 function chunkPrompt(langKey) {
   return [
-    'You are a strict knowledge-extraction assistant.',
+    COMMON_PREFIX,
+    '',
+    '--- TASK ---',
     'You are given ONE PART of a longer document. Extract every knowledge point contained in THIS PART.',
-    '',
-    EXTRACTION_RULES,
-    '',
-    FIDELITY_RULES,
-    '',
-    COHERENCE_RULES,
-    '',
-    POINT_QUALITY_RULES,
-    '',
-    'OUTPUT FORMAT for this stage:',
+    'This is an intermediate stage, so the FORMAT rules above are replaced by the following:',
     '- Output a flat Markdown list of knowledge points, one point per line, each a compact self-contained phrase.',
+    '- Do NOT write headings, introductions, or conclusions at this stage. A later stage adds the structure.',
     '- Keep code/commands/numbers verbatim, inside fenced blocks when they span lines.',
-    '- Do NOT write headings, introductions, or conclusions at this stage.',
     '- Do NOT mention that this is a part of a document, and do not refer to page or slide numbers.',
     '- If this part contains no knowledge, output nothing at all.',
-    '',
-    languageRule(langKey),
+    'Everything else above (what counts as knowledge, what to drop, fidelity, point quality) still applies.',
     '',
     'Output the raw Markdown list only. No JSON, no code fence around the whole answer, no commentary.',
+    '',
+    languageRule(langKey),
   ].join('\n');
 }
 
 // 分割処理の第2段：拾い集めた知識点を1つのノートにまとめ直す。
 function consolidatePrompt(langKey) {
   return [
-    'You are a strict knowledge-base editor.',
-    'You are given knowledge points extracted from consecutive parts of ONE document. Organize them into a single coherent note.',
+    COMMON_PREFIX,
     '',
-    'RULES:',
+    '--- TASK ---',
+    'You are given knowledge points extracted from consecutive parts of ONE document.',
+    'Organize them into a single coherent note body.',
     '- Keep EVERY distinct knowledge point. Removing a real point is a failure.',
     '- Remove exact and near duplicates that appear across parts (the parts overlap slightly).',
     '- NEVER add, infer, or explain anything that is not in the given points.',
-    '',
-    'The earlier stage was imperfect, so filter again now.',
-    FINAL_FILTER_RULES,
-    '',
-    COHERENCE_RULES,
-    '',
-    POINT_QUALITY_RULES,
     '',
     'STRUCTURE:',
     '- If there are 8 or more points, group them under 3-8 topical "##" headings, ordered logically.',
     '- Never leave a long flat list ungrouped; never create a heading for a single point.',
     '',
-    DENSITY_RULES,
-    '',
-    languageRule(langKey),
+    'The earlier stage was imperfect, so filter again now.',
+    FINAL_FILTER_RULES,
     '',
     'Preserve any existing [[...]] wiki-link notation.',
     '',
     'Output the note body as raw Markdown only. No JSON, no title line, no commentary, no code fence around the whole answer.',
+    '',
+    languageRule(langKey),
   ].join('\n');
 }
 
@@ -415,6 +424,8 @@ async function callRaw({ key, model, system, user, maxTokens, json }) {
   const choice = res.choices[0];
   const u = res.usage || {};
   const used = model || DEFAULT_MODEL;
+  // 共通の前置きがキャッシュに当たった分。全額ではなく安い単価で計算する。
+  const cachedIn = (u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens) || 0;
   return {
     text: choice.message.content || '',
     // finish_reason が 'length' なら出力が途中で切られている。
@@ -422,8 +433,11 @@ async function callRaw({ key, model, system, user, maxTokens, json }) {
     usage: {
       input: u.prompt_tokens || 0,
       output: u.completion_tokens || 0,
+      cached: cachedIn,
       calls: 1,
-      byModel: { [used]: { input: u.prompt_tokens || 0, output: u.completion_tokens || 0, calls: 1 } },
+      byModel: {
+        [used]: { input: u.prompt_tokens || 0, cached: cachedIn, output: u.completion_tokens || 0, calls: 1 },
+      },
     },
   };
 }
@@ -463,25 +477,32 @@ async function callText({ key, model, system, user, maxTokens = 8000 }) {
 function addUsage(a, b) {
   const byModel = { ...(a.byModel || {}) };
   for (const [m, u] of Object.entries(b.byModel || {})) {
-    const cur = byModel[m] || { input: 0, output: 0, calls: 0 };
-    byModel[m] = { input: cur.input + u.input, output: cur.output + u.output, calls: cur.calls + u.calls };
+    const cur = byModel[m] || { input: 0, cached: 0, output: 0, calls: 0 };
+    byModel[m] = {
+      input: cur.input + u.input,
+      cached: (cur.cached || 0) + (u.cached || 0),
+      output: cur.output + u.output,
+      calls: cur.calls + u.calls,
+    };
   }
   return {
     input: a.input + b.input,
+    cached: (a.cached || 0) + (b.cached || 0),
     output: a.output + b.output,
     calls: a.calls + b.calls,
     byModel,
   };
 }
 
-const ZERO_USAGE = { input: 0, output: 0, calls: 0, byModel: {} };
+const ZERO_USAGE = { input: 0, cached: 0, output: 0, calls: 0, byModel: {} };
 
 // モデル別の内訳から実際の費用（米ドル）を求める。
 function costOf(usage) {
   let total = 0;
   for (const [model, u] of Object.entries((usage && usage.byModel) || {})) {
     const p = priceOf(model);
-    total += (u.input * p.in + u.output * p.out) / 1e6;
+    const cached = Math.min(u.cached || 0, u.input);
+    total += ((u.input - cached) * p.in + cached * (p.cached != null ? p.cached : p.in) + u.output * p.out) / 1e6;
   }
   return total;
 }
@@ -699,19 +720,17 @@ function normalizeTags(tags) {
 // ---------------------------------------------------------------------------
 function mergePrompt(langKey) {
   return [
-    'You are a strict knowledge-base assistant. You are given two related knowledge notes (A and B).',
-    'Merge them into ONE unified, de-duplicated knowledge note.',
+    COMMON_PREFIX,
     '',
-    'RULES:',
+    '--- TASK ---',
+    'You are given two related knowledge notes (A and B). Merge them into ONE unified, de-duplicated note.',
     '- Keep every distinct knowledge point from both; remove duplicates; organize coherently.',
     '- Do NOT invent or add anything not present in A or B. Knowledge only — no meta/logistics.',
     '- Preserve existing [[...]] wiki-link notation.',
     '',
-    DENSITY_RULES,
+    'Return ONLY a JSON object: {"title","markdown","summary","tags"} (tags: 0-6 short strings).',
     '',
     languageRule(langKey),
-    '',
-    'Return ONLY a JSON object: {"title","markdown","summary","tags"} (tags: 0-6 short strings).',
   ].join('\n');
 }
 
@@ -744,6 +763,14 @@ module.exports = {
   costOf,
   priceOf,
   tidyHeadings,
+  // 検証用：プロンプトの実測に使う
+  __prompts: (lang) => ({
+    single: singleBodyPrompt(lang),
+    chunk: chunkPrompt(lang),
+    consolidate: consolidatePrompt(lang),
+    meta: metaPrompt(lang),
+    merge: mergePrompt(lang),
+  }),
   LANGUAGES,
   MAX_DOC_CHARS,
   SINGLE_CALL_LIMIT,

@@ -125,10 +125,19 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
     try {
       data = await ai.structure(markdown, { lang });
       aiUsed = true;
-      await quota.record(userId, { kind: 'ingest', docChars: markdown.length, usage: data.usage });
     } catch (e) {
       console.error('[ingest] AI 整理に失敗:', e.message);
       data = null;
+    }
+    // 使用量の記録は AI 整理とは切り離す。
+    // ここを同じ try に入れていたため、記録の失敗で整理済みの結果まで
+    // 捨てられ、しかも「AI 整理に失敗」と表示されて原因が見えなくなっていた。
+    if (data) {
+      try {
+        await quota.record(userId, { kind: 'ingest', docChars: markdown.length, usage: data.usage });
+      } catch (e) {
+        console.error('[ingest] 使用量の記録に失敗（整理結果は保存します）:', e.message);
+      }
     }
     if (!data || !data.body_md) {
       // AI が使えない／知識が無いと判断された場合は、変換したテキストをそのまま残す。

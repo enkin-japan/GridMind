@@ -94,6 +94,7 @@ async function init() {
       in_tokens  INTEGER DEFAULT 0,
       out_tokens INTEGER DEFAULT 0,
       calls      INTEGER DEFAULT 0,
+      cached_in  INTEGER DEFAULT 0,           -- プロンプトキャッシュに当たった入力トークン
       cost_usd   REAL DEFAULT 0,                -- 実際にかかった費用（モデル別の価格で計算）
       created_at TEXT NOT NULL
     )
@@ -126,6 +127,10 @@ async function init() {
   // --- マイグレーション：利用実績に費用を追加（モデルを使い分けるため）---
   if (!(await columnExists('usage_log', 'cost_usd'))) {
     await run('ALTER TABLE usage_log ADD COLUMN cost_usd REAL DEFAULT 0');
+  }
+  // --- マイグレーション：キャッシュ命中分（費用の内訳を見るため）---
+  if (!(await columnExists('usage_log', 'cached_in'))) {
+    await run('ALTER TABLE usage_log ADD COLUMN cached_in INTEGER DEFAULT 0');
   }
   // --- マイグレーション：既定の出力言語（'auto' | 'ja' | 'en' | 'zh' | 'ko'）---
   if (!(await columnExists('users', 'out_lang'))) {
