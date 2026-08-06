@@ -12,6 +12,7 @@ const ai = require('../services/ai');
 const ingest = require('../services/ingest');
 const relate = require('../services/relate');
 const quota = require('../services/quota');
+const embed = require('../services/embed');
 const { renderMarkdown } = require('../services/render');
 
 const upload = multer({
@@ -127,9 +128,20 @@ router.post('/ingest', upload.single('file'), async (req, res, next) => {
       body_text: notes.toPlainText(data.body_md),
     };
 
-    // 二次整理：関連する既存ノートを探す（本人の範囲・SQL のみ）
+    // 意味ベクトルはここで1回だけ作り、関連づけと保存の両方で使いまわす。
+    // （ベクトルはセッションに入れると大きすぎるので staged には持たせない）
+    let stagedEmb = null;
+    try {
+      stagedEmb = await embed.embed(
+        embed.textForNote({ title: staged.title, summary: staged.summary, body_text: staged.body_text, tags: staged.tags })
+      );
+    } catch (e) {
+      console.error('[ingest] ベクトル生成に失敗:', e.message);
+    }
+
+    // 二次整理：関連する既存ノートを探す
     const isBatch = String(req.body.batch || '') === '1'; // 複数ファイルの一括処理は非対話
-    const related = await relate.findRelated(userId, staged);
+    const related = await relate.findRelated(userId, staged, { vec: stagedEmb ? stagedEmb.vec : null });
     const top = related[0];
 
     if (!isBatch && top && top.score >= relate.HIGH) {
@@ -150,6 +162,7 @@ router.post('/ingest', upload.single('file'), async (req, res, next) => {
     const id = await notes.create({
       title: staged.title, body_md: body, summary: staged.summary,
       source_type: staged.source_type, tagNames: staged.tags, userId,
+      embedding: stagedEmb,
     });
     res.json({ id, aiUsed, linked: mediums.map((r) => r.title) });
   } catch (e) {

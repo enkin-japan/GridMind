@@ -99,7 +99,20 @@ async function init() {
   `);
   await run('CREATE INDEX IF NOT EXISTS idx_usage_user_period ON usage_log (user_id, period)');
 
-  // embeddings テーブルは DEFERRED（ARCHITECTURE §7）。MVP では作成しない。
+  // ノートの意味ベクトル（二次整理の関連づけに使う）。
+  // vec は Float32 の並びを BLOB にしたもの。model と dim も持たせておき、
+  // 後でモデルを変えたときに「作り直しが必要な行」を見分けられるようにする。
+  await run(`
+    CREATE TABLE IF NOT EXISTS embeddings (
+      note_id    INTEGER PRIMARY KEY,
+      user_id    INTEGER NOT NULL,
+      model      TEXT NOT NULL,
+      dim        INTEGER NOT NULL,
+      vec        BLOB NOT NULL,
+      updated_at TEXT NOT NULL
+    )
+  `);
+  await run('CREATE INDEX IF NOT EXISTS idx_embeddings_user ON embeddings (user_id)');
 
   // --- マイグレーション：既存の notes に user_id を追加（マルチユーザー化）---
   if (!(await columnExists('notes', 'user_id'))) {

@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node --watch app.js",
-    "seed": "node tools/seed.js"
+    "seed": "node tools/seed.js",
+    "embed:backfill": "node tools/embed_backfill.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
