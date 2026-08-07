@@ -400,11 +400,33 @@ function isNextGen(model) {
   return /^(gpt-5|o[1-9])/.test(String(model));
 }
 
+// gpt-5 系は temperature / top_p を受け付けない代わりに、
+// 「どれだけ考えるか（reasoning_effort）」と「どれだけ書くか（verbosity）」で調整する。
+// Chat Completions でも平たい形（reasoning_effort / verbosity）で指定できる。
+//
+// 【実測して既定のままにした理由】
+// 図表の文字が崩れた資料（ラベルと数値がずれている）で3回ずつ比べた:
+//   既定       … 誤情報の残存 0/3、出力3991tok、20秒、$0.0067
+//   high       … 誤情報の残存 3/3、出力9524tok、44秒、$0.0130
+//   xhigh      … 誤情報の残存 2/3、出力14374tok、62秒、$0.0187（上限超過の警告も出た）
+//   verbosity低… 出力は1割減るが、別の資料で本文が15%短くなった（取りこぼし増）
+// 考えさせるほど「原文に忠実であろう」とするのか、崩れた記述をそのまま残しやすくなった。
+// 費用と時間は2〜3倍になるうえ精度も落ちるため、上げる意味がない。
+//
+// なお seed は受け付けられるが出力は一致せず（system_fingerprint も返らない）、
+// 再現性を得る手段は今のところ無い。
+const REASONING_EFFORT = process.env.AI_REASONING_EFFORT || null;
+const VERBOSITY = process.env.AI_VERBOSITY || null;
+
 function paramsFor(model, maxTokens, json) {
   const p = json ? { response_format: { type: 'json_object' } } : {};
   if (isNextGen(model)) {
-    // temperature は既定値(1)しか受け付けない。出力のぶれは指示の明確さで抑える。
-    return { ...p, max_completion_tokens: maxTokens };
+    return {
+      ...p,
+      max_completion_tokens: maxTokens,
+      ...(REASONING_EFFORT ? { reasoning_effort: REASONING_EFFORT } : {}),
+      ...(VERBOSITY ? { verbosity: VERBOSITY } : {}),
+    };
   }
   return { ...p, max_tokens: maxTokens, temperature: 0.1 };
 }
