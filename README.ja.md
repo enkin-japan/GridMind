@@ -13,31 +13,37 @@
 - **アカウント** —— 登録 / ログイン / ログアウト（セッション + bcrypt でハッシュ化したパスワード）。ノートはユーザーごとに分離されます。
 - **ノート** —— 作成・表示・編集・削除。Markdown で書けます。
 - **AI 取り込み** —— ファイルをアップロード（[MarkItDown](https://github.com/microsoft/markitdown) が Markdown に変換）またはテキストを貼り付け。LLM が**知識だけ**を取り出し、タイトル・要約・タグを自動生成します。ノイズ（目標・成績・日程・体裁）は意図的に除外し、内容が乏しいときも無理に増やしません。
+- **出力言語の選択** —— 原文の言語とは別に、ノートの言語を選べます。英語の PDF から日本語のノートを作れます。出力が原文の言語に戻ってしまった場合は、1回だけ言い直させる護欄が働きます。
+- **長い資料** —— およそ 15,000 字を超える資料は分割して並行に抽出し、最後に1つのノートへまとめ直します。長さの上限で切り捨てられることはありません。
+- **進捗の可視化** —— 取り込みには 20〜35 秒かかります。その間、いまどの段階にいるか、拾い出した知識点の一覧、そして書かれつつある本文がそのまま画面に流れます。
 - **検索と整理** —— キーワード検索（タイトル/本文）、タグでのしぼりこみ、ページネーション。
 - **双方向リンクと被リンク** —— `[[別のノート]]` でノートをリンク。各ノートには、それを指しているノートの一覧が表示されます。
-- **二次整理** —— 新しい知識が既存ノートと強く関連するとき、左右に並べた確認画面で「**リンク**」するか「**まとめる（統合）**」かを選べます（AI が生成した、編集可能なプレビュー付き）。
+- **二次整理** —— 新しい知識が既存ノートと強く関連するとき、左右に並べた確認画面で「**リンク**」するか「**まとめる（統合）**」かを選べます（AI が生成した、編集可能なプレビュー付き）。関連度は語の重なりと意味ベクトルの両方で判定します。
 - **一括取り込み** —— 複数ファイルを選ぶと、**1つずつ順番に**処理します（モデルが集中できるように）。進捗も表示します。
-- **BYOK（各自のキーを使う）** —— 各ユーザーが自分の OpenAI API キーを保存。**保存時は暗号化（AES-256-GCM）**され、呼び出し時にメモリ上でのみ復号し、記録も再表示もしません。
-- **やさしいフォールバック** —— キー未設定（または API 失敗）でも、変換したテキストとして保存されます。
+- **プランと利用上限** —— API キーはサービス側が持ち、利用者は一切触れません。フリー／プロの2段階で、月あたりの取り込み回数と1ファイルの文字数の両方に上限をかけます。トークン使用量と費用は1件ごとに記録します。
+- **元ファイルを残さない** —— アップロードされたファイルは変換が終わり次第削除し、抽出したノートだけを保存します。
 
 ## 技術スタック
 
 - **サーバ:** Node.js、Express、EJS（サーバサイドレンダリング）、SQLite（`sqlite3`）
-- **認証/セキュリティ:** `express-session`、`bcryptjs`、Node `crypto` による AES-256-GCM
-- **取り込み/AI:** `multer`（アップロード）、Python [MarkItDown](https://github.com/microsoft/markitdown) ブリッジ（ファイル → Markdown）、`openai`、`marked`（Markdown → HTML）
+- **認証/セキュリティ:** `express-session`（SQLite に永続化）、`bcryptjs`
+- **取り込み/AI:** `multer`（アップロード）、常駐する Python [MarkItDown](https://github.com/microsoft/markitdown) ワーカー群（ファイル → Markdown）、`openai`、`marked`（Markdown → HTML）
 - **入力チェック:** `express-validator`
 
 構成は MVC に沿っています：`views/` = View、`routes/` = Controller、`models/` + `services/` = Model。
+
+ファイル変換は、常駐させた複数の Python プロセスが標準入出力で行単位の JSON をやりとりして行います。MarkItDown の読み込みを毎回ではなく起動時の1回だけにすることで、1件あたり約 0.5 秒の立ち上げ時間がなくなります。待ち行列があふれたら断り、制限時間を超えたワーカーは作り直し、落ちたら自動で立ち上げ直します。
 
 ## 必要環境
 
 - **Node.js**（LTS 推奨）
 - **Python 3** と MarkItDown：`pip install "markitdown[all]"`
+- 運営側が用意する **OpenAI API キー**（利用者は用意しません）
 
 ## セットアップ
 
 ```bash
-git clone https://github.com/enkin-japan/finalTaskWeb.git gridmind
+git clone https://github.com/enkin-japan/GridMind.git gridmind
 cd gridmind
 
 # Node の依存関係
@@ -48,20 +54,27 @@ pip install "markitdown[all]"
 
 # 設定
 cp .env.example .env
-# .env を編集 —— 最低限、固有の APP_ENCRYPTION_KEY と SESSION_SECRET を設定：
+# .env を編集 —— 最低限、OPENAI_API_KEY と固有の SESSION_SECRET を設定：
 #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 ### 環境変数（`.env`）
 
+必須は最初の2つだけです。任意の項目は、その既定値の根拠となった実測値とあわせて `.env.example` に書いてあります。
+
 | 変数 | 用途 |
 |---|---|
-| `APP_ENCRYPTION_KEY` | 各ユーザーの OpenAI キーを暗号化する鍵（AES-256-GCM）。**必須**。長いランダム値を使う。 |
-| `SESSION_SECRET` | `express-session` の署名鍵。 |
+| `OPENAI_API_KEY` | サービス側のキー。知識の抽出と意味ベクトルの両方に使う。**必須**。 |
+| `SESSION_SECRET` | `express-session` の署名鍵。**必須**。 |
+| `OPENAI_MODEL` | 抽出に使うモデル（既定 `gpt-5.6-luna`）。 |
 | `PORT` | 待ち受けポート（既定 `3000`）。 |
 | `HOST` | バインドアドレス（既定 `127.0.0.1`、ループバックのみ）。`0.0.0.0` で全インターフェースに公開。 |
-| `OPENAI_API_KEY` | 任意。開発/テスト用のフォールバックキー（seed スクリプトが demo アカウントに設定）。通常は各アカウントがアプリ内で自分のキーを登録する。 |
-| `OPENAI_MODEL` | 既定モデル（既定 `gpt-4o-mini`）。 |
+| `AI_TWO_STAGE` | `1` で「知識点の洗い出し → 書き上げ」の二段構えにする。15,000 字未満の資料で知識量 +74%、費用 +74%（実測）。 |
+| `PLAN_FREE_INGESTS` / `PLAN_FREE_DOC_CHARS` | フリープランの上限（既定：月30回、1ファイル 20,000 字）。 |
+| `PLAN_PRO_INGESTS` / `PLAN_PRO_DOC_CHARS` | プロプランの上限（既定：500 / 60,000）。 |
+| `MD_WORKERS` | Python 変換ワーカーの本数（既定：CPU コア数 − 1、上限4本）。 |
+| `EMBEDDING_ENABLED` | `0` で意味ベクトルを使わず、語の重なりだけで関連づける。 |
+| `TRUST_PROXY` / `COOKIE_SECURE` | リバースプロキシの後ろで HTTPS 運用するときは両方 `1`。 |
 
 ## 起動
 
@@ -76,28 +89,35 @@ npm start
 ## 使い方
 
 1. アカウントを**登録**（seed した場合は `demo` / `demo1234` でログイン）。
-2. **⚙ 設定**を開き、自分の OpenAI API キーを貼り付ける（暗号化して保存）。
-3. **⇪ 取り込み**で、ファイルを選ぶかテキストを貼り付け、AI にノート化してもらう。
+2. **⇪ 取り込み**で、ファイルを選ぶかテキストを貼り付け、出力言語を選んで、AI にノート化してもらう。
+3. 既存ノートと内容が強く重なる場合は、「リンク」か「まとめる」かを選ぶ。
 4. ノートを閲覧・検索・タグ付けし、`[[ノート名]]` でリンクする。
+5. **⚙ 設定**で、プラン・今月の利用状況・既定の出力言語を確認できる。
 
-> キーが無くても取り込みは動きます —— AI 整理をせず、変換したテキストのまま保存します。
+> 利用者が API キーを入力する場面はありません。AI の呼び出しに失敗した場合も、変換したテキストはそのまま保存されるので、内容が失われることはありません。
 
 ## プロジェクト構成
 
 ```
 app.js            # Express エントリ（サーバ + ルーティング + セッション）
 middleware.js     # ログインガード + ログインユーザーの読み込み
-models/           # SQLite アクセス：db, users, notes, tags
-services/         # ai, ingest（MarkItDown ブリッジ）, search, links, relate, render, crypto
+models/           # SQLite アクセス：db, users, notes, tags, embeddings
+services/         # ai, embed, ingest（MarkItDown ワーカー群）, janitor, links,
+                  #   quota, relate, render, search
 routes/           # コントローラ：auth, index（ホーム）, notes, settings
 views/            # EJS テンプレート + パーシャル
 public/           # css / クライアント js
-tools/            # md_convert.py（Python ブリッジ）, seed.js（例データ）
+tools/            # md_worker.py（Python ワーカー）, seed.js, embed_backfill.js
+docs/             # 設計と実行の記録
 ```
 
-## プライバシーと BYOK
+## プライバシー
 
-GridMind はマルチユーザーのサービスなので、ノートはサーバの SQLite に保存され、アカウントごとに分離されます。もっとも重要な部分——あなたの OpenAI キー——は、データベースに入れないサーバ側の鍵（`APP_ENCRYPTION_KEY`）で**暗号化して保存**されます。そのため、データベースの流出だけでは復元できません。キーは OpenAI 呼び出し時に一時的に使うだけで、記録もブラウザへの返却もしません。
+GridMind はマルチユーザーのサービスなので、ノートはサーバの SQLite に保存され、アカウントごとに分離されます。あるノートに触れられるのは、それを作ったアカウントだけです。
+
+OpenAI の API キーはサービス側のもので、サーバの環境変数から読みます。ユーザーごとに保存することはなく、ブラウザへ送ることも、記録することもありません。
+
+アップロードされたファイルは変換が終わり次第ディスクから削除します。途中で中断された場合の取り残しも、定期的な掃除で消します。残るのは抽出したノートだけです。
 
 ## ライセンス
 
