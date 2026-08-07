@@ -736,6 +736,12 @@ async function structure(markdown, opts = {}) {
     let done = 0;
     const results = await mapWithLimit(parts, CHUNK_CONCURRENCY, async (part, i) => {
       try {
+        // 分割経路では二段構えにしない。
+        // ここはすでに「断片ごとの抽出 → まとめ直し」という二段の形になっており、
+        // さらに洗い出しを挟むと三重のふるいになって、かえって減る。
+        //   実測（15000字超の資料3件）:
+        //     現行     476行 116秒 $0.0628
+        //     二段構え 394行 169秒 $0.0995  （行数 -17%、費用 +58%、時間 +46%）
         const r = await callText({
           key,
           model,
