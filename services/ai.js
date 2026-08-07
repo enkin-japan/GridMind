@@ -69,7 +69,8 @@ const TAIL_CHECKLIST = [
   'Before you answer, check these three things:',
   '1. Every line states a fact a reader could learn. Delete agenda, task instructions, and topic-only pointers.',
   '2. No fragment, and no number that contradicts another number in the same note. When two figures cannot both be true, keep only one.',
-  '3. No LaTeX delimiters. Write formulas as plain text.',
+  '3. No three bullets in a row start with the same term or stem. Where they do, merge them into one bullet that keeps every fact.',
+  '4. No LaTeX delimiters. Write formulas as plain text.',
 ].join('\n');
 
 // 見出しの下に内容が1つしかないセクションは、見出しを外す。
@@ -207,11 +208,26 @@ const FIDELITY_RULES = [
 ].join('\n');
 
 // 「密度」の指示。GPT は放っておくと1文1行の水増しレイアウトを作るため、強く縛る。
+//
+// 【同じ書き出しの繰り返しについて】
+// いちばん多い水増しは「D2Cでは…」「MBA —」のような同じ主語の箇条書きが
+// 縦に並ぶ形だった。以前は「近い事実はまとめよ」という一般的な言い方だったが、
+// 抽象的すぎて効いていなかったので、「3行以上同じ書き出しが続いたら1行にする」と
+// 数で言い切る形に変えた（TAIL_CHECKLIST の最後にも同じことを置いてある）。
+//
+// 実測（5資料 × 3回ずつ。同じ書き出しが3行以上続く箇条書きの割合）:
+//   変更前 18.3% / 15.6% / 18.5%   箇条書き平均 321行、本文 15,614字
+//   変更後 11.2% /  7.4% /  8.2%   箇条書き平均 235行、本文 15,634字
+// 行数は27%減ったのに本文の字数は変わらない＝知識は落とさずに詰められている。
+// 費用も変わらない（1資料あたり $0.006 前後）。
 const DENSITY_RULES = [
   'FORMAT — the note must be information-DENSE. Wasted lines are a failure:',
   '- Use the tightest structure that fits the content: a Markdown table for parallel or comparable facts, a flat list otherwise. Nest at most 2 levels.',
   '- One bullet = one complete, self-contained fact. Write it as a compact phrase, not a padded sentence.',
-  '- Merge closely related facts into a single bullet instead of repeating the same stem across several bullets.',
+  '- ONE SUBJECT, ONE BULLET: if three or more bullets would begin with the same term or stem',
+  '  ("D2Cでは…", "MBA —", "意思決定は…"), that subject gets a SINGLE bullet. Fold all of their facts into it.',
+  '  Repeating a stem down a column of bullets is padding, not structure, and is the most common way this task is failed.',
+  '  Merging must not drop facts: the merged bullet has to carry everything the separate bullets said.',
   '- Use a heading ONLY when it groups 2 or more distinct points. Never emit an empty or near-empty section.',
   '- FORBIDDEN sections: "Introduction", "Overview", "Background", "Summary", "Conclusion", "In closing", or any section that only restates other sections.',
   '- No preamble, no closing remarks, no meta commentary about the note itself.',
@@ -924,6 +940,8 @@ module.exports = {
   costOf,
   priceOf,
   tidyHeadings,
+  // 検証用：二段構えの内部（洗い出しの一覧まで取り出したいとき）
+  __twoStageBody: twoStageBody,
   // 検証用：プロンプトの実測に使う
   __prompts: (lang) => ({
     single: singleBodyPrompt(lang),
