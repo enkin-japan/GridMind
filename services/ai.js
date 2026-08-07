@@ -295,6 +295,111 @@ function singleBodyPrompt(langKey) {
   ].join('\n');
 }
 
+// ---------------------------------------------------------------------------
+// 二段構えの取り出し（AI_TWO_STAGE=1 で有効）
+//
+// 1回で「探す」と「書く」を同時にやらせると、書く方に気を取られて
+// 拾い漏れが出る。そこで仕事を二つに分ける:
+//   1段目 … 資料に何が書いてあるかを、短い見出しの一覧として洗い出す（出力が小さい＝安い）
+//   2段目 … その一覧を目次として渡し、一つずつ資料の記述で埋めさせる
+//
+// 2回とも「共通の前置き＋資料本文」までまったく同じ並びにしてあるので、
+// 2回目は資料本文ごとキャッシュに乗る（luna なら $0.20 → $0.02 /1M）。
+// ---------------------------------------------------------------------------
+
+// 1段目：知識点の洗い出しだけをさせる。書き込ませない。
+function inventoryInstruction(langKey) {
+  return [
+    '--- TASK (stage 1 of 2) ---',
+    'Do NOT write the note yet. First, take inventory of what this document actually teaches.',
+    '',
+    'List every distinct knowledge point the document contains, as a flat list.',
+    '- One line per point. Each line is a SHORT label naming the point, not an explanation.',
+    '  Good: "- localStorage と Cookie の容量の違い" / "- while 文の基本構文"',
+    '  Bad:  "- localStorage は5MBまで保存でき、Cookieは4KBまでで通信ごとに送られる" (that is stage 2)',
+    '- Be exhaustive. Missing a point here means it is lost for good.',
+    '- Apply the EXCLUDE rules above: do not list agenda, exercises, grading, logistics.',
+    '- Order the points the way the document presents them.',
+    '',
+    'Output the raw list only. No headings, no numbering, no commentary.',
+    '',
+    languageRule(langKey),
+  ].join('\n');
+}
+
+// 2段目：一覧を目次として渡し、資料の記述で埋めさせる。
+// 「ふくらませる」ではなく「資料が実際に述べている内容を書き出す」と言い切るのが要点。
+// ふくらませろと言うと、資料に無いことを補い始めてしまう。
+function writeUpInstruction(langKey, inventory) {
+  return [
+    '--- TASK (stage 2 of 2) ---',
+    'Below is the inventory of knowledge points you found in the document above.',
+    'Now write the finished note body, covering EVERY point in the inventory.',
+    '',
+    '<inventory>',
+    inventory,
+    '</inventory>',
+    '',
+    'HOW TO WRITE IT:',
+    '- For each inventory item, state what the DOCUMENT actually says about it. Look it up in the document above.',
+    '- This is NOT an invitation to elaborate. Add nothing the document does not state.',
+    '- If the document says little about an item, keep that line short. If it turns out not to be knowledge, drop it.',
+    '- Cover every item. A point listed in the inventory but missing from the note is a failure.',
+    '',
+    'STRUCTURE:',
+    '- If there are 8 or more points, group them under 3-8 topical "##" headings, ordered logically.',
+    '- Never leave a long flat list ungrouped; never create a heading for a single point.',
+    '- Preserve any existing [[...]] wiki-link notation.',
+    '',
+    FINAL_FILTER_RULES,
+    '',
+    'Output the note body as raw Markdown only. No JSON, no title line, no commentary, no code fence around the whole answer.',
+    '',
+    languageRule(langKey),
+  ].join('\n');
+}
+
+// 二段構えで本文を作る。戻り値: { bodyMd, usage, inventory }
+async function twoStageBody({ key, model, lang, source, onProgress }) {
+  // prompt_cache_key は資料ごとに変えると配信先が散らばり、
+  // かえって共通の前置きにも当たらなくなった（命中 12% → 6%）。指定しない。
+  // 2回の呼び出しで完全に同じにする部分。ここがキャッシュに乗る。
+  //
+  // 【資料本文を system 側に入れている理由】
+  // 実測すると、キャッシュに再利用されるのは system メッセージまでで、
+  // 資料を user メッセージに置くと毎回書き込まれるだけで一度も命中しなかった
+  //   user 側に置く … 2回目の命中 1425/8964（前置きのみ）
+  //   system に含める… 2回目の命中 8948/8960（資料ごと命中）
+  // 先頭は全資料で共通の COMMON_PREFIX なので、そこは他の利用者とも共有できる。
+  const head = [
+    { role: 'system', content: COMMON_PREFIX + '\n\n<document>\n' + source + '\n</document>' },
+  ];
+
+  if (onProgress) onProgress({ stage: 'inventory', index: 1, total: 2 });
+  const s1 = await callText({
+    key,
+    model,
+    messages: [...head, { role: 'user', content: inventoryInstruction(lang) }],
+    maxTokens: 3000,
+  });
+  const inventory = stripFence(s1.text).trim();
+  if (!inventory) return { bodyMd: '', usage: s1.usage, inventory: '' };
+
+  if (onProgress) onProgress({ stage: 'writeup', index: 2, total: 2 });
+  const s2 = await callText({
+    key,
+    model: FINAL_MODEL || model,
+    messages: [...head, { role: 'user', content: writeUpInstruction(lang, inventory) + TAIL_CHECKLIST }],
+    maxTokens: 10000,
+  });
+
+  return {
+    bodyMd: tidyHeadings(stripFence(s2.text)),
+    usage: addUsage(s1.usage, s2.usage),
+    inventory,
+  };
+}
+
 // 本文から見出し・要約・タグだけを作る（出力が小さいので JSON で安全に受け取れる）。
 function metaPrompt(langKey) {
   return [
@@ -432,6 +537,8 @@ function isNextGen(model) {
 const REASONING_EFFORT = process.env.AI_REASONING_EFFORT || null;
 const VERBOSITY = process.env.AI_VERBOSITY || null;
 const TEMPERATURE = process.env.AI_TEMPERATURE != null ? Number(process.env.AI_TEMPERATURE) : null;
+// 二段構え（洗い出し → 書き出し）を使うか。
+const TWO_STAGE = process.env.AI_TWO_STAGE === '1';
 
 function paramsFor(model, maxTokens, json) {
   const p = json ? { response_format: { type: 'json_object' } } : {};
@@ -449,13 +556,18 @@ function paramsFor(model, maxTokens, json) {
 }
 
 // モデルを1回呼ぶ低レベル関数。出力が長さ上限で切られたかどうかも返す。
-async function callRaw({ key, model, system, user, maxTokens, json }) {
+async function callRaw({ key, model, system, user, messages, maxTokens, json, cacheKey }) {
   const client = clientFor(key);
   const m = model || DEFAULT_MODEL;
   const res = await client.chat.completions.create({
     model: m,
     ...paramsFor(m, maxTokens, json),
-    messages: [
+    // 同じ前置きの呼び出しを同じ配信先へ寄せてキャッシュに当たりやすくする。
+    ...(cacheKey ? { prompt_cache_key: cacheKey } : {}),
+    // messages を直接渡せるようにしてある。二段構えの取り出しでは
+    // 「共通の前置き＋資料本文」までをまったく同じ並びにして、
+    // 2回目の呼び出しで資料本文ごとキャッシュに乗せるために使う。
+    messages: messages || [
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
@@ -507,8 +619,8 @@ async function callJson({ key, model, system, user, maxTokens = 6000 }) {
 
 // 素のテキストで呼び出す（分割抽出の第1段で使う）。
 // JSON にしないので、途中で切れても「そこまでの知識点」は使える＝全滅しない。
-async function callText({ key, model, system, user, maxTokens = 8000 }) {
-  const r = await callRaw({ key, model, system, user, maxTokens, json: false });
+async function callText({ key, model, system, user, messages, maxTokens = 8000, cacheKey }) {
+  const r = await callRaw({ key, model, system, user, messages, maxTokens, json: false, cacheKey });
   if (r.truncated) console.warn('[ai] 断片の抽出が上限で切れました（途中までを採用します）。');
   return r;
 }
@@ -597,12 +709,16 @@ async function structure(markdown, opts = {}) {
   let chunks = 1;
   let usage = ZERO_USAGE;
 
-  if (source.length <= SINGLE_CALL_LIMIT) {
+  if (source.length <= SINGLE_CALL_LIMIT && TWO_STAGE) {
+    // --- 二段構え：先に洗い出し、次に埋める ---
+    const r = await twoStageBody({ key, model, lang, source, onProgress });
+    usage = addUsage(usage, r.usage);
+    bodyMd = r.bodyMd;
+  } else if (source.length <= SINGLE_CALL_LIMIT) {
     // --- 短い資料：1回で整理する ---
     if (onProgress) onProgress({ stage: 'single', index: 1, total: 1 });
     const r = await callText({
       key,
-      model,
       model: FINAL_MODEL || model,
       system: singleBodyPrompt(lang),
       user:
