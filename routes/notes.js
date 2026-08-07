@@ -86,11 +86,58 @@ router.get('/import', async (req, res, next) => {
   }
 });
 
-// --- 取り込み実行（fetch から呼ばれ JSON を返す）---
+// 進捗を1行1件の JSON（NDJSON）で送り出すための小さな道具。
+//
+// 【なぜ最初から流さないか】
+// 上限超過や読み取り失敗は「流し始める前」に分かるので、そこまでは今までどおり
+// HTTP のステータス＋JSON で返す。ヘッダを送ったあとはステータスを変えられないため、
+// 断れるものは断ってから流し始める。
+//
+// 【なぜ delta をまとめるか】
+// 逐次受け取りは1トークンごとに来る（実測で 77 トークン＝74 回）。
+// そのまま1件ずつ送ると本文1本で数千行になるので、少しためてから送る。
+function ndjson(res) {
+  res.status(200);
+  res.set({
+    'Content-Type': 'application/x-ndjson; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    'X-Accel-Buffering': 'no', // 前段にリバースプロキシが入ってもためこませない
+  });
+  res.flushHeaders();
+
+  let buf = '';
+  let timer = null;
+  const flush = () => {
+    timer = null;
+    if (!buf) return;
+    res.write(JSON.stringify({ type: 'delta', text: buf }) + '\n');
+    buf = '';
+  };
+  return {
+    send(obj) {
+      flush();
+      res.write(JSON.stringify(obj) + '\n');
+    },
+    delta(text) {
+      buf += text;
+      if (!timer) timer = setTimeout(flush, 100);
+    },
+    end(obj) {
+      if (timer) clearTimeout(timer);
+      flush();
+      res.write(JSON.stringify(obj) + '\n');
+      res.end();
+    },
+  };
+}
+
+// --- 取り込み実行（fetch から呼ばれる）---
+// 断れる段階までは JSON、AI 整理に入ったら NDJSON で進捗を流す。
 // API キーはサービス側が持つ。利用者はプランの範囲内で使う。
 router.post('/ingest', uploadSingle, async (req, res, next) => {
   const user = res.locals.user;
   const userId = user.id;
+  let out = null; // NDJSON を流し始めたら入る（＝もう HTTP ステータスは変えられない）
   try {
     // 1) 回数の上限を先に見る（変換の費用を払う前に断る）。
     const pre = await quota.check(user, 0);
@@ -118,12 +165,25 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
     const post = await quota.check(user, markdown.length);
     if (!post.ok) return res.status(413).json({ error: post.message, reason: post.reason });
 
-    // 4) AI 整理。出力言語は指定があればそれ、無ければアカウントの既定。
+    // 4) ここから先は時間がかかる。進捗を流し始める。
+    //    見積もりを最初に渡しておくと、画面側は段階の切りかわりを待たずに
+    //    進捗を進められる（切りかわりが来たら、そちらを正として合わせ直す）。
+    out = ndjson(res);
+    const plan = ai.estimate(markdown.length);
+    out.send({ type: 'plan', chars: markdown.length, ...plan });
+
+    // 5) AI 整理。出力言語は指定があればそれ、無ければアカウントの既定。
     const lang = req.body.lang || user.out_lang || 'auto';
     let data;
     let aiUsed = false;
     try {
-      data = await ai.structure(markdown, { lang });
+      data = await ai.structure(markdown, {
+        lang,
+        onProgress: (e) => {
+          if (e.phase === 'delta') out.delta(e.text);
+          else out.send({ type: 'stage', ...e });
+        },
+      });
       aiUsed = true;
     } catch (e) {
       console.error('[ingest] AI 整理に失敗:', e.message);
@@ -157,6 +217,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
 
     // 意味ベクトルはここで1回だけ作り、関連づけと保存の両方で使いまわす。
     // （ベクトルはセッションに入れると大きすぎるので staged には持たせない）
+    out.send({ type: 'stage', stage: 'relate', phase: 'start' });
     let stagedEmb = null;
     try {
       stagedEmb = await embed.embed(
@@ -177,7 +238,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
         note: staged, aiUsed, topId: top.id,
         autoLink: related.slice(1).map((r) => r.title),
       };
-      return res.json({ reconcile: true, url: '/notes/reconcile' });
+      return out.end({ type: 'reconcile', url: '/notes/reconcile' });
     }
 
     // バッチ時は確認画面を出さず、関連（中以上）を自動リンクして保存する。
@@ -191,8 +252,13 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
       source_type: staged.source_type, tagNames: staged.tags, userId,
       embedding: stagedEmb,
     });
-    res.json({ id, aiUsed, linked: mediums.map((r) => r.title) });
+    out.end({ type: 'done', id, aiUsed, linked: mediums.map((r) => r.title) });
   } catch (e) {
+    // すでに流し始めていればステータスは変えられないので、本文の中で伝える。
+    if (out) {
+      console.error('[ingest] 取り込みに失敗:', e.message);
+      return out.end({ type: 'error', error: '取り込みに失敗しました。' });
+    }
     next(e);
   }
 });

@@ -45,6 +45,47 @@ const MAX_DOC_CHARS = Number(process.env.AI_MAX_DOC_CHARS) || 60000;
 // 断片を同時に何本まで投げるか（レート制限を避けつつ待ち時間を短くする）。
 const CHUNK_CONCURRENCY = Number(process.env.AI_CHUNK_CONCURRENCY) || 3;
 
+// 取り込みにかかる時間の見積もり。進捗表示の目盛りに使う。
+//
+// 実測（1資料1回ずつ、gpt-5.6-luna）:
+//   2,562字 25.9秒 ／ 4,948字 19.2秒 ／ 10,025字 31.7秒 ／ 11,849字 34.0秒
+//   19,469字（分割2断片）35.4秒 … 断片抽出 15.0秒＋まとめ直し 17.6秒
+// 段階ごとの割合は資料が変わってもよくそろっていて、
+// 二段構えなら 洗い出し 35% / 書き上げ 55% / 見出し 8% あたりに落ち着く。
+//
+// これはあくまで目盛りであって約束ではない。実際の段階の切りかわりが来たら
+// そちらを正として進捗を合わせる（見積もりが外れても表示は真値に戻る）。
+function estimate(chars) {
+  const n = Math.max(1, Number(chars) || 1);
+  if (n > SINGLE_CALL_LIMIT) {
+    const parts = Math.ceil(n / CHUNK_SIZE);
+    const waves = Math.ceil(parts / CHUNK_CONCURRENCY); // 同時実行数で頭打ちになる
+    return {
+      route: 'chunked',
+      chunks: parts,
+      stages: [
+        { key: 'extract', label: '資料を分けて読んでいます', ms: waves * (6000 + 0.75 * CHUNK_SIZE) },
+        { key: 'consolidate', label: '知識をまとめ直しています', ms: 8000 + 0.5 * n },
+        { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+      ],
+    };
+  }
+  return {
+    route: TWO_STAGE ? 'two-stage' : 'single',
+    chunks: 1,
+    stages: TWO_STAGE
+      ? [
+          { key: 'inventory', label: '知識点を洗い出しています', ms: 4000 + 0.7 * n },
+          { key: 'writeup', label: '本文を書いています', ms: 6000 + 1.2 * n },
+          { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+        ]
+      : [
+          { key: 'single', label: '知識を取り出しています', ms: 8000 + 1.6 * n },
+          { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+        ],
+  };
+}
+
 // 同時実行数を制限しながら map する（結果は元の順番を保つ）。
 async function mapWithLimit(items, limit, fn) {
   const out = new Array(items.length);
@@ -391,7 +432,9 @@ async function twoStageBody({ key, model, lang, source, onProgress }) {
     { role: 'system', content: COMMON_PREFIX + '\n\n<document>\n' + source + '\n</document>' },
   ];
 
-  if (onProgress) onProgress({ stage: 'inventory', index: 1, total: 2 });
+  const say = (e) => { if (onProgress) onProgress(e); };
+
+  say({ stage: 'inventory', phase: 'start' });
   const s1 = await callText({
     key,
     model,
@@ -399,15 +442,22 @@ async function twoStageBody({ key, model, lang, source, onProgress }) {
     maxTokens: 3000,
   });
   const inventory = stripFence(s1.text).trim();
-  if (!inventory) return { bodyMd: '', usage: s1.usage, inventory: '' };
+  if (!inventory) {
+    say({ stage: 'inventory', phase: 'done', count: 0 });
+    return { bodyMd: '', usage: s1.usage, inventory: '' };
+  }
+  const items = inventory.split('\n').map((l) => l.replace(/^[-*\d.\s]+/, '').trim()).filter((l) => l.length > 1);
+  say({ stage: 'inventory', phase: 'done', count: items.length, items });
 
-  if (onProgress) onProgress({ stage: 'writeup', index: 2, total: 2 });
+  say({ stage: 'writeup', phase: 'start' });
   const s2 = await callText({
     key,
     model: FINAL_MODEL || model,
     messages: [...head, { role: 'user', content: writeUpInstruction(lang, inventory) + TAIL_CHECKLIST }],
     maxTokens: 10000,
+    onDelta: onProgress ? (d) => say({ stage: 'writeup', phase: 'delta', text: d }) : null,
   });
+  say({ stage: 'writeup', phase: 'done' });
 
   return {
     bodyMd: tidyHeadings(stripFence(s2.text)),
@@ -571,11 +621,25 @@ function paramsFor(model, maxTokens, json) {
   return { ...p, max_tokens: maxTokens, temperature: 0.1 };
 }
 
+// 使用量を1回分の形にそろえる（通常応答でも逐次応答でも同じ形にする）。
+function usageOf(u, model) {
+  const uu = u || {};
+  // 共通の前置きがキャッシュに当たった分。全額ではなく安い単価で計算する。
+  const cachedIn = (uu.prompt_tokens_details && uu.prompt_tokens_details.cached_tokens) || 0;
+  const one = { input: uu.prompt_tokens || 0, cached: cachedIn, output: uu.completion_tokens || 0, calls: 1 };
+  return { ...one, byModel: { [model]: one } };
+}
+
 // モデルを1回呼ぶ低レベル関数。出力が長さ上限で切られたかどうかも返す。
-async function callRaw({ key, model, system, user, messages, maxTokens, json, cacheKey }) {
+//
+// onDelta を渡すと逐次受け取りに切り替える。書き上げの待ち時間がいちばん長いので、
+// そこを流しながら画面に出せるようにするための入口。
+// 逐次受け取りでは既定で usage が返ってこないため、stream_options で明示的に要求する。
+// これを忘れると費用の記録が全部ゼロになる。
+async function callRaw({ key, model, system, user, messages, maxTokens, json, cacheKey, onDelta }) {
   const client = clientFor(key);
   const m = model || DEFAULT_MODEL;
-  const res = await client.chat.completions.create({
+  const opts = {
     model: m,
     ...paramsFor(m, maxTokens, json),
     // 同じ前置きの呼び出しを同じ配信先へ寄せてキャッシュに当たりやすくする。
@@ -587,26 +651,38 @@ async function callRaw({ key, model, system, user, messages, maxTokens, json, ca
       { role: 'system', content: system },
       { role: 'user', content: user },
     ],
-  });
-  const choice = res.choices[0];
-  const u = res.usage || {};
-  const used = model || DEFAULT_MODEL;
-  // 共通の前置きがキャッシュに当たった分。全額ではなく安い単価で計算する。
-  const cachedIn = (u.prompt_tokens_details && u.prompt_tokens_details.cached_tokens) || 0;
-  return {
-    text: choice.message.content || '',
-    // finish_reason が 'length' なら出力が途中で切られている。
-    truncated: choice.finish_reason === 'length',
-    usage: {
-      input: u.prompt_tokens || 0,
-      output: u.completion_tokens || 0,
-      cached: cachedIn,
-      calls: 1,
-      byModel: {
-        [used]: { input: u.prompt_tokens || 0, cached: cachedIn, output: u.completion_tokens || 0, calls: 1 },
-      },
-    },
   };
+
+  if (!onDelta) {
+    const res = await client.chat.completions.create(opts);
+    const choice = res.choices[0];
+    return {
+      text: choice.message.content || '',
+      // finish_reason が 'length' なら出力が途中で切られている。
+      truncated: choice.finish_reason === 'length',
+      usage: usageOf(res.usage, m),
+    };
+  }
+
+  const stream = await client.chat.completions.create({
+    ...opts,
+    stream: true,
+    stream_options: { include_usage: true },
+  });
+  let text = '';
+  let finish = null;
+  let usage = null;
+  for await (const part of stream) {
+    const ch = part.choices && part.choices[0];
+    if (ch) {
+      const d = ch.delta && ch.delta.content;
+      if (d) { text += d; onDelta(d, text); }
+      if (ch.finish_reason) finish = ch.finish_reason;
+    }
+    // 使用量は最後のかたまりだけに入っている（choices は空）。
+    if (part.usage) usage = part.usage;
+  }
+  return { text, truncated: finish === 'length', usage: usageOf(usage, m) };
 }
 
 // JSON モードで呼び出す。
@@ -635,8 +711,8 @@ async function callJson({ key, model, system, user, maxTokens = 6000 }) {
 
 // 素のテキストで呼び出す（分割抽出の第1段で使う）。
 // JSON にしないので、途中で切れても「そこまでの知識点」は使える＝全滅しない。
-async function callText({ key, model, system, user, messages, maxTokens = 8000, cacheKey }) {
-  const r = await callRaw({ key, model, system, user, messages, maxTokens, json: false, cacheKey });
+async function callText({ key, model, system, user, messages, maxTokens = 8000, cacheKey, onDelta }) {
+  const r = await callRaw({ key, model, system, user, messages, maxTokens, json: false, cacheKey, onDelta });
   if (r.truncated) console.warn('[ai] 断片の抽出が上限で切れました（途中までを採用します）。');
   return r;
 }
@@ -720,6 +796,7 @@ async function structure(markdown, opts = {}) {
   const { key, model = DEFAULT_MODEL, lang = 'auto', onProgress } = opts;
   const source = String(markdown).slice(0, MAX_DOC_CHARS);
   if (!source.trim()) throw new Error('EMPTY_INPUT');
+  const say = (e) => { if (onProgress) onProgress(e); };
 
   let bodyMd = '';
   let chunks = 1;
@@ -732,7 +809,7 @@ async function structure(markdown, opts = {}) {
     bodyMd = r.bodyMd;
   } else if (source.length <= SINGLE_CALL_LIMIT) {
     // --- 短い資料：1回で整理する ---
-    if (onProgress) onProgress({ stage: 'single', index: 1, total: 1 });
+    say({ stage: 'single', phase: 'start' });
     const r = await callText({
       key,
       model: FINAL_MODEL || model,
@@ -741,7 +818,9 @@ async function structure(markdown, opts = {}) {
         'Extract ONLY knowledge points from the following document.\n' +
         '<document>\n' + source + '\n</document>' + TAIL_CHECKLIST,
       maxTokens: 8000,
+      onDelta: onProgress ? (d) => say({ stage: 'single', phase: 'delta', text: d }) : null,
     });
+    say({ stage: 'single', phase: 'done' });
     usage = addUsage(usage, r.usage);
     bodyMd = tidyHeadings(stripFence(r.text));
   } else {
@@ -750,6 +829,7 @@ async function structure(markdown, opts = {}) {
     // 断片どうしは独立しているので同時に投げる（待ち時間を大きく短縮できる）。
     // ただしレート制限を避けるため同時数は絞る。
     let done = 0;
+    say({ stage: 'extract', phase: 'start', total: parts.length });
     const results = await mapWithLimit(parts, CHUNK_CONCURRENCY, async (part, i) => {
       try {
         // 分割経路では二段構えにしない。
@@ -768,7 +848,7 @@ async function structure(markdown, opts = {}) {
           maxTokens: 8000,
         });
         done += 1;
-        if (onProgress) onProgress({ stage: 'extract', index: done, total: parts.length });
+        say({ stage: 'extract', phase: 'done', index: done, total: parts.length });
         return r;
       } catch (e) {
         // 1断片が失敗しても全体は続行する（全滅は避ける）。
@@ -791,7 +871,7 @@ async function structure(markdown, opts = {}) {
       return { title: 'Untitled', body_md: '', summary: null, tags: [], usage, chunks, langOk: true };
     }
 
-    if (onProgress) onProgress({ stage: 'consolidate', index: parts.length, total: parts.length });
+    say({ stage: 'consolidate', phase: 'start' });
     const r2 = await callText({
       key,
       model,
@@ -801,7 +881,9 @@ async function structure(markdown, opts = {}) {
         'Organize these knowledge points, extracted from consecutive parts of one document, into a single note body.\n\n' +
         collected.map((p, i) => `<part-${i + 1}>\n${p}\n</part-${i + 1}>`).join('\n\n') + TAIL_CHECKLIST,
       maxTokens: 12000,
+      onDelta: onProgress ? (d) => say({ stage: 'consolidate', phase: 'delta', text: d }) : null,
     });
+    say({ stage: 'consolidate', phase: 'done' });
     usage = addUsage(usage, r2.usage);
     bodyMd = tidyHeadings(stripFence(r2.text)) || collected.join('\n');
   }
@@ -812,7 +894,7 @@ async function structure(markdown, opts = {}) {
   }
 
   // --- 見出し・要約・タグを作る（本文と切り離した小さな JSON 呼び出し）---
-  if (onProgress) onProgress({ stage: 'meta', index: chunks, total: chunks });
+  say({ stage: 'meta', phase: 'start' });
   let meta = { title: 'Untitled', summary: null, tags: [] };
   try {
     const { json, usage: u3 } = await callJson({
@@ -940,6 +1022,7 @@ module.exports = {
   costOf,
   priceOf,
   tidyHeadings,
+  estimate,
   // 検証用：二段構えの内部（洗い出しの一覧まで取り出したいとき）
   __twoStageBody: twoStageBody,
   // 検証用：プロンプトの実測に使う

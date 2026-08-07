@@ -241,3 +241,41 @@ a:hover { text-decoration: underline; }
   display: inline-block; padding: 1px 8px; border-radius: 999px;
   background: var(--accent); color: #fff; font-size: .72rem; vertical-align: middle;
 }
+
+/* ===== 取り込みの進捗表示 ===== */
+/* 待ち時間そのものは 20〜35 秒あって縮められないので、
+   「いまどこにいるか」と「書かれつつある本文」を見せて待ちに中身を持たせる。 */
+.ingest { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
+.ingest-bar {
+  height: 6px; border-radius: 999px; background: var(--border); overflow: hidden;
+}
+.ingest-bar > span {
+  display: block; height: 100%; width: 0; border-radius: 999px; background: var(--accent);
+  /* 見積もりで進めるぶんは滑らかに、実際の段階に合わせ直すときも跳ねないように */
+  transition: width .45s linear;
+}
+.ingest-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  margin: 10px 0 0; font-size: .92rem;
+}
+.ingest-inv-list {
+  margin: 8px 0 0; padding-left: 20px; max-height: 180px; overflow-y: auto;
+  color: var(--muted); font-size: .85rem; line-height: 1.7;
+}
+.ingest-preview {
+  margin-top: 12px; padding: 12px 14px; max-height: 260px; overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: .85rem; line-height: 1.75; white-space: pre-wrap; word-break: break-word;
+}
+/* 書かれている位置に点滅するカーソルを置く。動きがあるだけで「止まっていない」と伝わる。 */
+.ingest-preview::after {
+  content: ''; display: inline-block; width: .5em; height: 1em; margin-left: 1px;
+  vertical-align: text-bottom; background: var(--accent); opacity: .7;
+  animation: ingest-caret 1s steps(2, start) infinite;
+}
+.ingest-preview.done::after { display: none; }
+@keyframes ingest-caret { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .ingest-bar > span { transition: none; }
+  .ingest-preview::after { animation: none; }
+}

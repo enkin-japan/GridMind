@@ -40,6 +40,21 @@
     <a class="btn" href="/">キャンセル</a>
   </div>
   <p id="import-status" class="muted" role="status" aria-live="polite"></p>
+
+  <!-- 取り込み中の進捗。段階の切りかわりが来るまでは見積もりで進め、
+       来たらそこへ合わせ直す（進捗は決して戻さない）。 -->
+  <section id="ingest" class="ingest" hidden aria-live="polite">
+    <div class="ingest-bar"><span id="ingest-fill"></span></div>
+    <p class="ingest-head">
+      <span id="ingest-stage">準備しています</span>
+      <span id="ingest-meta" class="muted small"></span>
+    </p>
+    <details id="ingest-inv" hidden>
+      <summary>拾い出した知識点 <span id="ingest-inv-n" class="muted small"></span></summary>
+      <ul id="ingest-inv-list" class="ingest-inv-list"></ul>
+    </details>
+    <div id="ingest-preview" class="ingest-preview" hidden></div>
+  </section>
 </form>
 
 <%- include('../partials/footer') %>

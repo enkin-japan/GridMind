@@ -30,10 +30,194 @@
   var btn = document.getElementById('import-submit');
   var BTN_LABEL = btn.textContent;
 
+  // 進捗表示の部品
+  var panel = document.getElementById('ingest');
+  var fillEl = document.getElementById('ingest-fill');
+  var stageEl = document.getElementById('ingest-stage');
+  var metaEl = document.getElementById('ingest-meta');
+  var invEl = document.getElementById('ingest-inv');
+  var invNEl = document.getElementById('ingest-inv-n');
+  var invListEl = document.getElementById('ingest-inv-list');
+  var previewEl = document.getElementById('ingest-preview');
+
   function currentLang() { return langInput ? langInput.value : 'auto'; }
 
-  function lock(msg) { btn.disabled = true; btn.textContent = '処理中…'; statusEl.textContent = msg; }
+  function lock(msg) { btn.disabled = true; btn.textContent = '処理中…'; statusEl.textContent = msg || ''; }
   function unlock(msg) { btn.disabled = false; btn.textContent = BTN_LABEL; if (msg) statusEl.textContent = msg; }
+
+  // ---------------------------------------------------------------------------
+  // 進捗計。
+  //
+  // 見積もり（サーバが最初に送ってくる段階ごとの想定時間）で滑らかに進めつつ、
+  // 実際の段階の切りかわりが来たらそこへ合わせ直す。守るのは2つだけ:
+  //   ・決して戻さない
+  //   ・次の目盛りを、実際にそこへ着く前に越えさせない
+  // 見積もりが外れても、表示が嘘になるのはせいぜい「少し遅く見える」程度で済む。
+  // ---------------------------------------------------------------------------
+  function Meter() {
+    this.stages = [];
+    this.bounds = [];      // 各段階の [開始, 終了] を 0〜1 で持つ
+    this.at = 0;           // いま表示している進捗
+    this.idx = -1;
+    this.stageStart = 0;
+    this.timer = null;
+  }
+
+  Meter.prototype.plan = function (stages) {
+    // 保存・関連づけのぶんとして最後の 6% を空けておく。
+    var SAVE = 0.06;
+    var total = stages.reduce(function (s, x) { return s + x.ms; }, 0) || 1;
+    var acc = 0;
+    this.stages = stages;
+    this.bounds = stages.map(function (x) {
+      var from = (acc / total) * (1 - SAVE);
+      acc += x.ms;
+      return [from, (acc / total) * (1 - SAVE)];
+    });
+    var self = this;
+    this.timer = setInterval(function () { self.tick(); }, 250);
+  };
+
+  Meter.prototype.enter = function (key, label) {
+    var i = -1;
+    for (var k = 0; k < this.stages.length; k++) if (this.stages[k].key === key) i = k;
+    if (i < 0 || i < this.idx) return;                 // 知らない段階・戻りは無視
+    this.idx = i;
+    this.stageStart = Date.now();
+    this.set(this.bounds[i][0]);                       // 目盛りへ合わせ直す
+    stageEl.textContent = label || this.stages[i].label;
+  };
+
+  // 段階の中の進み具合を、あらかじめ分かっている割合で直接指定する
+  // （分割経路の「断片 3/5」のように、本当に数えられるとき用）。
+  Meter.prototype.within = function (ratio) {
+    if (this.idx < 0) return;
+    var b = this.bounds[this.idx];
+    this.set(b[0] + (b[1] - b[0]) * Math.min(1, Math.max(0, ratio)));
+  };
+
+  Meter.prototype.tick = function () {
+    if (this.idx < 0) return;
+    var b = this.bounds[this.idx];
+    var est = this.stages[this.idx].ms || 1;
+    var r = (Date.now() - this.stageStart) / est;
+    // 見積もりを超えても段階の終わりには着かせない（着いた事にしてはいけない）。
+    // 残りを少しずつ詰めるだけにして、止まって見えないようにする。
+    var eased = r < 1 ? r * 0.9 : 0.9 + 0.1 * (1 - Math.exp(-(r - 1)));
+    this.set(b[0] + (b[1] - b[0]) * eased);
+  };
+
+  Meter.prototype.set = function (v) {
+    if (v <= this.at) return;                          // 決して戻さない
+    this.at = Math.min(v, 1);
+    fillEl.style.width = (this.at * 100).toFixed(1) + '%';
+    metaEl.textContent = Math.round(this.at * 100) + '%';
+  };
+
+  Meter.prototype.finish = function () {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null;
+    this.at = 0.999;                                   // set の単調性をすり抜けるため
+    this.set(1);
+  };
+
+  // ---------------------------------------------------------------------------
+  // NDJSON を読みながらイベントを配る。
+  // 断れる段階（上限超過・読み取り失敗）はふつうの JSON で返ってくるので、
+  // Content-Type を見て振り分ける。
+  // ---------------------------------------------------------------------------
+  function runIngest(fd, on) {
+    return fetch('/notes/ingest', { method: 'POST', body: fd }).then(function (res) {
+      var ct = res.headers.get('Content-Type') || '';
+      if (ct.indexOf('ndjson') < 0) {
+        return res.json().then(function (j) {
+          if (!res.ok) throw new Error(j.error || '取り込みに失敗しました。');
+          return j;                                    // 流さずに終わった場合（保険）
+        });
+      }
+      var reader = res.body.getReader();
+      var dec = new TextDecoder();
+      var buf = '';
+      var last = null;
+      function pump() {
+        return reader.read().then(function (r) {
+          buf += dec.decode(r.value || new Uint8Array(), { stream: !r.done });
+          var lines = buf.split('\n');
+          buf = r.done ? '' : lines.pop();             // 最後の1本は途中かもしれない
+          lines.forEach(function (line) {
+            if (!line.trim()) return;
+            var ev;
+            try { ev = JSON.parse(line); } catch (e) { return; }
+            last = on(ev) || last;
+          });
+          if (r.done) return last;
+          return pump();
+        });
+      }
+      return pump();
+    });
+  }
+
+  // 1件ぶんの進捗表示をまとめて面倒みる。戻り値は最後の結果イベント。
+  function withProgress(fd, opts) {
+    var meter = new Meter();
+    var body = '';
+    var showBody = !opts || opts.showBody !== false;
+    panel.hidden = false;
+    invEl.hidden = true;
+    invListEl.innerHTML = '';
+    previewEl.hidden = true;
+    previewEl.textContent = '';
+    previewEl.classList.remove('done');
+    fillEl.style.width = '0%';
+    stageEl.textContent = '資料を読み取っています';
+    metaEl.textContent = '';
+
+    var result = null;
+    return runIngest(fd, function (ev) {
+      if (ev.type === 'plan') {
+        meter.plan(ev.stages);
+        meter.enter(ev.stages[0].key);
+        if (ev.route === 'chunked') {
+          stageEl.textContent = ev.stages[0].label + '（' + ev.chunks + '分割）';
+        }
+      } else if (ev.type === 'stage') {
+        if (ev.phase === 'start') meter.enter(ev.stage);
+        if (ev.stage === 'extract' && ev.phase === 'done') {
+          meter.within(ev.index / ev.total);
+          stageEl.textContent = '資料を分けて読んでいます（' + ev.index + '/' + ev.total + '）';
+        }
+        if (ev.stage === 'inventory' && ev.phase === 'done' && ev.items && ev.items.length) {
+          invNEl.textContent = '(' + ev.count + '件)';
+          invListEl.innerHTML = '';
+          ev.items.forEach(function (t) {
+            var li = document.createElement('li');
+            li.textContent = t;
+            invListEl.appendChild(li);
+          });
+          invEl.hidden = false;
+        }
+        if (ev.stage === 'relate') stageEl.textContent = '関連するノートを探しています';
+      } else if (ev.type === 'delta') {
+        if (!showBody) return;
+        body += ev.text;
+        previewEl.hidden = false;
+        // 下端に貼りついている間だけ自動で追う（読み返している人の邪魔をしない）。
+        var stick = previewEl.scrollTop + previewEl.clientHeight >= previewEl.scrollHeight - 24;
+        previewEl.textContent = body;
+        if (stick) previewEl.scrollTop = previewEl.scrollHeight;
+      } else if (ev.type === 'done' || ev.type === 'reconcile' || ev.type === 'error') {
+        meter.finish();
+        previewEl.classList.add('done');
+        result = ev;
+        return ev;
+      }
+      return result;
+    }).then(function (ev) {
+      meter.finish();
+      return ev || result;
+    });
+  }
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -48,22 +232,24 @@
 
   // 単発：ファイル1つ or テキスト。関連が高ければ確認画面へ。
   function runSingle(file, text) {
-    lock('AI が整理中…（長い資料は分けて読むため、少し時間がかかります）');
+    lock('');
     var fd = new FormData();
     if (file) fd.append('file', file); else fd.append('text', text);
     fd.append('lang', currentLang());
-    fetch('/notes/ingest', { method: 'POST', body: fd })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-      .then(function (res) {
-        if (!res.ok) throw new Error(res.j.error || '取り込みに失敗しました。');
-        if (res.j.reconcile) { window.location.href = res.j.url; return; }
-        if (res.j.aiUsed === false) { statusEl.textContent = 'APIキー未設定のため AI 整理はスキップし、変換テキストで保存しました。'; }
-        window.location.href = '/notes/' + res.j.id;
+    withProgress(fd)
+      .then(function (ev) {
+        if (!ev) throw new Error('取り込みに失敗しました。');
+        if (ev.type === 'error') throw new Error(ev.error);
+        if (ev.type === 'reconcile') { stageEl.textContent = '似たノートが見つかりました'; window.location.href = ev.url; return; }
+        stageEl.textContent = '完了しました';
+        if (ev.aiUsed === false) statusEl.textContent = 'AI 整理はスキップし、変換テキストで保存しました。';
+        window.location.href = '/notes/' + ev.id;
       })
-      .catch(function (err) { unlock('エラー: ' + err.message); });
+      .catch(function (err) { panel.hidden = true; unlock('エラー: ' + err.message); });
   }
 
   // 複数：1ファイルずつ順番に送る（batch=1 で確認画面は出さず自動保存＋自動リンク）。
+  // 本文の流し見はしない（次々に切り替わって落ち着かないため）。進捗バーだけ出す。
   function runBatch(files) {
     btn.disabled = true;
     btn.textContent = '処理中…';
@@ -72,26 +258,29 @@
     var lastError = null;
     function next() {
       if (i >= n) {
+        panel.hidden = true;
         statusEl.textContent =
           '完了：' + ok + ' 件を取り込みました' + (fail ? '（' + fail + ' 件は失敗）' : '') +
           (lastError ? '　' + lastError : '') + '　ホームに移動します…';
         setTimeout(function () { window.location.href = '/'; }, lastError ? 4000 : 1400);
         return;
       }
-      statusEl.textContent = '処理中… (' + (i + 1) + '/' + n + ')　' + files[i].name;
+      statusEl.textContent = '(' + (i + 1) + '/' + n + ')　' + files[i].name;
       var fd = new FormData();
       fd.append('file', files[i]);
       fd.append('batch', '1');
       fd.append('lang', currentLang());
-      fetch('/notes/ingest', { method: 'POST', body: fd })
-        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
-        .then(function (res) {
-          if (res.ok && res.j.id) { ok++; return; }
+      withProgress(fd, { showBody: false })
+        .then(function (ev) {
+          if (ev && ev.type === 'done' && ev.id) { ok++; return; }
+          fail++;
+          if (ev && ev.type === 'error') lastError = ev.error;
+        })
+        .catch(function (err) {
           fail++;
           // 上限に達した場合は、残りを続けても無駄なのでここで止める。
-          if (res.j && (res.j.reason === 'MONTHLY_LIMIT')) { lastError = res.j.error; i = n; }
+          if (/上限/.test(err.message)) { lastError = err.message; i = n; }
         })
-        .catch(function () { fail++; })
         .then(function () { i++; next(); });
     }
     next();
