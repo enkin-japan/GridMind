@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-08T00:00:00+09:00",
+  "title": "Design System: GridMind",
+  "extensions": {
+    "colorMeta": {
+      "index-blue": {
+        "role": "primary",
+        "displayName": "Index Blue",
+        "canonical": "#3b6ef5",
+        "darkValue": "#6d97ff",
+        "cssVar": "--accent",
+        "tonalRamp": ["#0a1433", "#10225c", "#17307f", "#2044a8", "#2b57d0", "#3b6ef5", "#8fb0fb", "#e8efff"]
+      },
+      "index-wash": {
+        "role": "primary",
+        "displayName": "Index Wash",
+        "canonical": "#e8efff",
+        "darkValue": "#1e2740",
+        "cssVar": "--accent-soft",
+        "tonalRamp": ["#0d1424", "#141d33", "#1e2740", "#334160", "#5a6f9e", "#8fa8d6", "#c4d5f5", "#e8efff"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1c2128",
+        "darkValue": "#e6e9ef",
+        "cssVar": "--text",
+        "tonalRamp": ["#0f1116", "#1c2128", "#2a2f3a", "#3f4653", "#6a7280", "#9aa2af", "#c8cdd6", "#e6e9ef"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#6a7280",
+        "darkValue": "#9aa2af",
+        "cssVar": "--muted",
+        "tonalRamp": ["#14171c", "#22262d", "#343941", "#4d535d", "#6a7280", "#9aa2af", "#c2c7cf", "#e6e9ef"]
+      },
+      "lattice-line": {
+        "role": "neutral",
+        "displayName": "Lattice Line",
+        "canonical": "#e2e5ea",
+        "darkValue": "#2a2f3a",
+        "cssVar": "--border",
+        "tonalRamp": ["#14171c", "#1f232b", "#2a2f3a", "#434952", "#767d88", "#a9b0ba", "#cdd2d9", "#e2e5ea"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#ffffff",
+        "darkValue": "#181b22",
+        "cssVar": "--surface",
+        "tonalRamp": ["#0f1116", "#181b22", "#252932", "#3a3f4a", "#6f7682", "#a8aeb8", "#d8dbe1", "#ffffff"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#f6f7f9",
+        "darkValue": "#0f1116",
+        "cssVar": "--bg",
+        "tonalRamp": ["#0f1116", "#1a1d24", "#282c35", "#3e434d", "#737a86", "#abb1bb", "#dcdfe4", "#f6f7f9"]
+      },
+      "alert-red": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "#d63b3b",
+        "darkValue": "#d63b3b",
+        "cssVar": "--danger",
+        "tonalRamp": ["#2b0c0c", "#4a1414", "#6d1d1d", "#962828", "#bd3232", "#d63b3b", "#e88585", "#fdecec"]
+      }
+    },
+    "typographyMeta": {
+      "headline": { "displayName": "Headline", "purpose": "Page titles. Currently inheriting the browser default 2rem — unstyled in the incumbent." },
+      "title": { "displayName": "Title", "purpose": "The GridMind wordmark. Card titles run smaller at 1.05rem." },
+      "body": { "displayName": "Body", "purpose": "Note bodies and everything read at length. Never shrinks to win space." },
+      "label": { "displayName": "Label", "purpose": "The reconcile pane markers. The only uppercase type in the system." },
+      "mono": { "displayName": "Mono", "purpose": "Markdown editing textarea, code blocks, inline code." }
+    },
+    "shadows": [
+      {
+        "name": "card-lift",
+        "value": "0 6px 20px rgba(0,0,0,0.08)",
+        "purpose": "The only shadow in the system. Response to hovering a note card, paired with translateY(-2px) at .08s ease."
+      },
+      {
+        "name": "modal-scrim",
+        "value": "rgba(0,0,0,0.45)",
+        "purpose": "Full-viewport backdrop behind a modal. A background, not a box-shadow."
+      }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "0.08s ease", "purpose": "Card hover lift and shadow. The quickest transition in the system." },
+      { "name": "state-standard", "value": "0.15s ease", "purpose": "Colour and border transitions on the icon button and file drop zone." },
+      { "name": "gesture-slow", "value": "0.25s ease", "purpose": "The settings gear's 45-degree rotation. The system's one piece of personality." },
+      { "name": "measure-eased", "value": "0.3s ease", "purpose": "Quota bar fill. Eased because it reports a standing measure, not live work." },
+      { "name": "progress-linear", "value": "0.45s linear", "purpose": "Ingest bar fill. Linear because an eased progress bar reads as decelerating when it is not." },
+      { "name": "caret-blink", "value": "1s steps(2, start) infinite", "purpose": "The streaming preview caret. Disabled under prefers-reduced-motion." }
+    ],
+    "breakpoints": [
+      { "name": "compare-collapse", "value": "720px", "purpose": "The only layout media query in the system: the reconcile compare grid collapses to one column." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single committing action on a screen. Note: the incumbent defines no hover state for this component — the rule below is the recommended fill of that gap.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">AI で整理して取り込む</button>",
+      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: background .15s ease, border-color .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: #fff; border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Default Button",
+      "kind": "button",
+      "refersTo": "button-default",
+      "description": "Every non-committing action. Surface fill, ink text, hairline border.",
+      "html": "<button class=\"ds-btn ds-btn-default\">キャンセル</button>",
+      "css": ".ds-btn-default { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease; } .ds-btn-default:hover { border-color: var(--accent, #3b6ef5); } .ds-btn-default:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Delete only. Transparent fill with red text and border — the system has no filled destructive button.",
+      "html": "<button class=\"ds-btn-danger\">削除</button>",
+      "css": ".ds-btn-danger { padding: 8px 16px; border: 1px solid var(--danger, #d63b3b); border-radius: var(--radius, 10px); background: transparent; color: var(--danger, #d63b3b); font: inherit; cursor: pointer; transition: background .15s ease; } .ds-btn-danger:hover { background: rgba(214,59,59,0.08); } .ds-btn-danger:focus-visible { outline: 2px solid var(--danger, #d63b3b); outline-offset: 2px; }"
+    },
+    {
+      "name": "Settings Gear",
+      "kind": "button",
+      "refersTo": "icon-button",
+      "description": "The system's one piece of personality: a 38px circle whose gear visibly turns 45 degrees on hover.",
+      "html": "<button class=\"ds-icon-btn\" aria-label=\"設定\">⚙</button>",
+      "css": ".ds-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--border, #e2e5ea); border-radius: 50%; background: var(--surface, #fff); color: var(--muted, #6a7280); font-size: 1.05rem; line-height: 1; cursor: pointer; transition: color .15s ease, background .15s ease, border-color .15s ease, transform .25s ease; } .ds-icon-btn:hover { background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); border-color: var(--accent, #3b6ef5); transform: rotate(45deg); } .ds-icon-btn:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+    },
+    {
+      "name": "Tag Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "A pill because it behaves like a count, not a container. Active state takes the Index Wash tint.",
+      "html": "<span class=\"ds-chip\">JavaScript <span class=\"ds-chip-count\">7</span></span> <span class=\"ds-chip ds-chip-active\">IoT <span class=\"ds-chip-count\">3</span></span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); color: var(--muted, #6a7280); font-size: .85rem; } .ds-chip-active { background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); border-color: var(--accent, #3b6ef5); } .ds-chip-count { color: var(--accent, #3b6ef5); font-weight: 600; }"
+    },
+    {
+      "name": "Note Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "The list unit. Flat at rest; the system's only shadow appears on hover, paired with a 2px lift.",
+      "html": "<a class=\"ds-card\" href=\"#\"><h2>極座標と三角関数によるベクトル表現</h2><p class=\"ds-card-summary\">極座標表示は距離と角度でベクトルを表す方法で、類似度の計算がしやすい。</p><div class=\"ds-card-tags\"><span class=\"ds-chip ds-chip-sm\">IoT</span><span class=\"ds-chip ds-chip-sm\">数学</span></div><time class=\"ds-card-time\">2026-08-08</time></a>",
+      "css": ".ds-card { display: flex; flex-direction: column; gap: 8px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); padding: 16px; color: var(--text, #1c2128); text-decoration: none; max-width: 280px; transition: transform .08s ease, box-shadow .08s ease; } .ds-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); } .ds-card h2 { margin: 0; font-size: 1.05rem; } .ds-card-summary { margin: 0; color: var(--muted, #6a7280); font-size: .9rem; line-height: 1.65; } .ds-card-tags { display: flex; flex-wrap: wrap; gap: 6px; } .ds-chip-sm { display: inline-flex; padding: 2px 8px; border-radius: 999px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); color: var(--muted, #6a7280); font-size: .75rem; } .ds-card-time { color: var(--muted, #6a7280); font-size: .78rem; margin-top: auto; }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Surface fill inside the page, Paper fill when recessed inside an already-raised surface. The incumbent defines no focus treatment; the rule below fills that gap.",
+      "html": "<label class=\"ds-field\">タイトル<input class=\"ds-input\" type=\"text\" value=\"ローカルストレージの基本\"></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--text, #1c2128); max-width: 360px; } .ds-input { padding: 10px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font-family: inherit; font-size: 1rem; font-weight: 400; transition: border-color .15s ease; } .ds-input:hover { border-color: var(--muted, #6a7280); } .ds-input:focus-visible { outline: none; border-color: var(--accent, #3b6ef5); box-shadow: 0 0 0 3px var(--accent-soft, #e8efff); }"
+    },
+    {
+      "name": "File Drop Zone",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "The one dashed border in the system, at 1.5px, so it reads as a target rather than a container.",
+      "html": "<input class=\"ds-drop\" type=\"file\">",
+      "css": ".ds-drop { display: block; width: 100%; max-width: 420px; padding: 16px; border: 1.5px dashed var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--muted, #6a7280); font-family: inherit; font-weight: 400; cursor: pointer; transition: border-color .15s ease, background .15s ease; } .ds-drop:hover { border-color: var(--accent, #3b6ef5); background: var(--accent-soft, #e8efff); } .ds-drop::file-selector-button { margin-right: 14px; padding: 8px 18px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: #fff; font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer; transition: opacity .15s ease; } .ds-drop::file-selector-button:hover { opacity: .85; }"
+    },
+    {
+      "name": "Ingest Progress",
+      "kind": "custom",
+      "refersTo": "card",
+      "description": "The signature component. A 6px pill track filled linearly, because an eased progress bar reads as decelerating when it is not. The caret proves the stream is live.",
+      "html": "<div class=\"ds-ingest\"><div class=\"ds-ingest-bar\"><span style=\"width:62%\"></span></div><p class=\"ds-ingest-head\"><span>本文を書いています</span><span class=\"ds-ingest-pct\">62%</span></p><div class=\"ds-ingest-preview\">## D2Cとデータ駆動型ブランド\n- D2Cは Direct to customer の略で、企業が顧客へ直接商品を販売するビジネスモデル</div></div>",
+      "css": ".ds-ingest { max-width: 480px; border-top: 1px solid var(--border, #e2e5ea); padding-top: 16px; } .ds-ingest-bar { height: 6px; border-radius: 999px; background: var(--border, #e2e5ea); overflow: hidden; } .ds-ingest-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent, #3b6ef5); transition: width .45s linear; } .ds-ingest-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 10px 0 0; font-size: .92rem; color: var(--text, #1c2128); } .ds-ingest-pct { color: var(--muted, #6a7280); font-size: .85rem; } .ds-ingest-preview { margin-top: 12px; padding: 12px 14px; max-height: 160px; overflow-y: auto; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); font-size: .85rem; line-height: 1.75; white-space: pre-wrap; color: var(--text, #1c2128); } .ds-ingest-preview::after { content: ''; display: inline-block; width: .5em; height: 1em; margin-left: 1px; vertical-align: text-bottom; background: var(--accent, #3b6ef5); opacity: .7; animation: ds-caret 1s steps(2, start) infinite; } @keyframes ds-caret { to { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-ingest-bar > span { transition: none; } .ds-ingest-preview::after { animation: none; } }"
+    },
+    {
+      "name": "Header Navigation",
+      "kind": "nav",
+      "refersTo": "input-search",
+      "description": "A single surface bar with a bottom hairline. Sticky at z-index 10 — one of only two stacking levels in the system.",
+      "html": "<header class=\"ds-header\"><span class=\"ds-brand\">GridMind</span><form class=\"ds-search\"><input type=\"search\" placeholder=\"検索…\"><button type=\"submit\">検索</button></form><a class=\"ds-btn-new\" href=\"#\">＋ 新規</a></header>",
+      "css": ".ds-header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface, #fff); border-bottom: 1px solid var(--border, #e2e5ea); } .ds-brand { font-weight: 700; font-size: 1.2rem; color: var(--text, #1c2128); } .ds-search { display: flex; flex: 1; max-width: 320px; gap: 6px; } .ds-search input { flex: 1; padding: 8px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--text, #1c2128); font: inherit; } .ds-search button { padding: 8px 14px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: #fff; font: inherit; cursor: pointer; white-space: nowrap; } .ds-btn-new { padding: 8px 14px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); font-weight: 600; text-decoration: none; white-space: nowrap; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lattice",
+    "overview": "Knowledge arrives as a mess — a slide deck padded with schedules, grading rules, and page numbers. GridMind's job is to cut that away and leave cells of knowledge that snap into a structure. The interface is that structure made visible: a lattice of hairline rules dividing the screen into cells, where every cell holds something worth keeping and nothing holds filler. The 1px border is not a decorative edge here; it is the wall of the cell, and it is why almost nothing in this system needs a shadow to be understood.\n\nThe character is dense, precise, and calm enough to sit in for a long time. Dense because a wasted line is a defect in the product itself — the extraction refuses to pad, and the interface must not undo that by spreading five facts across a screen of whitespace. Precise because this is an instrument: it reports measured usage, real costs, and real progress, and it should look like something that knows the number rather than something that guesses. Calm because the actual work here is reading — long Japanese and English notes, read at length — so borders stay soft, contrast stays comfortable, and colour never raises its voice without cause.\n\nThe system commits to one accent and spends it carefully. Index Blue appears where the user needs to know where they are or where they can go — a link, the current page, the selected tag, the filling progress bar — and essentially nowhere else. Everything not carrying that job is ink, graphite, or a hairline. Confirmed rejection: this must never read as an \"AI product.\" No violet gradients, no glowing edges, no sparkle iconography, no chrome that advertises the model.",
+    "keyCharacteristics": [
+      "Hairline lattice (1px lattice-line) as the primary structural device, not shadow",
+      "One accent, spent only on position and navigation",
+      "Full light/dark parity through eight CSS custom properties",
+      "Compact type scale (0.72rem–1.2rem) tuned for CJK and Latin side by side",
+      "A single radius (10px) with pills reserved for count-like objects",
+      "Small, fast state changes — 80–150ms, a 2px lift at most"
+    ],
+    "rules": [
+      { "name": "The Index Rule", "body": "Index Blue answers exactly one question: where. Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.", "section": "colors" },
+      { "name": "The Two-Theme Rule", "body": "No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.", "section": "colors" },
+      { "name": "The Reading Text Is Sacred Rule", "body": "Body copy stays at 1rem/1.65 and never shrinks to win space. Density is bought from chrome — labels, metadata, chips, timestamps — never from the text the user came to read.", "section": "typography" },
+      { "name": "The 980 Rule", "body": "Reading content never exceeds 980px, and input surfaces never exceed 720px. A screen that wants more width is a screen that should have been split.", "section": "layout" },
+      { "name": "The One Radius Rule", "body": "Containers are 10px. If something is not 10px, it must be because it is a measure (pill), inline code (4px), or a circle — not because it looked better.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do build depth from a 1px lattice-line border and a paper/surface tonal step before reaching for a shadow. Match the incumbent while the depth question is open.",
+      "Do spend Index Blue only on position and navigation, per The Index Rule. Links, current page, selected tag, filled progress, primary action.",
+      "Do reach every colour through the eight custom properties, so the component is correct in both themes without a second rule.",
+      "Do keep containers at 10px radius and reserve pills (999px) for measures — chips, badges, progress tracks.",
+      "Do buy density from chrome, not from reading text. Labels and metadata may go to 0.72–0.85rem; body copy stays at 1rem/1.65.",
+      "Do keep state changes small and quick: 80–150ms, a 2px lift at most. The gear's 45-degree rotation at 250ms is the system's one indulgence and stays unique.",
+      "Do guard new motion with prefers-reduced-motion, as the ingest panel does. The card hover and gear rotation currently do not, and should be brought in.",
+      "Do define hover and focus states for any new interactive component. .btn currently has none — do not treat that omission as the pattern."
+    ],
+    "donts": [
+      "Don't let this look like an \"AI product.\" No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.",
+      "Don't write a literal hex inside a component rule. The warn notice and the .errors block do this and are the exceptions to fix, not the precedent to follow.",
+      "Don't spread content to fill width. Reading stays within 980px, input surfaces within 720px, per The 980 Rule.",
+      "Don't add a second accent colour. Alert Red is a text and stroke colour for destructive and invalid states only; it is not a palette slot to expand from.",
+      "Don't introduce a new radius value. Ten pixels, a pill, 4px/8px for code, and one circle is the complete vocabulary.",
+      "Don't ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.",
+      "Don't ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output."
+    ]
+  }
+}
