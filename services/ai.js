@@ -415,8 +415,23 @@ function isNextGen(model) {
 //
 // なお seed は受け付けられるが出力は一致せず（system_fingerprint も返らない）、
 // 再現性を得る手段は今のところ無い。
+// temperature / top_p / logprobs は reasoning_effort が 'none' のときだけ使える
+// （effort が none 以外だと 400 になる）。推論を切れば従来の採样パラメータに戻せる設計。
+//
+// 【effort='none' を採用しなかった理由】
+// 未処理の資料6件で比べたところ、費用は2割・時間は3割減るが、
+// 抽出できる知識が軒並み減った:
+//   pwd_w12   210行 → 124行 (-41%)   IoT第10回  81行 → 49行 (-40%)
+//   会社システム 67行 →  51行 (-24%)   WSD_W02  141行 → 109行 (-23%)
+// 「取りこぼさない」ことを優先する方針と正面から反するため、既定のままにする。
+//
+// なお temperature=0 に seed を足しても出力は毎回変わった。
+// このモデルでは再現性そのものが得られないので、
+// 揺れを抑えたい場合はモデルの設定ではなく、複数回生成して突き合わせるなど
+// 呼び出し側の作りで対処するしかない。
 const REASONING_EFFORT = process.env.AI_REASONING_EFFORT || null;
 const VERBOSITY = process.env.AI_VERBOSITY || null;
+const TEMPERATURE = process.env.AI_TEMPERATURE != null ? Number(process.env.AI_TEMPERATURE) : null;
 
 function paramsFor(model, maxTokens, json) {
   const p = json ? { response_format: { type: 'json_object' } } : {};
@@ -426,6 +441,8 @@ function paramsFor(model, maxTokens, json) {
       max_completion_tokens: maxTokens,
       ...(REASONING_EFFORT ? { reasoning_effort: REASONING_EFFORT } : {}),
       ...(VERBOSITY ? { verbosity: VERBOSITY } : {}),
+      // 推論を切っているときに限り temperature を指定できる（それ以外は 400 になる）。
+      ...(REASONING_EFFORT === 'none' && TEMPERATURE != null ? { temperature: TEMPERATURE } : {}),
     };
   }
   return { ...p, max_tokens: maxTokens, temperature: 0.1 };
