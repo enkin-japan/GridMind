@@ -318,6 +318,7 @@ Components are **restrained and precise**: thin strokes, one radius, and state c
 - **Hover:** Border shifts to Graphite (150ms).
 - **Focus:** Border shifts to Index Blue, under the same 2px outline every other control gets. The border moves as well as the ring so the field itself answers, not just the halo around it.
 - **Select:** Selects were unstyled until they were added to the shared input rule; they now match text inputs exactly.
+- **Label caption:** A form label is a column flex container, so every inline child inside it becomes its own row. A caption carrying a required marker or inline code must be wrapped in a single `<span>`, or it breaks across two and three lines. This was live in the note form until a headless screenshot caught it.
 - **Error:** Field-level errors render in the `.errors` block, not on the field.
 
 ### Navigation

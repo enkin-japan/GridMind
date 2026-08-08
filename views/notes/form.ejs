@@ -9,7 +9,7 @@
     </ul>
   <% } %>
 
-  <label>タイトル <span class="req">*</span>
+  <label><span>タイトル <span class="req">*</span></span>
     <input type="text" name="title" value="<%= note ? (note.title || '') : '' %>" required>
   </label>
 
@@ -17,7 +17,7 @@
     <input type="text" name="tags" value="<%= note ? (note.tags_str || '') : '' %>" placeholder="例: 機械学習, メモ">
   </label>
 
-  <label>本文（Markdown・<code>[[別のノート名]]</code> でリンク）
+  <label><span>本文（Markdown・<code>[[別のノート名]]</code> でリンク）</span>
     <textarea name="body_md" rows="16"><%= note ? (note.body_md || '') : '' %></textarea>
   </label>
 

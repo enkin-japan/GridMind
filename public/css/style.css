@@ -135,6 +135,12 @@ a.tag-chip:hover { border-color: var(--accent); color: var(--accent); text-decor
 /* フォーム */
 .note-form { display: flex; flex-direction: column; gap: 14px; max-width: 720px; }
 .note-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; }
+/* ラベルは縦並びの flex なので、中の文字・<span>・<code> がそれぞれ別の段になる。
+   見出しに補足（必須の * や <code>）を入れるときは <span> でひとまとめにすること。
+   ここは、まとめ忘れても崩れないようにするための受け皿。 */
+.note-form label > span:first-child { display: block; }
+.note-form label > span:first-child .req,
+.note-form label > span:first-child code { display: inline; }
 .note-form input, .note-form textarea, .note-form select {
   padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
   background: var(--surface); color: var(--text); font-family: inherit; font-size: 1rem; font-weight: 400;
@@ -279,6 +285,9 @@ a.tag-chip:hover { border-color: var(--accent); color: var(--accent); text-decor
 /* ===== 取り込みの進捗表示 ===== */
 /* 待ち時間そのものは 20〜35 秒あって縮められないので、
    「いまどこにいるか」と「書かれつつある本文」を見せて待ちに中身を持たせる。 */
+/* 中身が無いときの状態表示が、空のまま1行ぶんの高さを取っていた。
+   進捗の区切り線との間に 120px ほどの空白ができていたので、空なら畳む。 */
+#import-status:empty { display: none; }
 .ingest { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
 .ingest-bar {
   height: 6px; border-radius: 999px; background: var(--border); overflow: hidden;
