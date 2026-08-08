@@ -64,6 +64,7 @@ async function init() {
       summary     TEXT,                        -- AI 要約（任意）
       source_type TEXT DEFAULT 'paste',        -- 'upload' | 'paste'
       src_chars   INTEGER,                     -- 取り込んだ資料の文字数（削った量を出すため）
+      out_lang    TEXT,                        -- そのノート自身の言語。分からなければ null
       created_at  TEXT NOT NULL,
       updated_at  TEXT NOT NULL
     )
@@ -155,6 +156,12 @@ async function init() {
     if (!(await columnExists('users', col))) {
       await run(`ALTER TABLE users ADD COLUMN ${col} TEXT NOT NULL DEFAULT '${def}'`);
     }
+  }
+  // --- マイグレーション：ノート自身の言語 ---
+  // 画面の言語とは別もの。書体の字形をノートごとに正しく選ぶために持つ。
+  // 分からないノートは null のまま（推測で埋めない）。
+  if (!(await columnExists('notes', 'out_lang'))) {
+    await run('ALTER TABLE notes ADD COLUMN out_lang TEXT');
   }
   // --- マイグレーション：資料の元の文字数 ---
   // 「どれだけ削ったか」はこの製品の主張そのものなので、ノート側に控えておく。

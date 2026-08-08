@@ -35,9 +35,10 @@
     <div class="perf-col" aria-hidden="true"></div>
     <div class="roll-frames">
       <% rows.forEach(function (note) { %>
+        <% const nl = note.out_lang ? ' lang="' + note.out_lang + '"' : '' %>
         <a class="frame" href="/notes/<%= note.id %>">
-          <h2><%= note.title %></h2>
-          <% if (note.summary) { %><p class="summary"><%= note.summary %></p><% } %>
+          <h2<%- nl %>><%= note.title %></h2>
+          <% if (note.summary) { %><p class="summary"<%- nl %>><%= note.summary %></p><% } %>
           <% if (note.tags && note.tags.length) { %>
             <div class="frame-tapes">
               <% note.tags.forEach(function (x) { %><span class="tape sm"><%= x %></span><% }) %>

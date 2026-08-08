@@ -11,7 +11,7 @@
       <span class="roll-id">A</span>
       <span class="lbl"><%= t('rec.new') %></span>
     </div>
-    <div class="pane-body">
+    <div class="pane-body"<%- staged.out_lang ? ' lang="' + staged.out_lang + '"' : '' %>>
       <h3><%= staged.title %></h3>
       <div class="markdown-body"><%- newHtml %></div>
     </div>
@@ -21,7 +21,7 @@
       <span class="roll-id">B</span>
       <span class="lbl"><%= t('rec.old') %></span>
     </div>
-    <div class="pane-body">
+    <div class="pane-body"<%- old.out_lang ? ' lang="' + old.out_lang + '"' : '' %>>
       <h3><%= old.title %></h3>
       <div class="markdown-body"><%- oldHtml %></div>
     </div>

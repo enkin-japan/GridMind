@@ -286,30 +286,40 @@
 /* --- 土台 --------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* 書体の基準は body ではなく html に置く。body に置くと、body 自身の宣言が
+   html から継いだ値に勝ってしまい、[lang] で切りかえた書体が画面側に届かない。 */
+html {
+  -webkit-text-size-adjust: 100%;
+  font-family: 'Archivo', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP',
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
 
 body {
   margin: 0;
   background: var(--bench);
   color: var(--ink);
-  font-family: 'Archivo', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP',
-    'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-size: var(--t-body);
   font-variation-settings: 'wdth' 100;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
 }
 
-/* 画面の言語ごとに書体の優先順を替える。同じ漢字でも字形が違うので、
-   簡体字の書体で正體を出すと形が崩れる（骨・角・門などで目に見えて出る）。
-   基準は和文。ラテンは Archivo が先頭で共通。 */
-html[lang='zh'] body {
+/* 言語ごとに書体の優先順を替える。同じ漢字でも字形が違うので、簡体字の書体で
+   正體を出すと形が崩れる（骨・角・門などで目に見えて出る）。
+   セレクタを [lang] 単体にしてあるのは、画面の言語とノート自身の言語を
+   同じ規則で扱うため。ノートに lang が付いていれば、その要素の宣言が
+   body から継いだ値に勝つので、韓国語の画面で日本語のノートを読んでも
+   字形は日本語のまま出る。ラテンは Archivo が先頭で共通。 */
+[lang='ja'], [lang='en'] {
+  font-family: 'Archivo', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', sans-serif;
+}
+[lang='zh'] {
   font-family: 'Archivo', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
 }
-html[lang='zh-TW'] body {
+[lang='zh-TW'] {
   font-family: 'Archivo', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
 }
-html[lang='ko'] body {
+[lang='ko'] {
   font-family: 'Archivo', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
 }
 

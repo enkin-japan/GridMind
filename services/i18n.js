@@ -125,6 +125,33 @@ function t(lang, key, vars) {
   return fill(str, vars);
 }
 
+// 書かれた文字だけで言語が確実に決まる場合にかぎって、その言語を返す。
+// かなが出れば日本語、ハングルが出れば韓国語——これは推測ではなく、文字体系の定義。
+// 漢字だけ（簡体か正體か）とラテンだけの場合は、確実には決まらないので null を返す。
+// 「出力言語＝原文のまま」で取り込んだノートの言語を、嘘をつかずに埋めるために使う。
+function sniffScript(text = '') {
+  let kana = 0;
+  let hangul = 0;
+  const s = String(text).slice(0, 4000);   // 冒頭だけで足りる
+  for (const ch of s) {
+    const c = ch.codePointAt(0);
+    if ((c >= 0x3040 && c <= 0x30ff) && c !== 0x30fb) kana++;          // ひらがな・カタカナ
+    else if ((c >= 0xac00 && c <= 0xd7af) || (c >= 0x1100 && c <= 0x11ff)
+             || (c >= 0x3130 && c <= 0x318f)) hangul++;                // ハングル
+  }
+  const FLOOR = 20;   // 引用に紛れた数文字で決めない
+  if (kana >= FLOOR && kana > hangul) return 'ja';
+  if (hangul >= FLOOR && hangul > kana) return 'ko';
+  return null;
+}
+
+// そのノート自身の言語を決める。指定があればそれ、「原文のまま」なら文字から。
+function noteLang(outLang, text) {
+  const picked = canon(outLang);
+  if (picked) return picked;
+  return sniffScript(text);
+}
+
 // 画面側へ渡すぶんだけ取り出す（js. と stage. の2群）。
 function clientDict(lang) {
   const table = LOCALES[lang] || LOCALES[DEFAULT];
@@ -138,4 +165,4 @@ function clientDict(lang) {
 }
 
 module.exports = { LOCALES, CODES, DEFAULT, UI_LANGS, THEMES, LOOK, LOOK_KEYS,
-  canon, isLang, isTheme, isLook, pickLang, pickTheme, pickLook, lookAttrs, t, fill, clientDict };
+  canon, isLang, isTheme, isLook, sniffScript, noteLang, pickLang, pickTheme, pickLook, lookAttrs, t, fill, clientDict };

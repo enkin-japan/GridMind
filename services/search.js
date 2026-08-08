@@ -35,7 +35,7 @@ async function keyword({ q = '', tag = '', page = 1, userId } = {}) {
   const offset = (current - 1) * PAGE_SIZE;
 
   const rows = await all(
-    `SELECT n.id, n.title, n.summary, n.created_at
+    `SELECT n.id, n.title, n.summary, n.out_lang, n.created_at
        FROM notes n ${whereSql}
       ORDER BY n.created_at DESC
       LIMIT ? OFFSET ?`,

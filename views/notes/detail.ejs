@@ -8,11 +8,14 @@
   const cut = src && src > kept ? Math.round((1 - kept / src) * 100) : null;
 %>
 
+<%# ノート自身の言語。分かっているときだけ打つ（分からないものは画面の言語に従う）。 %>
+<% const nl = note.out_lang ? ' lang="' + note.out_lang + '"' : '' %>
+
 <article class="note-layout">
   <%# ライトボックス。このページで光るのはここだけ。 %>
   <div class="lightbox">
     <div class="note-bar">
-      <h1 class="note-title"><%= note.title %></h1>
+      <h1 class="note-title"<%- nl %>><%= note.title %></h1>
       <div class="acts">
         <a class="btn" href="/notes/<%= note.id %>/edit"><svg class="ico"><use href="#i-pencil"/></svg><%= t('note.edit') %></a>
         <form action="/notes/<%= note.id %>/delete" method="post" onsubmit="return confirm('<%= t('note.delete.confirm') %>');">
@@ -30,12 +33,12 @@
     <% if (note.summary) { %>
       <div class="summary-box">
         <span class="lbl"><%= t('note.summary') %></span>
-        <%= note.summary %>
+        <span<%- nl %>><%= note.summary %></span>
       </div>
     <% } %>
 
     <% if (html && html.trim()) { %>
-      <div class="markdown-body"><%- html %></div>
+      <div class="markdown-body"<%- nl %>><%- html %></div>
     <% } else { %>
       <div class="markdown-body empty-body"><%= t('note.empty') %></div>
     <% } %>
