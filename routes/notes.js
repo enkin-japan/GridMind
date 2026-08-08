@@ -11,6 +11,7 @@ const links = require('../services/links');
 const ai = require('../services/ai');
 const ingest = require('../services/ingest');
 const relate = require('../services/relate');
+const i18n = require('../services/i18n');
 const quota = require('../services/quota');
 const embed = require('../services/embed');
 const { renderMarkdown } = require('../services/render');
@@ -34,7 +35,7 @@ function uploadSingle(req, res, next) {
         reason: 'FILE_TOO_LARGE',
       });
     }
-    return res.status(400).json({ error: 'ファイルを受け取れませんでした。' });
+    return res.status(400).json({ error: req.t('err.file') });
   });
 }
 
@@ -42,18 +43,25 @@ function parseTags(str = '') {
   return String(str).split(/[,、]/).map((s) => s.trim()).filter(Boolean);
 }
 
-const validate = [body('title', 'タイトルは必ず入力してください。').trim().notEmpty()];
+const validate = [body('title', 'err.title.required').trim().notEmpty()];
+
+// 上限に達したときの断り文。プラン名も画面の言語で差しこむ。
+function quotaMessage(req, res) {
+  const v = { ...(res.messageVars || {}) };
+  if (v.planKey) { v.plan = req.t(v.planKey); delete v.planKey; }
+  return req.t(res.messageKey, v);
+}
 
 // --- 追加フォーム ---
 router.get('/new', (req, res) => {
-  res.render('notes/form', { title: '新規ノート', mode: 'new', note: null, errors: [] });
+  res.render('notes/form', { titleKey: 'form.new', mode: 'new', note: null, errors: [] });
 });
 
 // --- 作成 ---
 router.post('/new', validate, async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).render('notes/form', { title: '新規ノート', mode: 'new', note: req.body, errors: errors.array() });
+    return res.status(400).render('notes/form', { titleKey: 'form.new', mode: 'new', note: req.body, errors: errors.array() });
   }
   try {
     const id = await notes.create({
@@ -75,7 +83,7 @@ router.get('/import', async (req, res, next) => {
     const user = res.locals.user;
     const q = await quota.check(user, 0);
     res.render('notes/import', {
-      title: '取り込み',
+      titleKey: 'import.title',
       plan: q.plan,
       usage: q.usage,
       languages: ai.LANGUAGES,
@@ -141,7 +149,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
   try {
     // 1) 回数の上限を先に見る（変換の費用を払う前に断る）。
     const pre = await quota.check(user, 0);
-    if (!pre.ok) return res.status(429).json({ error: pre.message, reason: pre.reason });
+    if (!pre.ok) return res.status(429).json({ error: quotaMessage(req, pre), reason: pre.reason });
 
     // 2) ファイル → Markdown（元ファイルは必ず消す）。
     let markdown = '';
@@ -150,20 +158,20 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
         markdown = await ingest.fileToMarkdown(req.file.path);
       } catch (e) {
         if (e.message === 'BRIDGE_BUSY') {
-          return res.status(503).json({ error: 'ただいま混み合っています。少し待ってからお試しください。' });
+          return res.status(503).json({ error: req.t('err.busy') });
         }
-        return res.status(422).json({ error: 'このファイルは読み取れませんでした。' });
+        return res.status(422).json({ error: req.t('err.unreadable') });
       } finally {
         fs.unlink(req.file.path, () => {});
       }
     } else {
       markdown = req.body.text || '';
     }
-    if (!markdown.trim()) return res.status(400).json({ error: '内容が空です。' });
+    if (!markdown.trim()) return res.status(400).json({ error: req.t('err.empty') });
 
     // 3) 文字数の上限を見る（変換してからでないと本当の長さが分からない）。
     const post = await quota.check(user, markdown.length);
-    if (!post.ok) return res.status(413).json({ error: post.message, reason: post.reason });
+    if (!post.ok) return res.status(413).json({ error: quotaMessage(req, post), reason: post.reason });
 
     // 4) ここから先は時間がかかる。進捗を流し始める。
     //    見積もりを最初に渡しておくと、画面側は段階の切りかわりを待たずに
@@ -202,7 +210,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
     if (!data || !data.body_md) {
       // AI が使えない／知識が無いと判断された場合は、変換したテキストをそのまま残す。
       const firstLine = markdown.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 60);
-      data = { title: firstLine || '無題', body_md: markdown, summary: null, tags: [] };
+      data = { title: firstLine || req.t('err.untitled'), body_md: markdown, summary: null, tags: [] };
       aiUsed = false;
     }
 
@@ -258,7 +266,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
     // すでに流し始めていればステータスは変えられないので、本文の中で伝える。
     if (out) {
       console.error('[ingest] 取り込みに失敗:', e.message);
-      return out.end({ type: 'error', error: '取り込みに失敗しました。' });
+      return out.end({ type: 'error', error: req.t('err.ingest') });
     }
     next(e);
   }
@@ -282,7 +290,7 @@ router.get('/reconcile', async (req, res, next) => {
     }
     const newHtml = await renderMarkdown(p.note.body_md, userId);
     const oldHtml = await renderMarkdown(old.body_md, userId);
-    res.render('notes/reconcile', { title: '関連の確認', staged: p.note, old, newHtml, oldHtml });
+    res.render('notes/reconcile', { titleKey: 'rec.title', staged: p.note, old, newHtml, oldHtml });
   } catch (e) {
     next(e);
   }
@@ -351,7 +359,7 @@ router.post('/reconcile/merge', async (req, res, next) => {
       };
     }
     req.session.pendingMerge = { oldId: old.id, ...merged };
-    res.render('notes/merge_preview', { title: '統合プレビュー', old, merged });
+    res.render('notes/merge_preview', { titleKey: 'merge.title', old, merged });
   } catch (e) {
     next(e);
   }
@@ -386,7 +394,7 @@ router.get('/:id', async (req, res, next) => {
   const userId = req.session.userId;
   try {
     const note = await notes.findById(req.params.id, userId);
-    if (!note) return res.status(404).render('error', { title: '404', message: 'ノートが見つかりません。' });
+    if (!note) return res.status(404).render('error', { titleKey: 'err.404', messageKey: 'err.404.note' });
     const html = await renderMarkdown(note.body_md || '', userId);
     const back = await links.backlinks(note.id, userId);
     res.render('notes/detail', { title: note.title, note, html, backlinks: back });
@@ -400,9 +408,9 @@ router.get('/:id/edit', async (req, res, next) => {
   const userId = req.session.userId;
   try {
     const note = await notes.findById(req.params.id, userId);
-    if (!note) return res.status(404).render('error', { title: '404', message: 'ノートが見つかりません。' });
+    if (!note) return res.status(404).render('error', { titleKey: 'err.404', messageKey: 'err.404.note' });
     note.tags_str = (note.tags || []).join(', ');
-    res.render('notes/form', { title: '編集', mode: 'edit', note, errors: [] });
+    res.render('notes/form', { titleKey: 'form.edit', mode: 'edit', note, errors: [] });
   } catch (e) {
     next(e);
   }
@@ -413,7 +421,7 @@ router.post('/:id/edit', validate, async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).render('notes/form', {
-      title: '編集', mode: 'edit',
+      titleKey: 'form.edit', mode: 'edit',
       note: { id: req.params.id, ...req.body, tags_str: req.body.tags }, errors: errors.array(),
     });
   }
@@ -423,7 +431,7 @@ router.post('/:id/edit', validate, async (req, res, next) => {
       { title: req.body.title, body_md: req.body.body_md || '', tagNames: parseTags(req.body.tags) },
       req.session.userId
     );
-    if (!ok) return res.status(404).render('error', { title: '404', message: 'ノートが見つかりません。' });
+    if (!ok) return res.status(404).render('error', { titleKey: 'err.404', messageKey: 'err.404.note' });
     res.redirect(`/notes/${req.params.id}`);
   } catch (e) {
     next(e);

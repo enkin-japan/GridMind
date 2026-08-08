@@ -2,6 +2,18 @@
 (function () {
   'use strict';
 
+  // 画面の文言。footer が埋めた JSON から読む（ここに直接書かない）。
+  var DICT = {};
+  try { DICT = JSON.parse(document.getElementById('i18n').textContent); } catch (e) { DICT = {}; }
+  function T(key, vars) {
+    var s = DICT[key];
+    if (s === undefined) return key;                 // 訳が無いことを隠さない
+    if (!vars) return s;
+    return s.replace(/\{(\w+)\}/g, function (m, k) {
+      return vars[k] === undefined ? m : String(vars[k]);
+    });
+  }
+
   // ===== 汎用：POST フォームの二重送信防止 ＋「処理中…」表示 =====
   // 送信ボタンを押したら無効化し、ラベルを「処理中…」にする。
   // 通常フォームはレスポンスで画面遷移するので、その時にリセットされる。
@@ -15,7 +27,7 @@
       if (btn.dataset.busy) { e.preventDefault(); return; }         // 二重送信ブロック
       btn.dataset.busy = '1';
       btn.dataset.label = btn.innerHTML;
-      btn.innerHTML = '処理中…';
+      btn.innerHTML = T('js.processing');
       setTimeout(function () { btn.disabled = true; }, 0);          // 送信開始後に無効化
     });
   });
@@ -44,11 +56,22 @@
 
   function currentLang() { return langInput ? langInput.value : 'auto'; }
 
+  // 選んだファイル名を自前で出す（ネイティブの表示はブラウザの言語で出るため隠してある）。
+  var fileNameEl = document.getElementById('import-file-name');
+  if (fileInput && fileNameEl) {
+    fileInput.addEventListener('change', function () {
+      var n = fileInput.files.length;
+      if (!n) { fileNameEl.textContent = fileInput.dataset.nofile; return; }
+      if (n === 1) { fileNameEl.textContent = fileInput.files[0].name; return; }
+      fileNameEl.textContent = T('import.nfiles', { n: n });
+    });
+  }
+
   function say(msg, bad) {
     statusEl.textContent = msg || '';
     statusEl.classList.toggle('warn', !!bad);
   }
-  function lock(msg) { btn.disabled = true; btn.textContent = '処理中…'; say(msg); }
+  function lock(msg) { btn.disabled = true; btn.textContent = T('js.processing'); say(msg); }
   function unlock(msg, bad) { btn.disabled = false; btn.innerHTML = BTN_LABEL; if (msg) say(msg, bad); }
 
   // ---------------------------------------------------------------------------
@@ -91,7 +114,7 @@
     this.idx = i;
     this.stageStart = Date.now();
     this.set(this.bounds[i][0]);                       // 目盛りへ合わせ直す
-    stageEl.textContent = label || this.stages[i].label;
+    stageEl.textContent = label || T('stage.' + this.stages[i].key);
   };
 
   // 段階の中の進み具合を、あらかじめ分かっている割合で直接指定する
@@ -140,7 +163,11 @@
       var ct = res.headers.get('Content-Type') || '';
       if (ct.indexOf('ndjson') < 0) {
         return res.json().then(function (j) {
-          if (!res.ok) throw new Error(j.error || '取り込みに失敗しました。');
+          if (!res.ok) {
+            var e = new Error(j.error || T('js.error', { msg: res.status }));
+            e.quota = j.reason === 'MONTHLY_LIMIT' || j.reason === 'DOC_TOO_LARGE';
+            throw e;
+          }
           return j;                                    // 流さずに終わった場合（保険）
         });
       }
@@ -169,7 +196,7 @@
 
   // 拾い出した知識点を、トリムビンに1本ずつ吊るす。
   function hangTrims(items, count) {
-    invNEl.textContent = count + ' 件';
+    invNEl.textContent = count + ' ' + T('js.unit');
     invListEl.innerHTML = '';
     items.forEach(function (t, i) {
       var li = document.createElement('li');
@@ -194,7 +221,7 @@
     previewEl.classList.remove('done');
     fillEl.style.width = '0%';
     gateEl.style.left = '0%';
-    stageEl.textContent = '資料を読み取っています';
+    stageEl.textContent = T('js.reading');
     metaEl.textContent = '0';
     // 押した場所から離れた下の方に出るので、見えるところまで運んでやる。
     panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -205,18 +232,18 @@
         meter.plan(ev.stages);
         meter.enter(ev.stages[0].key);
         if (ev.route === 'chunked') {
-          stageEl.textContent = ev.stages[0].label + '（' + ev.chunks + '分割）';
+          stageEl.textContent = T('js.chunked', { label: T('stage.' + ev.stages[0].key), n: ev.chunks });
         }
       } else if (ev.type === 'stage') {
         if (ev.phase === 'start') meter.enter(ev.stage);
         if (ev.stage === 'extract' && ev.phase === 'done') {
           meter.within(ev.index / ev.total);
-          stageEl.textContent = '資料を分けて読んでいます（' + ev.index + '/' + ev.total + '）';
+          stageEl.textContent = T('js.extract', { i: ev.index, n: ev.total });
         }
         if (ev.stage === 'inventory' && ev.phase === 'done' && ev.items && ev.items.length) {
           hangTrims(ev.items, ev.count);
         }
-        if (ev.stage === 'relate') stageEl.textContent = '関連するノートを探しています';
+        if (ev.stage === 'relate') stageEl.textContent = T('js.relate');
       } else if (ev.type === 'delta') {
         if (!showBody) return;
         body += ev.text;
@@ -243,7 +270,7 @@
     if (btn.disabled) return;                                       // 二重送信ブロック
     var files = fileInput.files;
     var text = (textInput.value || '').trim();
-    if (!files.length && !text) { say('ファイルを選ぶか、テキストを貼り付けてください。', true); return; }
+    if (!files.length && !text) { say(T('js.need_input'), true); return; }
 
     if (files.length > 1) runBatch(files);
     else runSingle(files.length ? files[0] : null, files.length ? null : text);
@@ -257,29 +284,29 @@
     fd.append('lang', currentLang());
     withProgress(fd)
       .then(function (ev) {
-        if (!ev) throw new Error('取り込みに失敗しました。');
+        if (!ev) throw new Error(T('js.error', { msg: '' }));
         if (ev.type === 'error') throw new Error(ev.error);
-        if (ev.type === 'reconcile') { stageEl.textContent = '似たノートが見つかりました'; window.location.href = ev.url; return; }
-        stageEl.textContent = '完了しました';
-        if (ev.aiUsed === false) say('AI 整理はスキップし、変換したテキストで保存しました。', true);
+        if (ev.type === 'reconcile') { stageEl.textContent = T('js.similar'); window.location.href = ev.url; return; }
+        stageEl.textContent = T('js.done');
+        if (ev.aiUsed === false) say(T('js.ai_skipped'), true);
         window.location.href = '/notes/' + ev.id;
       })
-      .catch(function (err) { panel.hidden = true; unlock('エラー: ' + err.message, true); });
+      .catch(function (err) { panel.hidden = true; unlock(T('js.error', { msg: err.message }), true); });
   }
 
   // 複数：1ファイルずつ順番に送る（batch=1 で確認画面は出さず自動保存＋自動リンク）。
   // 本文の流し見はしない（次々に切り替わって落ち着かないため）。進捗バーだけ出す。
   function runBatch(files) {
     btn.disabled = true;
-    btn.textContent = '処理中…';
+    btn.textContent = T('js.processing');
     var ok = 0, fail = 0, n = files.length;
     var i = 0;
     var lastError = null;
     function next() {
       if (i >= n) {
         panel.hidden = true;
-        say('完了：' + ok + ' 件を取り込みました' + (fail ? '（' + fail + ' 件は失敗）' : '') +
-            (lastError ? '　' + lastError : '') + '　ホームに移動します…', !!fail);
+        say(T('js.batch.done', { ok: ok }) + (fail ? T('js.batch.failed', { n: fail }) : '') +
+            (lastError ? '　' + lastError : '') + T('js.batch.goto'), !!fail);
         setTimeout(function () { window.location.href = '/'; }, lastError ? 4000 : 1400);
         return;
       }
@@ -297,7 +324,8 @@
         .catch(function (err) {
           fail++;
           // 上限に達した場合は、残りを続けても無駄なのでここで止める。
-          if (/上限/.test(err.message)) { lastError = err.message; i = n; }
+          // 文面ではなく、サーバが付けた理由で判断する（言語が変わっても効くように）。
+          if (err.quota) { lastError = err.message; i = n; }
         })
         .then(function () { i++; next(); });
     }

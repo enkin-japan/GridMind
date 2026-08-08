@@ -60,6 +60,7 @@
   --on-warn: #17180f;         /* 黄の塗りの上の字。明暗で反転しない。 */
   --ctr-hot: #ffb0a4;         /* 残りが少ないカウンタの字 */
   --on-blue: #efefe8;         /* 青の塗りの上の字 */
+  --rail-slot: #00000059;     /* レールに切られた溝（検索欄）の深さ */
   --tape: #f0ece1;            /* 紙テープの地。パネルとは別の素材。 */
   --tape-hover: #e6e0d1;
 
@@ -85,9 +86,11 @@
   --perf-w: 22px;   /* 同・横 */
 }
 
-/* 暗色＝夜の編集室。台は沈み、ライトボックスだけが起きている。 */
+/* 暗色＝夜の編集室。台は沈み、ライトボックスだけが起きている。
+   出しかたは3通り。設定で決めていないときだけシステムに従い、
+   決めているときはそちらを必ず勝たせる。 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bench: #0d0e0b;
     --panel: #24271f;
     --well: #050603;
@@ -104,6 +107,23 @@
     --tape: #33362c;
     --tape-hover: #3e4237;
   }
+}
+:root[data-theme='dark'] {
+    --bench: #0d0e0b;
+    --panel: #24271f;
+    --well: #050603;
+    --perf: #33362c;
+    --ink: #eae9e0;
+    --ink-2: #a0a396;
+    --edge: #454940;
+    --edge-2: #55594d;
+    --wax-red: #f0705c;
+    --wax-red-fill: #c0301f;
+    --wax-blue: #7fa6ee;
+    --wax-amber: #e0b44a;
+    --on-blue: #17180f;
+    --tape: #33362c;
+    --tape-hover: #3e4237;
 }
 
 /* --- 土台 --------------------------------------------------------------- */
@@ -263,7 +283,7 @@ img, svg { max-width: 100%; }
 .site-header .search input {
   flex: 1;
   min-width: 0;
-  background: #00000059;
+  background: var(--rail-slot);
   border: 1px solid #ffffff2e;
   border-right: 0;
   color: var(--on-film);
@@ -425,28 +445,32 @@ input:hover, select:hover, textarea:hover { border-color: var(--ink-2); }
 input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 ::placeholder { color: var(--ink-2); opacity: 1; }
 
-/* ファイル欄は「台に置く場所」。破線で置き場を示す。 */
-input[type=file] {
-  width: 100%;
+/* ファイル欄は「台に置く場所」。破線で置き場を示す。
+   ネイティブのボタンは使わない：その文字はブラウザの言語で出るので、
+   画面の言語と食いちがう（英語表示なのに「选择文件」になる）。
+   入力そのものは残したまま覆いをかけ、こちらのラベルを見せる。 */
+.drop {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  flex-wrap: wrap;
   padding: var(--s4);
   border: 1.5px dashed var(--edge-2);
-  background: transparent;
-  color: var(--ink-2);
-  font: inherit;
-  font-size: var(--t-sm);
+  cursor: pointer;
+  position: relative;
 }
-input[type=file]:hover { border-color: var(--wax-red); color: var(--ink); }
-input[type=file]::file-selector-button {
-  margin-right: var(--s4);
-  padding: 7px 14px;
-  border: 1px solid var(--wax-red-fill);
-  background: var(--wax-red-fill);
-  color: var(--on-fill);
-  font: inherit;
-  font-size: var(--t-sm);
-  font-weight: 700;
+.drop:hover { border-color: var(--wax-red); }
+.drop:focus-within { outline: 2px solid var(--wax-blue); outline-offset: 2px; }
+.drop input[type=file] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
 }
+.drop .btn { pointer-events: none; }
+.drop-name { color: var(--ink-2); font-size: var(--t-sm); }
 
 /* --- 面（フォーム・囲み）------------------------------------------------- */
 .sheet {
@@ -631,7 +655,7 @@ input[type=file]::file-selector-button {
 }
 .page + .page { border-left: 0; }
 .page:hover { text-decoration: none; background: var(--bench); }
-.page.active { background: var(--well); border-color: var(--well); color: var(--on-film); }
+.page.active { background: var(--ink); border-color: var(--ink); color: var(--panel); }
 
 /* ===========================================================================
    ライトボックス（ノート本文）
@@ -1056,6 +1080,8 @@ input[type=file]::file-selector-button {
   /* 細い画面ではレールが3段になる。3割の高さを固定で取られるので、
      ここだけ貼りつけをやめて一緒に流す。 */
   .site-header { position: static; gap: 6px; }
+  .brand { padding: 6px; gap: 0; }
+  .brand .name { display: none; }
   .rail-btn { padding: 6px 9px; }
   .rail-btn.icon-only .txt { position: static; width: auto; height: auto; clip-path: none; }
   .search { flex-basis: 100%; order: 5; max-width: none; }

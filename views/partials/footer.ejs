@@ -1,7 +1,9 @@
   </main>
   <footer class="site-footer">
-    <span>GridMind — 資料から知識だけを取り出す</span>
+    <span>GridMind — <%= t('footer.tagline') %></span>
   </footer>
+  <%# 画面側の文言。app.js はここから読む（テンプレートに文字列を直接書かないため）。 %>
+  <script id="i18n" type="application/json"><%- JSON.stringify(clientDict) %></script>
   <script src="/js/app.js"></script>
 </body>
 </html>

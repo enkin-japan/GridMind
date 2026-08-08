@@ -60,7 +60,8 @@ Three commitments a neighbouring "AI summarizer" could not truthfully copy:
 - **The server must be Node.js.** This is the single hard stack rule inherited from the course brief, and it remains binding.
 - **Python with MarkItDown is a required runtime dependency** for file conversion.
 - **The service holds the API key; users never see or supply one.** Model cost is therefore the operator's cost, which makes quota a product-level constraint rather than a nicety.
-- **The interface must become multi-language.** Today it is Japanese only; the committed direction is a multi-language UI. From this point on, UI copy must not be hard-coded into templates.
+- **The interface is multi-language.** Japanese, English and Simplified Chinese ship, resolved per request from the account setting, then a cookie, then `Accept-Language`. UI copy lives in `locales/` and must not be hard-coded into templates or client JS; a key with no translation falls back to Japanese rather than rendering blank. Korean is offered as a *note* output language but not yet as an interface language.
+- **Light and dark are a user choice, not only a system preference.** Stored per account with a cookie fallback so the signed-out screens honour it too.
 - **Extraction is not reproducible.** The model in use forces a fixed temperature, so completeness varies between runs on identical input. Any claim of deterministic output would be false.
 - The course deliverable is still open; until it closes, running reliably on demo day is a first-class requirement.
 

@@ -195,8 +195,8 @@ components:
     rounded: "{rounded.none}"
     size: "38px"
   pager-item-active:
-    backgroundColor: "{colors.well}"
-    textColor: "{colors.on-film}"
+    backgroundColor: "{colors.ink}"
+    textColor: "{colors.panel}"
   notice-warn:
     backgroundColor: "{colors.wax-amber-fill}"
     textColor: "{colors.on-warn}"
@@ -254,7 +254,7 @@ Two greys, one white, one near-black, and three pigments — the pigments never 
 
 - **Bench Grey** (`{colors.bench}`): the bench top. Page ground, the summary box, the code-block-in-prose background, hovered frame, current plan row, and the disabled button. The lower of the two material levels.
 - **Light-Box White** (`{colors.panel}`): the lit reading surface. In light it is pure white; in dark it is the one raised surface in the room. It carries the note body, the roll, sheets, compare panes, the auth slate and the pager. Measured 17.89:1 against ink in light, 12.44:1 in dark.
-- **The Well** (`{colors.well}`): a recess cut into the material — dark in *both* themes. It is the header rail, counter plates, the gate head, the progress and quota troughs, table header rows, the active pager cell, the slate plate and clapper, and `<pre>` blocks. `{colors.on-film}` is its text and does not invert.
+- **The Well** (`{colors.well}`): a recess cut into the material — dark in *both* themes. It is the header rail, counter plates, the gate head, the progress and quota troughs, table header rows, the slate plate and clapper, and `<pre>` blocks. `{colors.on-film}` is its text and does not invert.
 - **Ink** (`{colors.ink}`) / **Ink 2** (`{colors.ink-2}`): primary and secondary type. Ink-2 carries summaries, hints, labels, edge codes and metadata; measured 6.32:1 on panel and 5.36:1 on tape in light, 5.90:1 and 4.79:1 in dark.
 - **Edge** (`{colors.edge}`) and **Bench Edge** (`{colors.edge-2}`): the entire depth vocabulary. Edge is the rule drawn *on* the light box (panel-level dividers, frame separators, table cells). Bench Edge is the rule drawn *on* the bench (outer container borders, form controls, dashed placement zones, the footer rule).
 - **Tape** (`{colors.tape}` / `{colors.tape-hover}`): paper tape stock, a separate material from the panel. It is the tag chip's ground and nothing else.
@@ -324,6 +324,8 @@ Hover does not lift anything. It changes background, border colour, or text colo
 ### Named Rules
 
 **The Rule-And-Step Rule.** If a surface needs to separate from what is behind it, give it a 1px rule in the correct edge token and, if it is a reading surface, the panel material. Never a shadow, never a glow, never a gradient, never a blur.
+
+**The Three-State Theme Rule.** Dark is not only a system preference. The light tokens live on bare `:root`; the dark tokens are written **twice** — once under `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-theme='light'])`, and once as `:root[data-theme='dark']`. The server stamps `data-theme` on `<html>` only when the user has chosen light or dark, so an unset preference still follows the room, and an explicit choice wins in both directions. Never define a colour only inside the media block.
 
 **The Dark Machine Rule.** Machine parts — the rail, counter plates, gate head, progress troughs, table header rows, the slate plate — use `{colors.well}` and `{colors.on-film}` in both themes. They are not surfaces that respond to the room; they are the equipment.
 
@@ -400,7 +402,7 @@ Used on login and register only. A 440px panel with a sprocket column spanning i
 
 ### Pager
 
-Butted square cells, 38×38px minimum, panel fill with a bench-edge border and the left border removed on adjacent cells so the row reads as one continuous strip of frame counters. Tabular figures. The active cell inverts to the well.
+Butted square cells, 38×38px minimum, panel fill with a bench-edge border and the left border removed on adjacent cells so the row reads as one continuous strip of frame counters. Tabular figures. The active cell **inverts the surface**: ink fill, panel-coloured numeral. It was briefly a well fill, which failed in dark — the well is darker than the dark ground, so the current page read as a hole punched in the strip at 1.3:1. Inversion is the only treatment that carries the same weight in both rooms.
 
 ### Prose (note body)
 

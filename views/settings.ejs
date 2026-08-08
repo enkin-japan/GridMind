@@ -1,27 +1,60 @@
 <%- include('partials/header') %>
 
 <div class="page-head">
-  <h1>設定</h1>
+  <h1><%= t('set.title') %></h1>
 </div>
 
 <div class="form-narrow">
   <% if (saved === 'lang') { %>
-    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg>出力言語を保存しました。</p>
+    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg><%= t('set.saved.lang') %></p>
   <% } %>
   <% if (saved === 'plan') { %>
-    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg>プランを変更しました。</p>
+    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg><%= t('set.saved.plan') %></p>
+  <% } %>
+  <% if (saved === 'display') { %>
+    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg><%= t('set.saved.display') %></p>
   <% } %>
   <% if (saved === 'pro_pending') { %>
-    <p class="notice warn"><svg class="ico"><use href="#i-alert"/></svg>プロプランの受付は準備中です。もうしばらくお待ちください。</p>
+    <p class="notice warn"><svg class="ico"><use href="#i-alert"/></svg><%= t('set.pro_pending') %></p>
   <% } %>
+
+  <%# 画面の言語と表示テーマ。ノートの言語とは別ものなので、先にここで切り分ける。 %>
+  <form action="/settings/display" method="post" class="sheet">
+    <h2><%= t('set.display.h') %></h2>
+    <p><%= t('set.display.body') %></p>
+
+    <label class="field">
+      <span class="cap"><%= t('set.uilang') %></span>
+      <select name="ui_lang">
+        <option value="" <%= uiLang ? '' : 'selected' %>><%= t('set.theme.auto') %></option>
+        <% uiLangs.forEach(function (l) { %>
+          <option value="<%= l.code %>" <%= l.code === uiLang ? 'selected' : '' %>><%= l.label %></option>
+        <% }); %>
+      </select>
+    </label>
+
+    <label class="field">
+      <span class="cap"><%= t('set.theme') %></span>
+      <select name="theme">
+        <% ['auto', 'light', 'dark'].forEach(function (k) { %>
+          <option value="<%= k %>" <%= k === theme ? 'selected' : '' %>><%= t('set.theme.' + k) %></option>
+        <% }); %>
+      </select>
+    </label>
+
+    <div class="form-actions">
+      <button class="btn primary" type="submit"><svg class="ico"><use href="#i-check"/></svg><%= t('set.save') %></button>
+    </div>
+  </form>
 
   <%# プランと今月の使用量 %>
   <section class="sheet">
-    <h2>プランと使用量</h2>
-    <p>
-      現在のプラン：<strong><%= plan.label %></strong>（<%= plan.price %>）／
-      集計期間：<%= usage.period %>（東京時間で毎月1日にリセット）
-    </p>
+    <h2><%= t('set.plan.h') %></h2>
+    <p><%- t('set.plan.current', {
+        plan: '<strong>' + t(plan.labelKey) + '</strong>',
+        price: t(plan.priceKey),
+        period: usage.period,
+      }) %></p>
 
     <%
       const used = usage.ingests;
@@ -31,9 +64,9 @@
     %>
     <div class="quota">
       <div class="quota-label">
-        <span class="lbl">今月の取り込み</span>
+        <span class="lbl"><%= t('set.quota.ingests') %></span>
         <span class="ctr<%= hot ? ' hot' : '' %>">
-          <span><%= used %></span><span class="sep">/</span><span><%= cap %></span><span class="unit">回</span>
+          <span><%= used %></span><span class="sep">/</span><span><%= cap %></span><% if (t('set.unit.short')) { %><span class="unit"><%= t('set.unit.short') %></span><% } %>
         </span>
       </div>
       <div class="quota-bar">
@@ -43,26 +76,26 @@
 
     <div class="quota">
       <div class="quota-label">
-        <span class="lbl">今月に読んだ文字数</span>
-        <span class="ctr"><span><%= usage.chars.toLocaleString() %></span><span class="unit">字</span></span>
+        <span class="lbl"><%= t('set.quota.chars') %></span>
+        <span class="ctr"><span><%= usage.chars.toLocaleString() %></span><span class="unit"><%= t('set.unit.chars') %></span></span>
       </div>
     </div>
 
     <table class="spec-table">
       <thead>
-        <tr><th>プラン</th><th>月の取り込み</th><th>1ファイル</th><th></th></tr>
+        <tr><th><%= t('set.th.plan') %></th><th><%= t('set.th.monthly') %></th><th><%= t('set.th.perfile') %></th><th></th></tr>
       </thead>
       <tbody>
         <% Object.values(plans).forEach(function (p) { %>
           <tr class="<%= p.key === plan.key ? 'current' : '' %>">
-            <td><%= p.label %><% if (p.key === plan.key) { %><span class="badge">利用中</span><% } %></td>
-            <td><%= p.monthlyIngests %> 回</td>
-            <td><%= p.maxDocChars.toLocaleString() %> 字</td>
+            <td><%= t(p.labelKey) %><% if (p.key === plan.key) { %><span class="badge"><%= t('set.badge.current') %></span><% } %></td>
+            <td><%= p.monthlyIngests %> <%= t('set.unit.times') %></td>
+            <td><%= p.maxDocChars.toLocaleString() %> <%= t('set.unit.chars') %></td>
             <td>
               <% if (p.key !== plan.key) { %>
                 <form action="/settings/plan" method="post">
                   <input type="hidden" name="plan" value="<%= p.key %>">
-                  <button class="btn" type="submit"><%= p.key === 'pro' ? '申し込む' : 'こちらに戻す' %></button>
+                  <button class="btn" type="submit"><%= t(p.key === 'pro' ? 'set.apply' : 'set.revert') %></button>
                 </form>
               <% } %>
             </td>
@@ -72,23 +105,20 @@
     </table>
   </section>
 
-  <%# 既定の出力言語 %>
+  <%# ノートを何語で書くか（画面の言語とは別）%>
   <form action="/settings/language" method="post" class="sheet">
-    <h2>知識の出力言語</h2>
-    <p>
-      取り込んだ資料を、どの言語のノートにするかを決めます。「原文のまま」を選ぶと、
-      資料の言語をそのまま使います。取り込みのたびに変えることもできます。
-    </p>
+    <h2><%= t('set.outlang.h') %></h2>
+    <p><%= t('set.outlang.body') %></p>
     <label class="field">
-      <span class="cap">既定の出力言語</span>
+      <span class="cap"><%= t('set.outlang.default') %></span>
       <select name="out_lang">
         <% Object.keys(languages).forEach(function (k) { %>
-          <option value="<%= k %>" <%= k === outLang ? 'selected' : '' %>><%= languages[k].label %></option>
+          <option value="<%= k %>" <%= k === outLang ? 'selected' : '' %>><%= k === 'auto' ? t('outlang.auto') : languages[k].label %></option>
         <% }); %>
       </select>
     </label>
     <div class="form-actions">
-      <button class="btn primary" type="submit"><svg class="ico"><use href="#i-check"/></svg>保存</button>
+      <button class="btn primary" type="submit"><svg class="ico"><use href="#i-check"/></svg><%= t('set.save') %></button>
     </div>
   </form>
 </div>

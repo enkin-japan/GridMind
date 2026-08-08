@@ -7,7 +7,7 @@ const session = require('express-session');
 const path = require('path');
 const db = require('./models/db');
 const janitor = require('./services/janitor');
-const { loadUser, requireAuth } = require('./middleware');
+const { loadUser, localize, requireAuth } = require('./middleware');
 
 const app = express();
 
@@ -44,6 +44,7 @@ app.use(
 
 // 全リクエストでログインユーザーを res.locals.user に載せる
 app.use(loadUser);
+app.use(localize);
 
 // 認証ルート（ログイン不要）
 app.use('/', require('./routes/auth'));
@@ -55,7 +56,7 @@ app.use('/', requireAuth, require('./routes/index'));
 
 // 404
 app.use((req, res) => {
-  res.status(404).render('error', { title: '404', message: 'ページが見つかりません。' });
+  res.status(404).render('error', { titleKey: 'err.404', messageKey: 'err.404.page' });
 });
 
 // エラーハンドラ

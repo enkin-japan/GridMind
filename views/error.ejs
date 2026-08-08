@@ -1,7 +1,7 @@
 <%- include('partials/header') %>
 <div class="empty">
-  <h1><%= title %></h1>
-  <p><%= message %></p>
-  <a class="btn" href="/"><svg class="ico"><use href="#i-back"/></svg>ホームに戻る</a>
+  <h1><%= typeof titleKey !== 'undefined' && titleKey ? t(titleKey) : title %></h1>
+  <p><%= typeof messageKey !== 'undefined' && messageKey ? t(messageKey) : message %></p>
+  <a class="btn" href="/"><svg class="ico"><use href="#i-back"/></svg><%= t('err.home') %></a>
 </div>
 <%- include('partials/footer') %>

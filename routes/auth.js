@@ -7,25 +7,25 @@ const users = require('../models/users');
 // --- 新規登録 ---
 router.get('/register', (req, res) => {
   if (req.session.userId) return res.redirect('/');
-  res.render('auth/register', { title: '新規登録', errors: [], values: {} });
+  res.render('auth/register', { titleKey: 'auth.register', errors: [], values: {} });
 });
 
 router.post(
   '/register',
   [
-    body('username').trim().isLength({ min: 3 }).withMessage('ユーザー名は3文字以上で入力してください。'),
-    body('password').isLength({ min: 6 }).withMessage('パスワードは6文字以上で入力してください。'),
+    body('username').trim().isLength({ min: 3 }).withMessage('err.username.min'),
+    body('password').isLength({ min: 6 }).withMessage('err.password.min'),
   ],
   async (req, res, next) => {
     const errors = validationResult(req);
     const username = (req.body.username || '').trim();
     if (!errors.isEmpty()) {
-      return res.status(400).render('auth/register', { title: '新規登録', errors: errors.array(), values: { username } });
+      return res.status(400).render('auth/register', { titleKey: 'auth.register', errors: errors.array(), values: { username } });
     }
     try {
       if (await users.findByUsername(username)) {
         return res.status(400).render('auth/register', {
-          title: '新規登録', errors: [{ msg: 'そのユーザー名は既に使われています。' }], values: { username },
+          titleKey: 'auth.register', errors: [{ msg: 'err.username.taken' }], values: { username },
         });
       }
       const id = await users.create(username, req.body.password);
@@ -40,7 +40,7 @@ router.post(
 // --- ログイン ---
 router.get('/login', (req, res) => {
   if (req.session.userId) return res.redirect('/');
-  res.render('auth/login', { title: 'ログイン', errors: [], values: {} });
+  res.render('auth/login', { titleKey: 'auth.login', errors: [], values: {} });
 });
 
 router.post('/login', async (req, res, next) => {
@@ -49,7 +49,7 @@ router.post('/login', async (req, res, next) => {
     const user = await users.findByUsername(username);
     if (!user || !(await users.verifyPassword(user, req.body.password))) {
       return res.status(401).render('auth/login', {
-        title: 'ログイン', errors: [{ msg: 'ユーザー名またはパスワードが違います。' }], values: { username },
+        titleKey: 'auth.login', errors: [{ msg: 'err.credentials' }], values: { username },
       });
     }
     req.session.userId = user.id;

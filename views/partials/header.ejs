@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="<%= lang %>"<%- theme === 'auto' ? '' : ' data-theme="' + theme + '"' %>>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> | GridMind</title>
+  <title><%= typeof titleKey !== 'undefined' && titleKey ? t(titleKey) : title %> | GridMind</title>
   <meta name="theme-color" content="#22231e">
   <link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-latin.woff2" crossorigin>
   <link rel="stylesheet" href="/css/style.css">
@@ -74,28 +74,28 @@
 </svg>
 
   <header class="site-header">
-    <a class="brand" href="/"><svg class="ico"><use href="#i-reel"/></svg>GridMind</a>
+    <a class="brand" href="/" aria-label="GridMind"><svg class="ico"><use href="#i-reel"/></svg><span class="name">GridMind</span></a>
     <% if (user) { %>
       <form class="search" action="/" method="get" role="search">
         <input type="search" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>"
-               placeholder="タイトル・本文で検索" aria-label="ノートを検索">
-        <button type="submit" aria-label="検索"><svg class="ico"><use href="#i-search"/></svg></button>
+               placeholder="<%= t('nav.search') %>" aria-label="<%= t('nav.search.label') %>">
+        <button type="submit" aria-label="<%= t('nav.search.label') %>"><svg class="ico"><use href="#i-search"/></svg></button>
       </form>
-      <a class="rail-btn" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg><span class="txt">取り込み</span></a>
-      <a class="rail-btn" href="/notes/new"><svg class="ico"><use href="#i-new"/></svg><span class="txt">新規</span></a>
-      <a class="rail-btn icon-only" href="/settings" title="設定"><svg class="ico"><use href="#i-dial"/></svg><span class="txt">設定</span></a>
+      <a class="rail-btn" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg><span class="txt"><%= t('nav.import') %></span></a>
+      <a class="rail-btn" href="/notes/new"><svg class="ico"><use href="#i-new"/></svg><span class="txt"><%= t('nav.new') %></span></a>
+      <a class="rail-btn icon-only" href="/settings" title="<%= t('nav.settings') %>"><svg class="ico"><use href="#i-dial"/></svg><span class="txt"><%= t('nav.settings') %></span></a>
       <span class="user-box">
         <span class="username"><%= user.username %></span>
         <form action="/logout" method="post" class="logout-form">
-          <button class="rail-btn icon-only" type="submit" title="ログアウト">
-            <svg class="ico"><use href="#i-out"/></svg><span class="txt">ログアウト</span>
+          <button class="rail-btn icon-only" type="submit" title="<%= t('nav.logout') %>">
+            <svg class="ico"><use href="#i-out"/></svg><span class="txt"><%= t('nav.logout') %></span>
           </button>
         </form>
       </span>
     <% } else { %>
       <span class="header-spacer"></span>
-      <a class="rail-btn" href="/login">ログイン</a>
-      <a class="rail-btn" href="/register">新規登録</a>
+      <a class="rail-btn" href="/login"><%= t('nav.login') %></a>
+      <a class="rail-btn" href="/register"><%= t('nav.register') %></a>
     <% } %>
   </header>
   <main class="container">

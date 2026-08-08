@@ -19,7 +19,7 @@ function findByUsername(username) {
 }
 
 function findById(id) {
-  return get('SELECT id, username, plan, out_lang, created_at FROM users WHERE id = ?', [id]);
+  return get('SELECT id, username, plan, out_lang, ui_lang, theme, created_at FROM users WHERE id = ?', [id]);
 }
 
 function verifyPassword(user, password) {
@@ -31,9 +31,14 @@ async function setOutLang(userId, lang) {
   await run('UPDATE users SET out_lang = ? WHERE id = ?', [lang || 'auto', userId]);
 }
 
+// 画面の言語と表示テーマを保存する。null / 'auto' は「決め打ちしない」の意。
+async function setDisplay(userId, { uiLang, theme }) {
+  await run('UPDATE users SET ui_lang = ?, theme = ? WHERE id = ?', [uiLang || null, theme || 'auto', userId]);
+}
+
 // プランを変更する（'free' | 'pro'）。
 async function setPlan(userId, plan) {
   await run('UPDATE users SET plan = ? WHERE id = ?', [plan === 'pro' ? 'pro' : 'free', userId]);
 }
 
-module.exports = { create, findByUsername, findById, verifyPassword, setOutLang, setPlan };
+module.exports = { create, findByUsername, findById, verifyPassword, setOutLang, setDisplay, setPlan };

@@ -5,6 +5,7 @@ const router = express.Router();
 const users = require('../models/users');
 const quota = require('../services/quota');
 const ai = require('../services/ai');
+const i18n = require('../services/i18n');
 
 router.get('/', async (req, res, next) => {
   try {
@@ -12,12 +13,13 @@ router.get('/', async (req, res, next) => {
     const usage = await quota.usageFor(user.id);
     const plan = quota.planOf(user);
     res.render('settings', {
-      title: '設定',
+      titleKey: 'set.title',
       plan,
       plans: quota.PLANS,
       usage,
       languages: ai.LANGUAGES,
       outLang: user.out_lang || 'auto',
+      uiLang: user.ui_lang || '',
       saved: req.query.saved || '',
     });
   } catch (e) {
@@ -32,6 +34,23 @@ router.post('/language', async (req, res, next) => {
     if (!ai.LANGUAGES[lang]) return res.redirect('/settings');
     await users.setOutLang(req.session.userId, lang);
     res.redirect('/settings?saved=lang');
+  } catch (e) {
+    next(e);
+  }
+});
+
+// 画面の言語と表示テーマ。
+// アカウントに保存しつつ cookie にも書く。ログイン前の画面（ログイン・新規登録）は
+// アカウントを読めないので、cookie が無いとせっかくの設定が効かない。
+router.post('/display', async (req, res, next) => {
+  try {
+    const uiLang = i18n.isLang(req.body.ui_lang) ? req.body.ui_lang : null;
+    const theme = i18n.isTheme(req.body.theme) ? req.body.theme : 'auto';
+    await users.setDisplay(req.session.userId, { uiLang, theme });
+    const year = { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false, sameSite: 'lax', path: '/' };
+    if (uiLang) res.cookie('gm_lang', uiLang, year); else res.clearCookie('gm_lang', { path: '/' });
+    res.cookie('gm_theme', theme, year);
+    res.redirect('/settings?saved=display');
   } catch (e) {
     next(e);
   }

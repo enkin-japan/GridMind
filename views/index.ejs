@@ -1,10 +1,10 @@
 <%- include('partials/header') %>
 
 <div class="page-head">
-  <h1><%= q ? '検索：' + q : (tag ? 'タグ：' + tag : 'ノート') %></h1>
+  <h1><%= q ? t('home.title.search', { q }) : (tag ? t('home.title.tag', { tag }) : t('home.title')) %></h1>
   <p>
-    <span class="ctr"><span><%= total %></span><span class="unit">件</span></span>
-    <% if (q || tag) { %>　<a href="/">すべてに戻す</a><% } %>
+    <span class="ctr"><span><%= total %></span><% if (t('home.unit')) { %><span class="unit"><%= t('home.unit') %></span><% } %></span>
+    <% if (q || tag) { %>　<a href="/"><%= t('home.reset') %></a><% } %>
   </p>
 </div>
 
@@ -13,12 +13,12 @@
 <% if (allTags && allTags.length) { %>
   <details class="tags"<%= tag ? ' open' : '' %>>
     <summary>
-      <span class="grow">タグで絞り込み</span>
+      <span class="grow"><%= t('home.tags') %></span>
       <span><%= allTags.length %></span>
     </summary>
     <div class="tape-row">
-      <% allTags.forEach(function (t) { %>
-        <a class="tape<%= tag === t.name ? ' active' : '' %>" href="/?tag=<%= encodeURIComponent(t.name) %>"><%= t.name %> <span class="count"><%= t.count %></span></a>
+      <% allTags.forEach(function (x) { %>
+        <a class="tape<%= tag === x.name ? ' active' : '' %>" href="/?tag=<%= encodeURIComponent(x.name) %>"><%= x.name %> <span class="count"><%= x.count %></span></a>
       <% }) %>
     </div>
   </details>
@@ -26,8 +26,8 @@
 
 <% if (rows.length === 0) { %>
   <div class="empty">
-    <p><%= q || tag ? '条件に合うノートはありません。' : 'まだ1本も巻かれていません。資料を取り込むと、ここに並びます。' %></p>
-    <a class="btn primary" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg>資料を取り込む</a>
+    <p><%= q || tag ? t('home.empty.filtered') : t('home.empty') %></p>
+    <a class="btn primary" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg><%= t('home.empty.cta') %></a>
   </div>
 <% } else { %>
   <%# 一覧はカードの並びではなく1本のロール。送り穴は左端を途切れず走る。 %>
@@ -40,7 +40,7 @@
           <% if (note.summary) { %><p class="summary"><%= note.summary %></p><% } %>
           <% if (note.tags && note.tags.length) { %>
             <div class="frame-tapes">
-              <% note.tags.forEach(function (t) { %><span class="tape sm"><%= t %></span><% }) %>
+              <% note.tags.forEach(function (x) { %><span class="tape sm"><%= x %></span><% }) %>
             </div>
           <% } %>
           <div class="edge-code">
@@ -53,7 +53,7 @@
   </div>
 
   <% if (pages > 1) { %>
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" aria-label="<%= t('home.pager') %>">
       <% for (let p = 1; p <= pages; p++) { %>
         <a class="page<%= p === page ? ' active' : '' %>"
            <%= p === page ? 'aria-current="page"' : '' %>

@@ -1,18 +1,15 @@
 <%- include('../partials/header') %>
 
 <div class="page-head">
-  <h1>2本を見くらべる</h1>
-  <p>
-    いま取り込んだ知識が、既存のノート「<strong><%= old.title %></strong>」とかなり重なっています。
-    2本を並べたので、どう扱うかを決めてください。
-  </p>
+  <h1><%= t('rec.title') %></h1>
+  <p><%- t('rec.lede', { title: '<strong>' + old.title + '</strong>' }) %></p>
 </div>
 
 <div class="compare">
   <section class="pane pane-new">
     <div class="pane-head">
       <span class="roll-id">A</span>
-      <span class="lbl">新規（取り込み）</span>
+      <span class="lbl"><%= t('rec.new') %></span>
     </div>
     <div class="pane-body">
       <h3><%= staged.title %></h3>
@@ -22,7 +19,7 @@
   <section class="pane pane-old">
     <div class="pane-head">
       <span class="roll-id">B</span>
-      <span class="lbl">既存ノート</span>
+      <span class="lbl"><%= t('rec.old') %></span>
     </div>
     <div class="pane-body">
       <h3><%= old.title %></h3>
@@ -33,16 +30,16 @@
 
 <div class="sheet decide">
   <form action="/notes/reconcile/link" method="post">
-    <button class="btn primary" type="submit"><svg class="ico"><use href="#i-splice"/></svg>関連づけて保存</button>
-    <span class="hint">2本とも別々のノートとして残し、相互にリンクします。</span>
+    <button class="btn primary" type="submit"><svg class="ico"><use href="#i-splice"/></svg><%= t('rec.link') %></button>
+    <span class="hint"><%= t('rec.link.hint') %></span>
   </form>
   <form action="/notes/reconcile/merge" method="post">
-    <button class="btn" type="submit"><svg class="ico"><use href="#i-merge"/></svg>統合する（プレビュー）</button>
-    <span class="hint">B に統合します。AI が重複を除いてまとめ、確認してから保存します。</span>
+    <button class="btn" type="submit"><svg class="ico"><use href="#i-merge"/></svg><%= t('rec.merge') %></button>
+    <span class="hint"><%= t('rec.merge.hint') %></span>
   </form>
   <form action="/notes/reconcile/plain" method="post">
-    <button class="btn ghost" type="submit">リンクせず保存</button>
-    <span class="hint">関連づけずに、A をそのまま別のノートとして保存します。</span>
+    <button class="btn ghost" type="submit"><%= t('rec.plain') %></button>
+    <span class="hint"><%= t('rec.plain.hint') %></span>
   </form>
 </div>
 

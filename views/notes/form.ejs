@@ -1,39 +1,39 @@
 <%- include('../partials/header') %>
 
 <div class="page-head">
-  <h1><%= mode === 'edit' ? 'ノートを編集' : '新規ノート' %></h1>
+  <h1><%= t(mode === 'edit' ? 'form.edit' : 'form.new') %></h1>
 </div>
 
 <form class="sheet form-narrow" action="<%= mode === 'edit' ? '/notes/' + note.id + '/edit' : '/notes/new' %>" method="post">
   <% if (errors && errors.length) { %>
     <ul class="errors">
-      <% errors.forEach(function (e) { %><li><%= e.msg %></li><% }) %>
+      <% errors.forEach(function (e) { %><li><%= t(e.msg) %></li><% }) %>
     </ul>
   <% } %>
 
   <label class="field">
-    <span class="cap">タイトル <span class="req">*</span></span>
+    <span class="cap"><%= t('form.title') %> <span class="req">*</span></span>
     <input type="text" name="title" value="<%= note ? (note.title || '') : '' %>" required>
   </label>
 
   <label class="field">
-    <span class="cap">タグ</span>
-    <input type="text" name="tags" value="<%= note ? (note.tags_str || '') : '' %>" placeholder="例: 機械学習, メモ">
-    <small class="hint">カンマ区切りで複数つけられます。</small>
+    <span class="cap"><%= t('form.tags') %></span>
+    <input type="text" name="tags" value="<%= note ? (note.tags_str || '') : '' %>" placeholder="<%= t('form.tags.placeholder') %>">
+    <small class="hint"><%= t('form.tags.hint') %></small>
   </label>
 
   <label class="field">
-    <span class="cap">本文</span>
+    <span class="cap"><%= t('form.body') %></span>
     <textarea name="body_md" rows="18"><%= note ? (note.body_md || '') : '' %></textarea>
-    <small class="hint">Markdown で書けます。<code>[[別のノート名]]</code> と書くと、そのノートへの継ぎ目になります。</small>
+    <small class="hint"><%- t('form.body.hint', { code: '<code>' + t('form.body.sample') + '</code>' }) %></small>
   </label>
 
   <div class="form-actions">
     <button class="btn primary" type="submit">
-      <svg class="ico"><use href="#i-check"/></svg><%= mode === 'edit' ? '更新' : '作成' %>
+      <svg class="ico"><use href="#i-check"/></svg><%= t(mode === 'edit' ? 'form.update' : 'form.create') %>
     </button>
     <a class="btn" href="<%= mode === 'edit' ? '/notes/' + note.id : '/' %>">
-      <svg class="ico"><use href="#i-back"/></svg>キャンセル
+      <svg class="ico"><use href="#i-back"/></svg><%= t('form.cancel') %>
     </a>
   </div>
 </form>

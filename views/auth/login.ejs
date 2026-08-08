@@ -5,30 +5,30 @@
   <div class="slate-clap" aria-hidden="true"></div>
   <div class="slate-plate">
     <span class="lbl grow">GridMind</span>
-    <span class="ctr"><span>LOGIN</span></span>
+    <span class="ctr"><span><%= t('auth.login').toUpperCase() %></span></span>
   </div>
   <div class="slate-body">
-    <h1>ログイン</h1>
+    <h1><%= t('auth.login') %></h1>
 
     <% if (errors && errors.length) { %>
-      <ul class="errors"><% errors.forEach(function (e) { %><li><%= e.msg %></li><% }) %></ul>
+      <ul class="errors"><% errors.forEach(function (e) { %><li><%= t(e.msg) %></li><% }) %></ul>
     <% } %>
 
     <form action="/login" method="post">
       <label class="field">
-        <span class="cap">ユーザー名</span>
+        <span class="cap"><%= t('auth.username') %></span>
         <input type="text" name="username" value="<%= values.username || '' %>" autocomplete="username" required autofocus>
       </label>
       <label class="field">
-        <span class="cap">パスワード</span>
+        <span class="cap"><%= t('auth.password') %></span>
         <input type="password" name="password" autocomplete="current-password" required>
       </label>
       <div class="form-actions">
-        <button class="btn primary" type="submit">ログイン</button>
+        <button class="btn primary" type="submit"><%= t('auth.login') %></button>
       </div>
     </form>
 
-    <p class="foot">アカウントがない場合は <a href="/register">新規登録</a></p>
+    <p class="foot"><%= t('auth.to_register') %> <a href="/register"><%= t('auth.register') %></a></p>
   </div>
 </div>
 

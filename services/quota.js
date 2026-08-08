@@ -10,17 +10,17 @@ const ai = require('./ai');
 const PLANS = {
   free: {
     key: 'free',
-    label: 'フリー',
+    labelKey: 'plan.free',
+    priceKey: 'plan.free.price',
     monthlyIngests: Number(process.env.PLAN_FREE_INGESTS) || 30,
     maxDocChars: Number(process.env.PLAN_FREE_DOC_CHARS) || 20000,
-    price: '無料',
   },
   pro: {
     key: 'pro',
-    label: 'プロ',
+    labelKey: 'plan.pro',
+    priceKey: 'plan.pro.price',
     monthlyIngests: Number(process.env.PLAN_PRO_INGESTS) || 500,
     maxDocChars: Number(process.env.PLAN_PRO_DOC_CHARS) || 60000,
-    price: '有料',
   },
 };
 
@@ -85,9 +85,8 @@ async function check(user, docChars = 0) {
     return {
       ok: false,
       reason: 'MONTHLY_LIMIT',
-      message:
-        `今月の取り込み回数の上限（${plan.monthlyIngests}回）に達しました。` +
-        `来月になると回数が戻ります。もっと使う場合はプランの変更をご検討ください。`,
+      messageKey: 'quota.over.ingests',
+      messageVars: { n: plan.monthlyIngests },
       plan,
       usage,
     };
@@ -97,10 +96,12 @@ async function check(user, docChars = 0) {
     return {
       ok: false,
       reason: 'DOC_TOO_LARGE',
-      message:
-        `このファイルは ${docChars.toLocaleString()} 文字あり、` +
-        `${plan.label}プランの上限（1ファイル ${plan.maxDocChars.toLocaleString()} 文字）を超えています。` +
-        `ファイルを分けるか、プランの変更をご検討ください。`,
+      messageKey: 'quota.over.chars',
+      messageVars: {
+        chars: docChars.toLocaleString(),
+        max: plan.maxDocChars.toLocaleString(),
+        planKey: plan.labelKey,   // 呼ぶ側で訳してから差しこむ
+      },
       plan,
       usage,
     };

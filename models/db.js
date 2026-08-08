@@ -46,7 +46,9 @@ async function init() {
       username      TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       plan          TEXT NOT NULL DEFAULT 'free',  -- 'free' | 'pro'
-      out_lang      TEXT NOT NULL DEFAULT 'auto',  -- 既定の出力言語
+      out_lang      TEXT NOT NULL DEFAULT 'auto',  -- 既定の出力言語（ノートの中身）
+      ui_lang       TEXT,                          -- 画面の言語。null なら毎回ブラウザから決める
+      theme         TEXT NOT NULL DEFAULT 'auto',  -- 'auto' | 'light' | 'dark'
       created_at    TEXT NOT NULL
     )
   `);
@@ -136,6 +138,14 @@ async function init() {
   // --- マイグレーション：既定の出力言語（'auto' | 'ja' | 'en' | 'zh' | 'ko'）---
   if (!(await columnExists('users', 'out_lang'))) {
     await run("ALTER TABLE users ADD COLUMN out_lang TEXT NOT NULL DEFAULT 'auto'");
+  }
+  // --- マイグレーション：画面の言語（null＝ブラウザに合わせる）---
+  if (!(await columnExists('users', 'ui_lang'))) {
+    await run('ALTER TABLE users ADD COLUMN ui_lang TEXT');
+  }
+  // --- マイグレーション：表示テーマ（既定はシステムに従う）---
+  if (!(await columnExists('users', 'theme'))) {
+    await run("ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT 'auto'");
   }
   // --- マイグレーション：資料の元の文字数 ---
   // 「どれだけ削ったか」はこの製品の主張そのものなので、ノート側に控えておく。

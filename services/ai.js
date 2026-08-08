@@ -64,9 +64,9 @@ function estimate(chars) {
       route: 'chunked',
       chunks: parts,
       stages: [
-        { key: 'extract', label: '資料を分けて読んでいます', ms: waves * (6000 + 0.75 * CHUNK_SIZE) },
-        { key: 'consolidate', label: '知識をまとめ直しています', ms: 8000 + 0.5 * n },
-        { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+        { key: 'extract', ms: waves * (6000 + 0.75 * CHUNK_SIZE) },
+        { key: 'consolidate', ms: 8000 + 0.5 * n },
+        { key: 'meta', ms: 2200 },
       ],
     };
   }
@@ -75,13 +75,13 @@ function estimate(chars) {
     chunks: 1,
     stages: TWO_STAGE
       ? [
-          { key: 'inventory', label: '知識点を洗い出しています', ms: 4000 + 0.7 * n },
-          { key: 'writeup', label: '本文を書いています', ms: 6000 + 1.2 * n },
-          { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+          { key: 'inventory', ms: 4000 + 0.7 * n },
+          { key: 'writeup', ms: 6000 + 1.2 * n },
+          { key: 'meta', ms: 2200 },
         ]
       : [
-          { key: 'single', label: '知識を取り出しています', ms: 8000 + 1.6 * n },
-          { key: 'meta', label: '見出しと要約をつくっています', ms: 2200 },
+          { key: 'single', ms: 8000 + 1.6 * n },
+          { key: 'meta', ms: 2200 },
         ],
   };
 }

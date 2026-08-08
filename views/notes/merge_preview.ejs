@@ -1,35 +1,32 @@
 <%- include('../partials/header') %>
 
 <div class="page-head">
-  <h1>統合プレビュー</h1>
-  <p>
-    既存ノート「<strong><%= old.title %></strong>」に統合します。中身を確認・編集してから保存してください。
-    元のノートが更新され、そこへの継ぎ目（被リンク）はそのまま残ります。新しいノートは作られません。
-  </p>
+  <h1><%= t('merge.title') %></h1>
+  <p><%- t('merge.lede', { title: '<strong>' + old.title + '</strong>' }) %></p>
 </div>
 
 <form action="/notes/reconcile/merge/commit" method="post" class="sheet form-narrow">
   <label class="field">
-    <span class="cap">タイトル <span class="req">*</span></span>
+    <span class="cap"><%= t('form.title') %> <span class="req">*</span></span>
     <input type="text" name="title" value="<%= merged.title %>" required>
   </label>
   <label class="field">
-    <span class="cap">タグ</span>
+    <span class="cap"><%= t('form.tags') %></span>
     <input type="text" name="tags" value="<%= (merged.tags || []).join(', ') %>">
-    <small class="hint">カンマ区切りで複数つけられます。</small>
+    <small class="hint"><%= t('form.tags.hint') %></small>
   </label>
   <label class="field">
-    <span class="cap">要約</span>
+    <span class="cap"><%= t('note.summary') %></span>
     <input type="text" name="summary" value="<%= merged.summary || '' %>">
   </label>
   <label class="field">
-    <span class="cap">本文</span>
+    <span class="cap"><%= t('form.body') %></span>
     <textarea name="body_md" rows="20"><%= merged.markdown %></textarea>
   </label>
 
   <div class="form-actions">
-    <button class="btn primary" type="submit"><svg class="ico"><use href="#i-merge"/></svg>統合して保存</button>
-    <a class="btn" href="/notes/reconcile"><svg class="ico"><use href="#i-back"/></svg>戻る</a>
+    <button class="btn primary" type="submit"><svg class="ico"><use href="#i-merge"/></svg><%= t('merge.submit') %></button>
+    <a class="btn" href="/notes/reconcile"><svg class="ico"><use href="#i-back"/></svg><%= t('merge.back') %></a>
   </div>
 </form>
 
