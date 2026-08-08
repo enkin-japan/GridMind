@@ -1,19 +1,25 @@
 <%- include('partials/header') %>
 
-<div class="auth-card">
+<div class="page-head">
   <h1>設定</h1>
+</div>
 
-  <% if (saved === 'lang') { %><p class="notice ok">出力言語を保存しました。</p><% } %>
-  <% if (saved === 'plan') { %><p class="notice ok">プランを変更しました。</p><% } %>
+<div class="form-narrow">
+  <% if (saved === 'lang') { %>
+    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg>出力言語を保存しました。</p>
+  <% } %>
+  <% if (saved === 'plan') { %>
+    <p class="notice ok"><svg class="ico"><use href="#i-check"/></svg>プランを変更しました。</p>
+  <% } %>
   <% if (saved === 'pro_pending') { %>
-    <p class="notice warn">プロプランの受付は準備中です。もうしばらくお待ちください。</p>
+    <p class="notice warn"><svg class="ico"><use href="#i-alert"/></svg>プロプランの受付は準備中です。もうしばらくお待ちください。</p>
   <% } %>
 
-  <!-- プランと今月の使用量 -->
-  <section class="note-form">
+  <%# プランと今月の使用量 %>
+  <section class="sheet">
     <h2>プランと使用量</h2>
-    <p class="muted">
-      現在のプラン：<strong><%= plan.label %></strong>（<%= plan.price %>）<br>
+    <p>
+      現在のプラン：<strong><%= plan.label %></strong>（<%= plan.price %>）／
       集計期間：<%= usage.period %>（東京時間で毎月1日にリセット）
     </p>
 
@@ -21,29 +27,37 @@
       const used = usage.ingests;
       const cap  = plan.monthlyIngests;
       const pct  = Math.min(100, Math.round((used / cap) * 100));
+      const hot  = pct >= 80;
     %>
     <div class="quota">
       <div class="quota-label">
-        <span>今月の取り込み</span>
-        <strong><%= used %> / <%= cap %> 回</strong>
+        <span class="lbl">今月の取り込み</span>
+        <span class="ctr<%= hot ? ' hot' : '' %>">
+          <span><%= used %></span><span class="sep">/</span><span><%= cap %></span><span class="unit">回</span>
+        </span>
       </div>
-      <div class="quota-bar"><div class="quota-fill" style="width: <%= pct %>%"></div></div>
-      <p class="muted small">
-        1ファイルの上限：<%= plan.maxDocChars.toLocaleString() %> 文字 ／
-        今月の合計：<%= usage.chars.toLocaleString() %> 文字
-      </p>
+      <div class="quota-bar">
+        <div class="quota-fill<%= hot ? ' hot' : '' %>" style="width: <%= pct %>%"></div>
+      </div>
     </div>
 
-    <table class="plan-table">
+    <div class="quota">
+      <div class="quota-label">
+        <span class="lbl">今月に読んだ文字数</span>
+        <span class="ctr"><span><%= usage.chars.toLocaleString() %></span><span class="unit">字</span></span>
+      </div>
+    </div>
+
+    <table class="spec-table">
       <thead>
         <tr><th>プラン</th><th>月の取り込み</th><th>1ファイル</th><th></th></tr>
       </thead>
       <tbody>
         <% Object.values(plans).forEach(function (p) { %>
           <tr class="<%= p.key === plan.key ? 'current' : '' %>">
-            <td><%= p.label %><% if (p.key === plan.key) { %> <span class="badge">利用中</span><% } %></td>
+            <td><%= p.label %><% if (p.key === plan.key) { %><span class="badge">利用中</span><% } %></td>
             <td><%= p.monthlyIngests %> 回</td>
-            <td><%= p.maxDocChars.toLocaleString() %> 文字</td>
+            <td><%= p.maxDocChars.toLocaleString() %> 字</td>
             <td>
               <% if (p.key !== plan.key) { %>
                 <form action="/settings/plan" method="post">
@@ -58,14 +72,15 @@
     </table>
   </section>
 
-  <!-- 既定の出力言語 -->
-  <form action="/settings/language" method="post" class="note-form">
+  <%# 既定の出力言語 %>
+  <form action="/settings/language" method="post" class="sheet">
     <h2>知識の出力言語</h2>
-    <p class="muted">
-      取り込んだ資料を、どの言語のノートにするかを決めます。<br>
-      「原文のまま」を選ぶと、資料の言語をそのまま使います。取り込みのたびに変えることもできます。
+    <p>
+      取り込んだ資料を、どの言語のノートにするかを決めます。「原文のまま」を選ぶと、
+      資料の言語をそのまま使います。取り込みのたびに変えることもできます。
     </p>
-    <label>既定の出力言語
+    <label class="field">
+      <span class="cap">既定の出力言語</span>
       <select name="out_lang">
         <% Object.keys(languages).forEach(function (k) { %>
           <option value="<%= k %>" <%= k === outLang ? 'selected' : '' %>><%= languages[k].label %></option>
@@ -73,7 +88,7 @@
       </select>
     </label>
     <div class="form-actions">
-      <button class="btn primary" type="submit">保存</button>
+      <button class="btn primary" type="submit"><svg class="ico"><use href="#i-check"/></svg>保存</button>
     </div>
   </form>
 </div>

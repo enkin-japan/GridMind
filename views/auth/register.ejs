@@ -1,22 +1,37 @@
 <%- include('../partials/header') %>
 
-<div class="auth-card">
-  <h1>新規登録</h1>
-  <% if (errors && errors.length) { %>
-    <ul class="errors"><% errors.forEach(function (e) { %><li><%= e.msg %></li><% }) %></ul>
-  <% } %>
-  <form action="/register" method="post" class="note-form">
-    <label>ユーザー名（3文字以上）
-      <input type="text" name="username" value="<%= values.username || '' %>" required autofocus>
-    </label>
-    <label>パスワード（6文字以上）
-      <input type="password" name="password" required>
-    </label>
-    <div class="form-actions">
-      <button class="btn primary" type="submit">登録してはじめる</button>
-    </div>
-  </form>
-  <p class="muted">すでにアカウントがある場合は <a href="/login">ログイン</a></p>
+<div class="slate">
+  <div class="perf-col" aria-hidden="true"></div>
+  <div class="slate-clap" aria-hidden="true"></div>
+  <div class="slate-plate">
+    <span class="lbl grow">GridMind</span>
+    <span class="ctr"><span>NEW ACCOUNT</span></span>
+  </div>
+  <div class="slate-body">
+    <h1>新規登録</h1>
+
+    <% if (errors && errors.length) { %>
+      <ul class="errors"><% errors.forEach(function (e) { %><li><%= e.msg %></li><% }) %></ul>
+    <% } %>
+
+    <form action="/register" method="post">
+      <label class="field">
+        <span class="cap">ユーザー名</span>
+        <input type="text" name="username" value="<%= values.username || '' %>" autocomplete="username" required autofocus>
+        <small class="hint">3文字以上。</small>
+      </label>
+      <label class="field">
+        <span class="cap">パスワード</span>
+        <input type="password" name="password" autocomplete="new-password" required>
+        <small class="hint">6文字以上。</small>
+      </label>
+      <div class="form-actions">
+        <button class="btn primary" type="submit">登録してはじめる</button>
+      </div>
+    </form>
+
+    <p class="foot">すでにアカウントがある場合は <a href="/login">ログイン</a></p>
+  </div>
 </div>
 
 <%- include('../partials/footer') %>

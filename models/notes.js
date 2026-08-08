@@ -43,13 +43,13 @@ async function saveVector(id, userId, note, embedding) {
 
 // 作成。作成後に [[リンク]] を解決する（同一ユーザーの範囲内で）。
 // embedding: 取り込みの関連づけで作ったベクトルがあれば渡す（再生成を避けるため）。
-async function create({ title, body_md = '', summary = null, source_type = 'paste', tagNames = [], userId, embedding = null }) {
+async function create({ title, body_md = '', summary = null, source_type = 'paste', src_chars = null, tagNames = [], userId, embedding = null }) {
   const ts = now();
   const body_text = toPlainText(body_md);
   const res = await run(
-    `INSERT INTO notes (user_id, title, body_md, body_text, summary, source_type, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [userId, title, body_md, body_text, summary, source_type, ts, ts]
+    `INSERT INTO notes (user_id, title, body_md, body_text, summary, source_type, src_chars, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, title, body_md, body_text, summary, source_type, src_chars, ts, ts]
   );
   const id = res.lastID;
   await tags.setForNote(id, tagNames);

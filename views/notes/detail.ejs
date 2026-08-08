@@ -1,44 +1,82 @@
 <%- include('../partials/header') %>
 
-<article class="note">
-  <div class="note-head">
-    <h1><%= note.title %></h1>
-    <div class="actions">
-      <a class="btn" href="/notes/<%= note.id %>/edit">編集</a>
-      <form action="/notes/<%= note.id %>/delete" method="post" onsubmit="return confirm('このノートを削除しますか？');">
-        <button class="btn danger" type="submit">削除</button>
-      </form>
+<%
+  // 削った量。元の文字数を控えていないノート（この機能より前のもの）では出さない。
+  // 分からないものを、分かったふりに埋めない。
+  const kept = (note.body_md || '').length;
+  const src = note.src_chars;
+  const cut = src && src > kept ? Math.round((1 - kept / src) * 100) : null;
+%>
+
+<article class="note-layout">
+  <%# ライトボックス。このページで光るのはここだけ。 %>
+  <div class="lightbox">
+    <div class="note-bar">
+      <h1 class="note-title"><%= note.title %></h1>
+      <div class="acts">
+        <a class="btn" href="/notes/<%= note.id %>/edit"><svg class="ico"><use href="#i-pencil"/></svg>編集</a>
+        <form action="/notes/<%= note.id %>/delete" method="post" onsubmit="return confirm('このノートを削除しますか？');">
+          <button class="btn danger" type="submit"><svg class="ico"><use href="#i-bin"/></svg>削除</button>
+        </form>
+      </div>
     </div>
+
+    <% if (note.tags && note.tags.length) { %>
+      <div class="tape-row">
+        <% note.tags.forEach(function (t) { %><a class="tape" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a><% }) %>
+      </div>
+    <% } %>
+
+    <% if (note.summary) { %>
+      <div class="summary-box">
+        <span class="lbl">要約</span>
+        <%= note.summary %>
+      </div>
+    <% } %>
+
+    <% if (html && html.trim()) { %>
+      <div class="markdown-body"><%- html %></div>
+    <% } else { %>
+      <div class="markdown-body empty-body">この資料からは知識点を取り出せませんでした。中身が知識ではなかった場合、空のまま残すのが正しい結果です。</div>
+    <% } %>
   </div>
 
-  <% if (note.tags && note.tags.length) { %>
-    <div class="note-tags">
-      <% note.tags.forEach(function (t) { %><a class="tag-chip" href="/?tag=<%= encodeURIComponent(t) %>"><%= t %></a><% }) %>
+  <%# 欄外＝フィルムの縁。素性と行き先だけが住む。 %>
+  <aside class="margin-col">
+    <div class="margin-block">
+      <span class="lbl">この巻について</span>
+      <dl>
+        <dt>コード</dt>
+        <dd>GM<%= String(note.id).padStart(4, '0') %></dd>
+        <dt>素材</dt>
+        <dd><%= note.source_type === 'upload' ? 'ファイル' : '貼り付け' %></dd>
+        <% if (cut !== null) { %>
+          <dt>削った量</dt>
+          <dd>
+            <span class="ctr"><span><%= cut %></span><span class="unit">%</span></span>
+            <div style="margin-top:6px"><%= src.toLocaleString() %> → <%= kept.toLocaleString() %> 字</div>
+          </dd>
+        <% } %>
+        <dt>作成</dt>
+        <dd><%= note.created_at.slice(0, 10) %></dd>
+        <dt>更新</dt>
+        <dd><%= note.updated_at.slice(0, 10) %></dd>
+      </dl>
     </div>
-  <% } %>
 
-  <% if (note.summary) { %>
-    <div class="summary-box"><strong>要約：</strong><%= note.summary %></div>
-  <% } %>
-
-  <% if (html && html.trim()) { %>
-    <div class="markdown-body"><%- html %></div>
-  <% } else { %>
-    <div class="markdown-body muted">（このドキュメントからは知識点を抽出できませんでした）</div>
-  <% } %>
-
-  <section class="backlinks">
-    <h3>被リンク（このノートを参照しているノート）</h3>
-    <% if (backlinks.length === 0) { %>
-      <p class="muted">まだありません。</p>
-    <% } else { %>
-      <ul>
-        <% backlinks.forEach(function (b) { %><li><a href="/notes/<%= b.id %>"><%= b.title %></a></li><% }) %>
-      </ul>
-    <% } %>
-  </section>
-
-  <p class="meta">作成: <%= note.created_at.slice(0,16).replace('T',' ') %> ／ 更新: <%= note.updated_at.slice(0,16).replace('T',' ') %></p>
+    <div class="margin-block">
+      <span class="lbl">継ぎ目（<%= backlinks.length %>）</span>
+      <% if (backlinks.length === 0) { %>
+        <p class="none">このノートを参照しているノートは、まだありません。</p>
+      <% } else { %>
+        <ul>
+          <% backlinks.forEach(function (b) { %>
+            <li class="splice"><a href="/notes/<%= b.id %>"><%= b.title %></a></li>
+          <% }) %>
+        </ul>
+      <% } %>
+    </div>
+  </aside>
 </article>
 
 <%- include('../partials/footer') %>

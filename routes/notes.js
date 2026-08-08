@@ -212,6 +212,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
       summary: data.summary,
       tags: data.tags || [],
       source_type: req.file ? 'upload' : 'paste',
+      src_chars: markdown.length,
       body_text: notes.toPlainText(data.body_md),
     };
 
@@ -249,7 +250,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
 
     const id = await notes.create({
       title: staged.title, body_md: body, summary: staged.summary,
-      source_type: staged.source_type, tagNames: staged.tags, userId,
+      source_type: staged.source_type, src_chars: staged.src_chars, tagNames: staged.tags, userId,
       embedding: stagedEmb,
     });
     out.end({ type: 'done', id, aiUsed, linked: mediums.map((r) => r.title) });
@@ -274,7 +275,7 @@ router.get('/reconcile', async (req, res, next) => {
       // 相手が消えていたらそのまま保存
       const id = await notes.create({
         title: p.note.title, body_md: p.note.body_md, summary: p.note.summary,
-        source_type: p.note.source_type, tagNames: p.note.tags, userId,
+        source_type: p.note.source_type, src_chars: p.note.src_chars, tagNames: p.note.tags, userId,
       });
       req.session.pending = null;
       return res.redirect('/notes/' + id);
@@ -298,7 +299,7 @@ router.post('/reconcile/link', async (req, res, next) => {
     const body = relate.addRelatedLinks(p.note.body_md, titles);
     const id = await notes.create({
       title: p.note.title, body_md: body, summary: p.note.summary,
-      source_type: p.note.source_type, tagNames: p.note.tags, userId,
+      source_type: p.note.source_type, src_chars: p.note.src_chars, tagNames: p.note.tags, userId,
     });
     req.session.pending = null;
     res.redirect('/notes/' + id);
@@ -315,7 +316,7 @@ router.post('/reconcile/plain', async (req, res, next) => {
   try {
     const id = await notes.create({
       title: p.note.title, body_md: p.note.body_md, summary: p.note.summary,
-      source_type: p.note.source_type, tagNames: p.note.tags, userId,
+      source_type: p.note.source_type, src_chars: p.note.src_chars, tagNames: p.note.tags, userId,
     });
     req.session.pending = null;
     res.redirect('/notes/' + id);

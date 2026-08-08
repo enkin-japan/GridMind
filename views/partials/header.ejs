@@ -4,29 +4,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><%= title %> | GridMind</title>
+  <meta name="theme-color" content="#22231e">
+  <link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-latin.woff2" crossorigin>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+<!--
+  THESIS: This product's value is subtraction, so the interface is a cutting
+  bench, not a dashboard. It refuses the sidebar-plus-card-grid SaaS arrangement
+  the category ships.
+  OWN-WORLD: Bench-grey ground; one lit white light-box that is the only surface
+  allowed to glow; an always-dark machine rail; sprocket-perforated strips;
+  footage counters set in expanded tabular Archivo; grease-pencil marks with
+  fixed jobs — red cuts, blue splices, amber warns. Zero radius, zero shadow:
+  depth is a rule plus a material step.
+  STORY: The visitor meets a machine that throws material away, watches it work
+  for the 20-35 seconds it needs, and reads what survived.
+  FIRST VIEWPORT: Dark rail of engraved switches; page title under a red wax
+  rule; the note list as ONE continuous film roll — sprocket column at the left,
+  frames divided by hairlines, edge codes down the right.
+  FORM: The Cutting Bench; candidate 5 of 7; seed 7a894e29.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with the
+  finish review, the verdict, and DESIGN.md
+-->
+
+<!-- アイコンは1本の線幅で自作した SVG。絵文字は使わない。 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-reel" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="7.2"/><circle cx="10" cy="10" r="2"/>
+      <path d="M10 2.8v5M4.2 13.4l4.1-2.4M15.8 13.4l-4.1-2.4"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 20 20">
+      <circle cx="8.8" cy="8.8" r="5.3"/><path d="m12.8 12.8 4 4"/>
+    </symbol>
+    <symbol id="i-import" viewBox="0 0 20 20">
+      <path d="M3.2 11.8v5h13.6v-5M10 2.8v9"/><path d="m6.4 8.4 3.6 3.6 3.6-3.6"/>
+    </symbol>
+    <symbol id="i-new" viewBox="0 0 20 20">
+      <path d="M3.2 3.2h13.6v13.6H3.2z"/><path d="M10 6.4v7.2M6.4 10h7.2"/>
+    </symbol>
+    <symbol id="i-dial" viewBox="0 0 20 20">
+      <circle cx="10" cy="10" r="6.4"/><path d="M10 3.6v3.1M10 16.4v-2M3.6 10h2.2M16.4 10h-2.2"/>
+    </symbol>
+    <symbol id="i-out" viewBox="0 0 20 20">
+      <path d="M11.6 3.2H3.4v13.6h8.2"/><path d="M8.4 10h8.2"/><path d="m13.6 6.8 3.2 3.2-3.2 3.2"/>
+    </symbol>
+    <symbol id="i-pencil" viewBox="0 0 20 20">
+      <path d="m3.3 16.7 1-3.6L13 4.4l2.6 2.6-8.7 8.7z"/><path d="m11.6 5.8 2.6 2.6"/>
+    </symbol>
+    <symbol id="i-bin" viewBox="0 0 20 20">
+      <path d="M3.4 5.6h13.2"/><path d="M7.2 5.6V3.2h5.6v2.4"/><path d="M5.2 5.6 6 16.8h8L14.8 5.6"/>
+    </symbol>
+    <symbol id="i-splice" viewBox="0 0 20 20">
+      <path d="M2.6 6.4h6.2v7.2H2.6zM11.2 6.4h6.2v7.2h-6.2z"/><path d="M8.8 10h2.4"/>
+    </symbol>
+    <symbol id="i-merge" viewBox="0 0 20 20">
+      <path d="M2.8 4.2v2.6c0 2 1.4 3.2 3.2 3.2h10.8M2.8 15.8v-2.6c0-2 1.4-3.2 3.2-3.2"/>
+      <path d="m13.4 6.6 3.4 3.4-3.4 3.4"/>
+    </symbol>
+    <symbol id="i-back" viewBox="0 0 20 20">
+      <path d="M16.6 10H3.4"/><path d="m8 4.8-4.6 5.2L8 15.2"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 20 20"><path d="m3.6 10.4 4.2 4.2L16.4 6"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 20 20">
+      <path d="M10 3 17.4 16.6H2.6z"/><path d="M10 8v3.6M10 13.8v.8"/>
+    </symbol>
+  </defs>
+</svg>
+
   <header class="site-header">
-    <a class="brand" href="/">▦ GridMind</a>
+    <a class="brand" href="/"><svg class="ico"><use href="#i-reel"/></svg>GridMind</a>
     <% if (user) { %>
-      <form class="search" action="/" method="get">
-        <input type="text" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>" placeholder="タイトル・本文で検索">
-        <button type="submit">検索</button>
+      <form class="search" action="/" method="get" role="search">
+        <input type="search" name="q" value="<%= typeof q !== 'undefined' ? q : '' %>"
+               placeholder="タイトル・本文で検索" aria-label="ノートを検索">
+        <button type="submit" aria-label="検索"><svg class="ico"><use href="#i-search"/></svg></button>
       </form>
-      <a class="btn-new" href="/notes/import">⇪ 取り込み</a>
-      <a class="btn-new" href="/notes/new">＋ 新規</a>
-      <a class="icon-btn" href="/settings" title="設定">⚙</a>
+      <a class="rail-btn" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg><span class="txt">取り込み</span></a>
+      <a class="rail-btn" href="/notes/new"><svg class="ico"><use href="#i-new"/></svg><span class="txt">新規</span></a>
+      <a class="rail-btn icon-only" href="/settings" title="設定"><svg class="ico"><use href="#i-dial"/></svg><span class="txt">設定</span></a>
       <span class="user-box">
         <span class="username"><%= user.username %></span>
         <form action="/logout" method="post" class="logout-form">
-          <button class="link-btn" type="submit">ログアウト</button>
+          <button class="rail-btn icon-only" type="submit" title="ログアウト">
+            <svg class="ico"><use href="#i-out"/></svg><span class="txt">ログアウト</span>
+          </button>
         </form>
       </span>
     <% } else { %>
       <span class="header-spacer"></span>
-      <a class="btn-new" href="/login">ログイン</a>
-      <a class="btn-new" href="/register">新規登録</a>
+      <a class="rail-btn" href="/login">ログイン</a>
+      <a class="rail-btn" href="/register">新規登録</a>
     <% } %>
   </header>
   <main class="container">

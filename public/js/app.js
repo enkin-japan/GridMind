@@ -28,11 +28,13 @@
   var textInput = document.getElementById('import-text');
   var langInput = document.getElementById('import-lang');
   var btn = document.getElementById('import-submit');
-  var BTN_LABEL = btn.textContent;
+  var BTN_LABEL = btn.innerHTML;   // アイコンごと控える（textContent だと絵が消える）
 
-  // 進捗表示の部品
+  // ゲート（進捗表示）の部品
   var panel = document.getElementById('ingest');
+  var barEl = document.getElementById('ingest-bar');
   var fillEl = document.getElementById('ingest-fill');
+  var gateEl = document.getElementById('ingest-gate');
   var stageEl = document.getElementById('ingest-stage');
   var metaEl = document.getElementById('ingest-meta');
   var invEl = document.getElementById('ingest-inv');
@@ -42,8 +44,12 @@
 
   function currentLang() { return langInput ? langInput.value : 'auto'; }
 
-  function lock(msg) { btn.disabled = true; btn.textContent = '処理中…'; statusEl.textContent = msg || ''; }
-  function unlock(msg) { btn.disabled = false; btn.textContent = BTN_LABEL; if (msg) statusEl.textContent = msg; }
+  function say(msg, bad) {
+    statusEl.textContent = msg || '';
+    statusEl.classList.toggle('warn', !!bad);
+  }
+  function lock(msg) { btn.disabled = true; btn.textContent = '処理中…'; say(msg); }
+  function unlock(msg, bad) { btn.disabled = false; btn.innerHTML = BTN_LABEL; if (msg) say(msg, bad); }
 
   // ---------------------------------------------------------------------------
   // 進捗計。
@@ -110,8 +116,11 @@
   Meter.prototype.set = function (v) {
     if (v <= this.at) return;                          // 決して戻さない
     this.at = Math.min(v, 1);
-    fillEl.style.width = (this.at * 100).toFixed(1) + '%';
-    metaEl.textContent = Math.round(this.at * 100) + '%';
+    var pct = (this.at * 100).toFixed(1);
+    fillEl.style.width = pct + '%';                    // 露光済みのフィルム
+    gateEl.style.left = pct + '%';                     // ゲート印はその先端に立つ
+    metaEl.textContent = Math.round(this.at * 100);
+    barEl.setAttribute('aria-valuenow', Math.round(this.at * 100));
   };
 
   Meter.prototype.finish = function () {
@@ -158,6 +167,19 @@
     });
   }
 
+  // 拾い出した知識点を、トリムビンに1本ずつ吊るす。
+  function hangTrims(items, count) {
+    invNEl.textContent = count + ' 件';
+    invListEl.innerHTML = '';
+    items.forEach(function (t, i) {
+      var li = document.createElement('li');
+      li.textContent = t;
+      li.style.animationDelay = Math.min(i * 40, 600) + 'ms';
+      invListEl.appendChild(li);
+    });
+    invEl.hidden = false;
+  }
+
   // 1件ぶんの進捗表示をまとめて面倒みる。戻り値は最後の結果イベント。
   function withProgress(fd, opts) {
     var meter = new Meter();
@@ -165,13 +187,17 @@
     var showBody = !opts || opts.showBody !== false;
     panel.hidden = false;
     invEl.hidden = true;
+    invEl.open = false;
     invListEl.innerHTML = '';
     previewEl.hidden = true;
     previewEl.textContent = '';
     previewEl.classList.remove('done');
     fillEl.style.width = '0%';
+    gateEl.style.left = '0%';
     stageEl.textContent = '資料を読み取っています';
-    metaEl.textContent = '';
+    metaEl.textContent = '0';
+    // 押した場所から離れた下の方に出るので、見えるところまで運んでやる。
+    panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 
     var result = null;
     return runIngest(fd, function (ev) {
@@ -188,14 +214,7 @@
           stageEl.textContent = '資料を分けて読んでいます（' + ev.index + '/' + ev.total + '）';
         }
         if (ev.stage === 'inventory' && ev.phase === 'done' && ev.items && ev.items.length) {
-          invNEl.textContent = '(' + ev.count + '件)';
-          invListEl.innerHTML = '';
-          ev.items.forEach(function (t) {
-            var li = document.createElement('li');
-            li.textContent = t;
-            invListEl.appendChild(li);
-          });
-          invEl.hidden = false;
+          hangTrims(ev.items, ev.count);
         }
         if (ev.stage === 'relate') stageEl.textContent = '関連するノートを探しています';
       } else if (ev.type === 'delta') {
@@ -224,7 +243,7 @@
     if (btn.disabled) return;                                       // 二重送信ブロック
     var files = fileInput.files;
     var text = (textInput.value || '').trim();
-    if (!files.length && !text) { statusEl.textContent = 'ファイルかテキストを入力してください。'; return; }
+    if (!files.length && !text) { say('ファイルを選ぶか、テキストを貼り付けてください。', true); return; }
 
     if (files.length > 1) runBatch(files);
     else runSingle(files.length ? files[0] : null, files.length ? null : text);
@@ -242,10 +261,10 @@
         if (ev.type === 'error') throw new Error(ev.error);
         if (ev.type === 'reconcile') { stageEl.textContent = '似たノートが見つかりました'; window.location.href = ev.url; return; }
         stageEl.textContent = '完了しました';
-        if (ev.aiUsed === false) statusEl.textContent = 'AI 整理はスキップし、変換テキストで保存しました。';
+        if (ev.aiUsed === false) say('AI 整理はスキップし、変換したテキストで保存しました。', true);
         window.location.href = '/notes/' + ev.id;
       })
-      .catch(function (err) { panel.hidden = true; unlock('エラー: ' + err.message); });
+      .catch(function (err) { panel.hidden = true; unlock('エラー: ' + err.message, true); });
   }
 
   // 複数：1ファイルずつ順番に送る（batch=1 で確認画面は出さず自動保存＋自動リンク）。
@@ -259,13 +278,12 @@
     function next() {
       if (i >= n) {
         panel.hidden = true;
-        statusEl.textContent =
-          '完了：' + ok + ' 件を取り込みました' + (fail ? '（' + fail + ' 件は失敗）' : '') +
-          (lastError ? '　' + lastError : '') + '　ホームに移動します…';
+        say('完了：' + ok + ' 件を取り込みました' + (fail ? '（' + fail + ' 件は失敗）' : '') +
+            (lastError ? '　' + lastError : '') + '　ホームに移動します…', !!fail);
         setTimeout(function () { window.location.href = '/'; }, lastError ? 4000 : 1400);
         return;
       }
-      statusEl.textContent = '(' + (i + 1) + '/' + n + ')　' + files[i].name;
+      say('(' + (i + 1) + '/' + n + ')　' + files[i].name);
       var fd = new FormData();
       fd.append('file', files[i]);
       fd.append('batch', '1');

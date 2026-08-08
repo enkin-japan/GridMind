@@ -1,361 +1,454 @@
 ---
 name: GridMind
-description: A knowledge base where the grid is the structure, not the decoration.
+description: A film-editing cutting bench for a product whose value is subtraction.
 colors:
-  index-blue: "#3b6ef5"
-  index-wash: "#e8efff"
-  ink: "#1c2128"
-  graphite: "#6a7280"
-  lattice-line: "#e2e5ea"
-  surface: "#ffffff"
-  paper: "#f6f7f9"
-  on-accent: "#ffffff"
-  alert-red: "#d63b3b"
-  alert-red-soft: "#fdecec"
-  amber: "#8a6d00"
-  amber-soft: "#fdf0d5"
+  bench: "#e4e4df"
+  panel: "#ffffff"
+  well: "#22231e"
+  perf: "#e4e4df"
+  ink: "#17180f"
+  ink-2: "#5e6156"
+  on-film: "#efefe8"
+  edge: "#c6c6be"
+  edge-2: "#a3a399"
+  wax-red: "#ba2818"
+  wax-red-fill: "#c32b1c"
+  wax-blue: "#2b57a0"
+  wax-amber: "#8a6200"
+  wax-amber-fill: "#e5a600"
+  on-fill: "#efefe8"
+  on-warn: "#17180f"
+  ctr-hot: "#ffb0a4"
+  tape: "#f0ece1"
+  tape-hover: "#e6e0d1"
 typography:
+  display:
+    fontFamily: "Archivo, 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP', 'PingFang SC', 'Microsoft YaHei', sans-serif"
+    fontSize: "1.9rem"
+    fontWeight: 800
+    lineHeight: 1.3
+    letterSpacing: "-0.015em"
+    fontVariation: "'wdth' 90"
   headline:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "2rem"
-    fontWeight: 700
-    lineHeight: 1.65
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "1.25rem"
+    fontWeight: 800
+    lineHeight: 1.3
+    letterSpacing: "-0.015em"
+    fontVariation: "'wdth' 92"
   title:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "1.2rem"
-    fontWeight: 700
-    lineHeight: 1.65
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "1.0625rem"
+    fontWeight: 800
+    lineHeight: 1.3
+    letterSpacing: "-0.01em"
+    fontVariation: "'wdth' 96"
   body:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
+    fontFamily: "{typography.display.fontFamily}"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.65
-  title-sm:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "1.05rem"
-    fontWeight: 700
-    lineHeight: 1.65
+    lineHeight: 1.7
+    letterSpacing: "normal"
+    fontVariation: "'wdth' 100"
   small:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "0.9rem"
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.65
-  caption:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "0.85rem"
+    lineHeight: 1.6
+  fine:
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "0.8125rem"
     fontWeight: 400
-    lineHeight: 1.65
+    lineHeight: 1.5
   label:
-    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
-    fontSize: "0.75rem"
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "0.6875rem"
     fontWeight: 700
-    lineHeight: 1.65
-    letterSpacing: "0.04em"
+    lineHeight: 1.4
+    letterSpacing: "0.14em"
+    fontVariation: "'wdth' 84"
+  counter:
+    fontFamily: "{typography.display.fontFamily}"
+    fontSize: "0.875rem"
+    fontWeight: 700
+    lineHeight: 1.6
+    fontVariation: "'wdth' 116"
+    fontFeature: "tabular-nums"
   mono:
-    fontFamily: "ui-monospace, monospace"
-    fontSize: "1rem"
+    fontFamily: "ui-monospace, 'SFMono-Regular', Menlo, monospace"
+    fontSize: "0.875rem"
     fontWeight: 400
-    lineHeight: 1.65
+    lineHeight: 1.75
 rounded:
-  sm: "4px"
-  md: "8px"
-  lg: "10px"
-  pill: "999px"
-  circle: "50%"
+  none: "0"
 spacing:
-  xs: "6px"
-  sm: "8px"
-  md: "12px"
-  lg: "16px"
-  xl: "20px"
-  2xl: "24px"
-  3xl: "28px"
-  section: "64px"
+  s1: "4px"
+  s2: "8px"
+  s3: "12px"
+  s4: "16px"
+  s5: "24px"
+  s6: "32px"
+  s7: "48px"
+  s8: "64px"
 components:
-  button-primary:
-    backgroundColor: "{colors.index-blue}"
-    textColor: "{colors.on-accent}"
-    rounded: "{rounded.lg}"
-    padding: "8px 16px"
-  button-default:
-    backgroundColor: "{colors.surface}"
+  button:
+    backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
     padding: "8px 16px"
+    height: "38px"
+  button-primary:
+    backgroundColor: "{colors.wax-red-fill}"
+    textColor: "{colors.on-fill}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
+    padding: "8px 16px"
+    height: "38px"
   button-danger:
     backgroundColor: "transparent"
-    textColor: "{colors.alert-red}"
-    rounded: "{rounded.lg}"
+    textColor: "{colors.wax-red}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
     padding: "8px 16px"
-  button-ghost:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.graphite}"
-    rounded: "{rounded.lg}"
-    padding: "8px 16px"
-  button-accent-soft:
-    backgroundColor: "{colors.index-wash}"
-    textColor: "{colors.index-blue}"
-    rounded: "{rounded.lg}"
-    padding: "8px 14px"
-  icon-button:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.graphite}"
-    rounded: "{rounded.circle}"
-    width: "38px"
     height: "38px"
-  icon-button-hover:
-    backgroundColor: "{colors.index-wash}"
-    textColor: "{colors.index-blue}"
-  chip:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.graphite}"
-    rounded: "{rounded.pill}"
-    padding: "3px 10px"
-  chip-active:
-    backgroundColor: "{colors.index-wash}"
-    textColor: "{colors.index-blue}"
-    rounded: "{rounded.pill}"
-    padding: "3px 10px"
-  card:
-    backgroundColor: "{colors.surface}"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "{spacing.lg}"
+  button-danger-hover:
+    backgroundColor: "{colors.wax-red-fill}"
+    textColor: "{colors.on-fill}"
+  button-ghost:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
+    padding: "8px 16px"
+    height: "38px"
+  button-disabled:
+    backgroundColor: "{colors.bench}"
+    textColor: "{colors.ink-2}"
+  rail-switch:
+    backgroundColor: "transparent"
+    textColor: "{colors.on-film}"
+    typography: "{typography.label}"
+    rounded: "{rounded.none}"
+    padding: "6px 10px"
+    height: "36px"
+  rail-switch-hover:
+    backgroundColor: "{colors.on-film}"
+    textColor: "{colors.well}"
   input:
-    backgroundColor: "{colors.surface}"
+    backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "10px 12px"
-  input-search:
-    backgroundColor: "{colors.paper}"
+    typography: "{typography.body}"
+    rounded: "{rounded.none}"
+    padding: "9px 12px"
+    height: "40px"
+  textarea:
+    backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
-    rounded: "{rounded.lg}"
-    padding: "8px 12px"
+    typography: "{typography.mono}"
+    rounded: "{rounded.none}"
+    padding: "9px 12px"
+  counter:
+    backgroundColor: "{colors.well}"
+    textColor: "{colors.on-film}"
+    typography: "{typography.counter}"
+    rounded: "{rounded.none}"
+    padding: "1px 7px"
+  counter-hot:
+    backgroundColor: "{colors.well}"
+    textColor: "{colors.ctr-hot}"
+  tape:
+    backgroundColor: "{colors.tape}"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.fine}"
+    rounded: "{rounded.none}"
+    padding: "4px 10px"
+  tape-active:
+    backgroundColor: "{colors.wax-red-fill}"
+    textColor: "{colors.on-fill}"
+  lightbox:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
+    padding: "32px"
+  sheet:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
+    padding: "24px"
+  frame:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.none}"
+    padding: "16px 16px 16px 24px"
+  frame-hover:
+    backgroundColor: "{colors.bench}"
+    textColor: "{colors.ink}"
+  sprocket-column:
+    backgroundColor: "{colors.well}"
+    rounded: "{rounded.none}"
+    width: "20px"
+  pager-item:
+    backgroundColor: "{colors.panel}"
+    textColor: "{colors.ink}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
+    size: "38px"
+  pager-item-active:
+    backgroundColor: "{colors.well}"
+    textColor: "{colors.on-film}"
+  notice-warn:
+    backgroundColor: "{colors.wax-amber-fill}"
+    textColor: "{colors.on-warn}"
+    typography: "{typography.small}"
+    rounded: "{rounded.none}"
+    padding: "10px 14px"
   badge:
-    backgroundColor: "{colors.index-blue}"
-    textColor: "{colors.on-accent}"
-    rounded: "{rounded.pill}"
-    padding: "1px 8px"
+    backgroundColor: "{colors.wax-red-fill}"
+    textColor: "{colors.on-fill}"
+    typography: "{typography.label}"
+    rounded: "{rounded.none}"
+    padding: "2px 7px"
 ---
 
 # Design System: GridMind
 
 ## Overview
 
-**Creative North Star: "The Lattice"**
+**Creative North Star: "The Cutting Bench"**
 
-Knowledge arrives as a mess — a slide deck padded with schedules, grading rules, and page numbers. GridMind's job is to cut that away and leave cells of knowledge that snap into a structure. The interface is that structure made visible: a lattice of hairline rules dividing the screen into cells, where every cell holds something worth keeping and nothing holds filler. The 1px border is not a decorative edge here; it is the wall of the cell, and it is why almost nothing in this system needs a shadow to be understood.
+GridMind's product value is subtraction — it deletes everything in a document that is not knowledge — so its interface is a film editor's cutting bench, not a dashboard. The whole world is built from one physical fiction: material runs through a machine, the machine throws most of it away, and what survives is laid on a light box to be read. Every surface in the build answers to that fiction. The page ground is bench grey. The rail across the top is the machine: always dark, in both themes, because a machine is not paper and does not change colour when the room lights come on. The note list is not a card grid; it is one continuous strip of film with an unbroken sprocket column down its left edge and frames divided by hairlines. Numbers are footage counters — dark recessed plates with expanded tabular figures. Marks are grease pencil in three colours that each have exactly one job.
 
-The character is **dense, precise, and calm enough to sit in for a long time**. Dense because a wasted line is a defect in the product itself — the extraction refuses to pad, and the interface must not undo that by spreading five facts across a screen of whitespace. Precise because this is an instrument: it reports measured usage, real costs, and real progress, and it should look like something that knows the number rather than something that guesses. Calm because the actual work here is *reading* — long Japanese and English notes, read at length — so borders stay soft, contrast stays comfortable, and colour never raises its voice without cause.
+The system is aggressively flat and aggressively square. There is no border radius anywhere and no box-shadow anywhere; those are not defaults that happened, they are the two hardest invariants in the file. Depth is made only two ways: a 1px rule, and a material step between the bench and the panel. That step is measured at 1.28:1 in light and 1.28:1 in dark — deliberately matched, so the bench and the light box sit the same distance apart in both rooms. The result is dense, tool-like, and quiet: pure geometry, one accent that means "cut", and a lot of restraint about where light is allowed.
 
-The system commits to one accent and spends it carefully. Index Blue appears where the user needs to know **where they are or where they can go** — a link, the current page, the selected tag, the filling progress bar — and essentially nowhere else. Everything not carrying that job is ink, graphite, or a hairline. Confirmed rejection: this must never read as an "AI product." No violet gradients, no glowing edges, no sparkle iconography, no chrome that advertises the model.
+It refuses the arrangement its category ships. There is no left sidebar, no card grid, no rounded surface floating on a soft shadow, no pastel status pill. What it also refuses is decoration for its own sake — the world's devices (sprockets, counters, wax rules, tape, the clapper stripe) are structural, they mark where the machine touched the material, and none of them is applied twice for effect. The clapper stripe appears on the auth slate and nowhere else.
 
 **Key Characteristics:**
-- Hairline lattice (1px `lattice-line`) as the primary structural device, not shadow
-- One accent, spent only on position and navigation
-- Full light/dark parity through twelve CSS custom properties — no component owns a colour
-- A closed seven-step type ramp (0.75rem–2rem) tuned for CJK and Latin side by side
-- A single radius (10px) with pills reserved for count-like objects
-- Small, fast state changes — 80–150ms, a 2px lift at most
+- Bench-grey ground, one lit panel; zero radius, zero shadow
+- Depth from a 1px rule plus a 1.28:1 material step, matched in both themes
+- An always-dark machine rail, identical in light and dark
+- Sprocket perforations as the structural signature, not as ornament
+- Footage counters: dark plates, expanded tabular Archivo, one component for every number
+- Three grease-pencil colours with fixed, non-overlapping jobs
+- Hand-authored SVG applied as CSS masks so shape comes from the asset and colour from a token
+- Hand-drawn single-weight SVG icon sprite; no icon font, no emoji
 
 ## Colors
 
-A cool, near-neutral field crossed by hairlines, with one saturated blue reserved for orientation and two status hues reserved for feedback. The palette is defined once as twelve CSS custom properties on `:root` and redefined wholesale under `prefers-color-scheme: dark`, so every component inherits both themes without knowing they exist. **No component rule contains a literal colour.**
+Two greys, one white, one near-black, and three pigments — the pigments never trade jobs. Every pair below was measured against its real background; the ratios cited in prose are the shipped measurements, not estimates.
 
 ### Primary
 
-- **Index Blue** (light `#3b6ef5` / dark `#6d97ff`): The only voice in the system. It marks links, the active tag chip, the current pager page, the filled portion of a quota or ingest bar, the primary button, and the plan badge. Its role is *positional* — it answers "where am I" and "where can I go."
-- **Index Wash** (light `#e8efff` / dark `#1e2740`): Index Blue at rest. The tint behind a selected chip, the summary box on a note, the current plan row, an `ok` notice, and the hover state of the icon button and file drop zone. It says "this one" without shouting.
+- **Wax Red** (`{colors.wax-red}` text, `{colors.wax-red-fill}` fill): the grease pencil that means *cut, commit, destroy, or register*. It draws the rule under every page title and every margin-column label (via the wax mask), it fills the primary button and the file-picker button, it fills the active tape and the "in use" plan badge, it colours the delete button and the error list, it is the advance bar during ingest, it is the hang-mark on each trim-bin item, and it is the registration corner-marks that appear on the hovered frame. Measured 6.17:1 on panel in light, 5.18:1 in dark.
+- **Counter Hot** (`{colors.ctr-hot}`): the only variant colour a counter is allowed. It replaces the counter's figure colour when a quota is at or above 80%. It does not invert between themes — it sits on the well plate, which is dark in both.
+
+### Secondary
+
+- **Wax Blue** (`{colors.wax-blue}`): the grease pencil that means *splice*. It is links, the backlink splice-mark chevron in the margin column, the input focus border, the global focus-visible outline, and the "saved" notice. It is never used for a primary action and never fills a surface. Measured 7.06:1 on panel in light, 6.20:1 in dark.
+
+### Tertiary
+
+- **Wax Amber** (`{colors.wax-amber-fill}` fill, `{colors.wax-amber}` text): the grease pencil that means *be careful*. The fill ships on exactly one component — the warning notice — and nowhere else. The text token is declared and theme-mapped (measured 5.49:1 on panel in light, 7.80:1 in dark) but is not applied anywhere in the current build; it is reserved for amber type on a light surface, and any new use must still respect the one-job rule.
 
 ### Neutral
 
-- **Ink** (light `#1c2128` / dark `#e6e9ef`): All primary reading text. Note bodies, headings, card titles, input values.
-- **Graphite** (light `#6a7280` / dark `#9aa2af`): Everything secondary — summaries, timestamps, tag labels at rest, backlink headings, the footer, the pane labels, form hints. Roughly half of all text on a busy screen is graphite; that ratio is what keeps the reading text legible.
-- **Lattice Line** (light `#e2e5ea` / dark `#2a2f3a`): The structural hairline. Card edges, input strokes, table cells, the header rule, the footer rule, the unfilled track of every progress bar. This is the most load-bearing colour in the system.
-- **Surface** (light `#ffffff` / dark `#181b22`): Raised cells — cards, panes, inputs, the sticky header, modals, the auth card.
-- **Paper** (light `#f6f7f9` / dark `#0f1116`): The page ground behind the lattice. Also used *inside* raised surfaces for recessed elements: code blocks, the search field, the file drop zone, modal inputs.
-
-### On-Accent
-
-- **On-Accent** (light `#ffffff` / dark `#0f1116`): The text colour that sits on an Index Blue fill — the primary button, the active pager page, the plan badge, the search button, the file-selector button. It is the one token whose value *inverts* between themes rather than shifting.
-
-### Status
-
-Two hues, each with a soft companion, used only for feedback. This family is closed.
-
-- **Alert Red** (`#d63b3b`, identical in both themes): Required-field markers, the delete button's text and border, validation error text. A text and stroke colour — no red fill exists in the system.
-- **Alert Red Soft** (light `#fdecec` / dark `#3a1e1e`): The background of the form-error block.
-- **Amber** (light `#8a6d00` / dark `#e0c069`): The text of a warning notice.
-- **Amber Soft** (light `#fdf0d5` / dark `#3a3115`): The background of a warning notice.
-
-### Measured contrast
-
-| Pair | Light | Dark |
-|---|---|---|
-| On-Accent on Index Blue | 4.44:1 | 6.76:1 |
-| Ink on Surface | 16.18:1 | 14.17:1 |
-| Graphite on Surface | 4.85:1 | 6.70:1 |
-| Amber on Amber Soft | 4.36:1 | 7.31:1 |
-| Index Blue on Index Wash | 3.85:1 | 5.30:1 |
-| Index Blue link on Surface | 4.44:1 | 6.17:1 |
-| Alert Red on Alert Red Soft | 4.04:1 | 3.29:1 |
-
-Reading text and secondary text clear AA comfortably. **The accent-on-tint and link pairs sit in the 3.85–4.44 band** — above the 3:1 large-text floor, below the 4.5:1 normal-text bar. Closing that gap means darkening Index Blue itself in the light theme, which is an identity change and is deliberately not made here.
+- **Bench Grey** (`{colors.bench}`): the bench top. Page ground, the summary box, the code-block-in-prose background, hovered frame, current plan row, and the disabled button. The lower of the two material levels.
+- **Light-Box White** (`{colors.panel}`): the lit reading surface. In light it is pure white; in dark it is the one raised surface in the room. It carries the note body, the roll, sheets, compare panes, the auth slate and the pager. Measured 17.89:1 against ink in light, 12.44:1 in dark.
+- **The Well** (`{colors.well}`): a recess cut into the material — dark in *both* themes. It is the header rail, counter plates, the gate head, the progress and quota troughs, table header rows, the active pager cell, the slate plate and clapper, and `<pre>` blocks. `{colors.on-film}` is its text and does not invert.
+- **Ink** (`{colors.ink}`) / **Ink 2** (`{colors.ink-2}`): primary and secondary type. Ink-2 carries summaries, hints, labels, edge codes and metadata; measured 6.32:1 on panel and 5.36:1 on tape in light, 5.90:1 and 4.79:1 in dark.
+- **Edge** (`{colors.edge}`) and **Bench Edge** (`{colors.edge-2}`): the entire depth vocabulary. Edge is the rule drawn *on* the light box (panel-level dividers, frame separators, table cells). Bench Edge is the rule drawn *on* the bench (outer container borders, form controls, dashed placement zones, the footer rule).
+- **Tape** (`{colors.tape}` / `{colors.tape-hover}`): paper tape stock, a separate material from the panel. It is the tag chip's ground and nothing else.
+- **Perf** (`{colors.perf}`): the colour seen *through* a sprocket hole. Light: matches the bench. Dark: a lighter grey, so holes read as punched-through rather than as black-on-black.
 
 ### Named Rules
 
-**The Index Rule.** Index Blue answers exactly one question: *where.* Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.
+**The Three Pencils Rule.** Red cuts, blue splices, amber warns. A colour never takes another colour's job. Red is the only colour a primary action may use; blue is the only colour a link or focus ring may use; amber appears on warnings only, and today on exactly one component. Two review rounds were spent enforcing this after earlier drafts let red and blue drift into decoration — if a new surface needs a fourth meaning, it gets a shape or a rule, not a fourth pigment.
 
-**The On-Accent Rule.** Never hard-code the text colour that sits on an accent fill. `--on-accent` exists because the accent is *lighter* in dark mode: white on it measured 2.79:1, below even the large-text floor, on the primary button. The fill is identical in both themes; the text on it inverts.
+**The Opaque Pigment Rule.** `--on-warn`, `--on-fill`, `--on-film` and `--ctr-hot` do not invert between themes, and `--wax-amber-fill` and `--wax-red-fill` keep their dark-mode-adjacent values. Wax is opaque pigment on physical material; it does not change because the room lights changed. Never add a dark-theme override for an on-* token.
 
-**The Two-Theme Rule.** No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.
+**The One Lit Surface Rule.** On any reading surface, exactly one panel glows and the bench does not. On the note detail view this is literal — the light box is the only lit thing on the page, the margin column sits directly on the bench with no surface of its own.
 
 ## Typography
 
-**Body Font:** `-apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif`
-**Mono Font:** `ui-monospace, monospace` (Markdown editing textarea, code blocks, inline code)
+**Display / Body / Label / Counter Font:** Archivo variable (wght 400–800, wdth 62–125), self-hosted at `/fonts/archivo-latin.woff2` and `/fonts/archivo-latin-ext.woff2`, latin and latin-ext subsets only, `font-display: swap`, with the latin file preloaded.
+**CJK fallback:** Hiragino Kaku Gothic ProN → Yu Gothic → Noto Sans JP → PingFang SC → Microsoft YaHei → sans-serif.
+**Mono:** `ui-monospace, 'SFMono-Regular', Menlo, monospace`, used only for textareas and code.
 
-**Character:** A single system stack, chosen so Japanese and Latin sit on the same line without the height mismatch that a Latin-first stack produces. There is no display face and no brand face — the type is a delivery mechanism for other people's knowledge, and drawing attention to itself would be working against the product.
+**Character:** One grotesque doing every job, differentiated by *width* rather than by family. Archivo's width axis is the role signal: labels compress to 84 and go uppercase with wide letterspacing so they read as stamped-on markings; headings sit at 88–96 so they stay dense without shouting; counters expand to 116 so figures read as machined dials. Weight is nearly binary — 400 for prose, 700–800 for everything structural — which leaves width free to carry hierarchy on its own.
+
+The stack deliberately drops CJK to the system gothic. A CJK webfont would be multiple megabytes, and the one screen this product cannot afford to make slower is the one where the user is already waiting 20–35 seconds. Japanese therefore renders in the OS gothic with no width axis; the build accounts for this by leaning on weight and size for CJK hierarchy rather than on `wdth`.
 
 ### Hierarchy
 
-- **Headline** (700, browser-default `2rem`, line-height 1.65): Page titles — the note title, the import heading, the auth card heading. Currently unstyled and inheriting the browser default.
-- **Title** (700, `1.2rem`): The `GridMind` wordmark in the header. Card titles run smaller at `1.05rem`, weight inherited.
-- **Body** (400, `1rem`, line-height 1.65): Note bodies, form values, everything read at length. The 1.65 line-height is set once on `body` and inherited everywhere — including into headings, which is what gives headings their generous, unhurried set.
-- **Label** (700, `0.75rem`, letter-spacing `0.04em`, uppercase): The `新しい知識` / `既存のノート` markers on the reconcile panes. The only uppercase type in the system.
-- **Title-sm** (700, `1.05rem`): Card titles and the modal heading.
-- **Small** (400, `0.9rem`) and **Caption** (400, `0.85rem`): The dense secondary band. Small carries form labels, notices, summaries, and table text; Caption carries chips, hints, the streaming preview, and pane hints. Together they account for most secondary text in the system, and this compression is how the interface stays dense without shrinking the reading text.
-
-**The ramp is closed at seven steps:** `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`. Seven one-off sizes (`0.95`, `0.92`, `0.88`, `0.82`, `0.8`, `0.78`, `0.72rem`, each used exactly once) were snapped to their nearest step — the largest single move was 0.05rem, under one pixel at a 16px root. Timestamps in both the card grid and the note footer now share one step, which they did not before.
+- **Display** (800, 1.9rem → 1.55rem below 620px, wdth 90, lh 1.3, `text-wrap: balance`): page title and note title. Always followed by a red wax rule.
+- **Headline** (800, 1.25rem, wdth 92, lh 1.3): sheet headings, prose `h1`/`h2` inside note bodies, the slate's form title. Carries a 1px edge rule underneath.
+- **Title** (800, 1.0625rem, wdth 96, lh 1.3): the frame title in the roll, prose `h3`, compare-pane titles.
+- **Body** (400, 1rem, wdth 100, lh 1.7, max 74ch): note prose and general copy.
+- **Small** (400/700, 0.875rem, lh 1.6): summaries, buttons, field captions, table cells, gate output.
+- **Fine** (400, 0.8125rem, lh 1.5): hints, tags, trim-bin items, margin-column lists.
+- **Label** (700, 0.6875rem, wdth 84, ls 0.14em, uppercase): every marking on the machine — rail switch text, section labels, table headers, footer, badges. Uses 0.10–0.12em where it sits inside a tighter component.
+- **Counter** (700, 0.875rem, wdth 116, tabular-nums): every number the user is meant to compare or watch.
+- **Mono** (0.875rem, lh 1.75): textarea input and code only.
 
 ### Named Rules
 
-**The Reading Text Is Sacred Rule.** Body copy stays at `1rem`/1.65 and never shrinks to win space. Density is bought from chrome — labels, metadata, chips, timestamps — never from the text the user came to read.
+**The Width-Is-Role Rule.** Role is expressed by `font-variation-settings: 'wdth'`, not by adding a family. 84 = machine marking, 88–96 = heading, 100 = prose, 116 = counter. A new role picks a width on that scale; it does not introduce a second typeface.
+
+**The One Counter Rule.** Every quantity the user compares — quota, percent complete, character counts, note totals, the cut ratio — goes through the `.ctr` component so that they are all the same object. A number typeset as plain prose is a defect, not a variant.
+
+**The No-Webfont-For-CJK Rule.** Latin is self-hosted; CJK falls through to the system stack, permanently. The wait screen is the product's signature surface and must not carry a multi-megabyte font download.
 
 ## Layout
 
-A single centred column, `980px` maximum, with `20px` side padding and `64px` of bottom breathing room. Narrower containers step down for narrower jobs: `720px` for note forms, `520px` for the header search, `460px` for modals, `440px` for the auth and settings cards. Nothing in the system is full-bleed.
+A single centred column, not an app shell. There is no sidebar. Page container is `max-width: 1080px` with `32px 16px 64px` padding (tightening to `24px 12px 48px` below 620px); forms narrow to `680px`; note prose caps at `74ch`.
 
-The note list is the only true grid: `repeat(auto-fill, minmax(240px, 1fr))` with a `16px` gutter, so the column count is decided by the viewport rather than by breakpoints. The reconcile screen is a fixed two-column compare (`1fr 1fr`, `16px` gutter).
+The rail is a sticky flex row, `min-height: 52px`, `8px 16px` padding, that wraps: brand, search (`flex: 1 1 240px`, max 400px), then engraved switches, then the user box. Below 620px the rail stops being sticky and becomes static — at that width it wraps to three rows and would otherwise eat a third of the viewport — the search field takes a full row via `order: 5`, and the icon-only switches reveal their text labels instead of hiding them in a clip-path.
 
-**There is exactly one media query for layout in the entire system:** at `max-width: 720px` the reconcile compare collapses to a single column. Everything else adapts through `auto-fill`, `flex-wrap`, `max-width`, and percentage widths. Two further media queries exist for `prefers-color-scheme` and one for `prefers-reduced-motion`.
+The note detail view is a two-column grid: a `152px` margin column and the light box, `32px` apart, with the margin column `position: sticky; top: 78px`. Below 860px it collapses to one column and the margin column re-flows *below* the light box as an auto-fit grid of `minmax(180px, 1fr)` blocks with its dividing rules removed — the film edge becomes a footer strip rather than a margin. The A/B compare grid collapses from `1fr 1fr` to one column at the same breakpoint.
 
-Vertical rhythm runs on an ad-hoc but consistent set of gaps — `6 / 8 / 12 / 16 / 20 / 24 / 28`px — applied through flex and grid `gap` rather than margins. **These steps are not yet tokenized**; they are captured in this file's `spacing` scale as a description of current practice, not as an existing implementation.
+Spacing is an 8-step scale (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64). The working rhythm is `s4` inside dense components, `s5` between blocks and inside sheets, `s6` inside the light box, `s7`–`s8` only for page-level breathing and empty states. Type is a closed 7-step ramp; only `--t-display` changes responsively.
 
-The header is `position: sticky` at `z-index: 10`; modals sit at `z-index: 50`. Those are the only two stacking levels in the system.
-
-### Named Rules
-
-**The 980 Rule.** Reading content never exceeds 980px, and input surfaces never exceed 720px. A screen that wants more width is a screen that should have been split.
+Two breakpoints only: 860px (two-column layouts collapse) and 620px (rail unsticks and reflows, padding tightens, display type drops, the roll frame drops its edge-code column).
 
 ## Elevation & Depth
 
-The system is essentially flat: depth is carried by a 1px `lattice-line` border and by the `paper` / `surface` tonal step, not by shadow. In the entire stylesheet there is **one** box-shadow — the note card's hover lift — plus the modal's `rgba(0,0,0,.45)` scrim.
+**There are no box-shadows in this system.** Not one, anywhere in the stylesheet, in either theme. This is an invariant, not an omission.
 
-**This is currently a description, not a doctrine.** The flatness emerged from building components one at a time rather than from a decided position on depth, and the question of whether floating elements (modals, future dropdowns, tooltips, toasts) should earn a shadow is deliberately left open. The modal today floats on scrim alone, with the same 1px border as a static card — which works, but has not been tested against a system with more layered surfaces in it.
+Depth is made exactly two ways, and they are meant to be read together:
 
-Until that decision is made: match the incumbent. Add depth with a border and a tonal step; introduce a new shadow only with a specific reason, and record it here when you do.
+1. **A 1px rule.** `{colors.edge}` when the rule is drawn on the light box, `{colors.edge-2}` when it is drawn on the bench. Which token you use tells the reader which material they are looking at.
+2. **A material step.** Bench to panel is a 1.28:1 luminance difference in light and 1.28:1 in dark — matched on purpose, so the raise reads identically in both rooms. The well is the third level, recessed, and it is dark in both themes.
 
-### Shadow Vocabulary
-
-- **Card lift** (`box-shadow: 0 6px 20px rgba(0,0,0,.08)`, paired with `translateY(-2px)`, both at `.08s ease`): The response to hovering a note card in the list. The only shadow in the system.
-- **Modal scrim** (`background: rgba(0,0,0,.45)`): Full-viewport backdrop behind a modal.
-
-Note that the system-wide focus ring is an `outline`, not a shadow. Focus deliberately did not become a third entry in this vocabulary: an outline follows each element's own radius, works on pills and circles unchanged, and keeps the open depth question from being quietly answered by an accessibility fix.
-
-## Shapes
-
-One radius does nearly all the work: **10px** (`--radius`) on cards, buttons, inputs, panes, modals, the summary box, notices, and the file drop zone. Two exceptions are principled rather than accidental:
-
-- **Pills** (`999px`) belong to objects that behave like counts or quantities: tag chips, the plan badge, and the track and fill of every progress bar. A pill signals "this is a measure or a token," not "this is a container."
-- **Tighter radii** belong to inline code (`4px`) and to code blocks and pager buttons (`8px`) — small objects where 10px would read as bulbous.
-
-The settings gear is the one circle (`50%`, 38×38px).
-
-Borders are uniformly `1px solid var(--border)`. Two deliberate departures: the file input uses `1.5px dashed` to read as a drop target, and the reconcile panes carry a `3px` coloured top edge — Index Blue for the incoming note, graphite for the existing one — which is the system's only use of a border as a semantic marker rather than a structural one.
+Hover does not lift anything. It changes background, border colour, or text colour over 100–120ms of linear timing, and on the roll it additionally reveals two red registration corner-marks on the hovered frame. Nothing translates on the Z axis because nothing in this world has a Z axis.
 
 ### Named Rules
 
-**The One Radius Rule.** Containers are 10px. If something is not 10px, it must be because it is a measure (pill), inline code (4px), or a circle — not because it looked better.
+**The Rule-And-Step Rule.** If a surface needs to separate from what is behind it, give it a 1px rule in the correct edge token and, if it is a reading surface, the panel material. Never a shadow, never a glow, never a gradient, never a blur.
+
+**The Dark Machine Rule.** Machine parts — the rail, counter plates, gate head, progress troughs, table header rows, the slate plate — use `{colors.well}` and `{colors.on-film}` in both themes. They are not surfaces that respond to the room; they are the equipment.
+
+## Shapes
+
+**Radius is 0. Everywhere. No exceptions.** `border-radius` does not appear in the stylesheet, and the focus outline is square because the world is square. Do not introduce a radius scale; there is exactly one shape token (`{rounded.none}`) and it exists to make the zero explicit.
+
+The form language is rectangles and 1px rules, with four recurring geometries:
+
+- **Sprocket perforation.** Vertical: a 20px `{colors.well}` column with `{colors.perf}` holes on an 18px period, inset 5px. Horizontal: two `{colors.perf}` strips repeating on a 22px period along the top and bottom edges of the progress and quota troughs. This is the system's signature; it says "this is film".
+- **The wax rule.** A hand-drawn SVG stroke applied as a CSS mask (`--wax-mask`), tiling at 60px, colour supplied by `{colors.wax-red-fill}`. Every red rule in the product is this asset: 52×7px under a page title, 46×7px under the slate title, full-width 7px under the note bar, 6px under each margin-column label. The mask is why the stroke has hand-drawn ends and pressure variation instead of being a flat CSS rectangle.
+- **The tape outline.** A second hand-drawn SVG mask (`--tape-mask`) shapes `.tape` via a `::before` at `z-index: -1`. The chip has **no border at all** — its edges are torn because the asset is torn.
+- **Dashed placement.** 1.5px dashed `{colors.edge-2}` marks a place where something is meant to be set down: the file input, the empty state, an empty note body, the ghost button.
+
+Two clipped shapes exist and are intentional exceptions to the rectangle: the backlink splice mark (`clip-path: polygon(0 35%, 100% 0, 100% 65%, 0 100%)` in wax blue, a splice-tape parallelogram), and the slate's clapper stripe (a -68deg repeating gradient between `{colors.well}` and `{colors.on-film}`).
 
 ## Components
 
-Components are **restrained and precise**: thin strokes, one radius, and state changes that are small but unambiguous. A hover moves a card 2px and completes in 80ms. Nothing bounces, nothing scales, nothing glows.
-
 ### Buttons
 
-- **Shape:** One radius throughout (10px), `8px 16px` padding, 1px border.
-- **Primary:** Index Blue fill, white text, matching border. Used for the single committing action on a screen.
-- **Default:** Surface fill, ink text, lattice-line border. Everything non-committing.
-- **Danger:** Transparent fill, Alert Red text *and* border. Delete only. The system has no filled destructive button.
-- **Ghost:** Graphite text with a dashed border — used for "save without linking" on the reconcile screen, where the action is valid but deliberately de-emphasised.
-- **Accent soft** (`.btn-new`): Index Wash fill, Index Blue text, weight 600. The header's "new note" affordance — present but quieter than a primary button.
-- **Link button:** No border, no background, graphite underlined text at `0.85rem`; goes Index Blue on hover. Used for logout.
-- **Hover:** The border goes Index Blue on every variant (150ms). Primary additionally brightens its own fill (`filter: brightness(1.08)`) rather than reaching for a second blue; Danger takes a 10% wash of Alert Red derived from the token with `color-mix`, so neither hover introduces a colour the palette does not already own.
-- **Focus:** A 2px Index Blue outline at 2px offset, inherited from the system-wide focus rule. Danger swaps the outline to Alert Red so the ring agrees with the button.
-- **Disabled:** `opacity: .55` with `cursor: default`, and every hover suppressed via `:not(:disabled)`. The import button spends 20–35 seconds disabled during an ingest; before this existed it looked fully pressable the whole time.
+- **Shape:** hard rectangle (0 radius), 1px border, `min-height: 38px`, `8px 16px`, gap 7px to its icon, `font-weight: 700` at Small size.
+- **Default:** panel fill, ink text, bench-edge border. Hover darkens the border to ink; nothing else moves.
+- **Primary:** wax-red fill and border, `{colors.on-fill}` text. Hover is `filter: brightness(1.1)` — the pencil pressed harder, not a new colour.
+- **Danger:** transparent with a wax-red border and wax-red text; hover *fills* with wax red. Its focus outline switches to wax red, the one place the blue focus ring is overridden, because the ring must not contradict the action's colour.
+- **Ghost:** transparent, dashed border, ink-2 text. Used for the "do the lesser thing" option in a decision group.
+- **Disabled:** bench fill, bench-edge border, ink-2 text, no filter, `cursor: default`. Primary and default collapse to the same disabled appearance on purpose — a disabled control is not a coloured control.
+- **Transitions:** `background / color / border-color` at `.12s linear`.
 
-### Icon Button
+### Rail Switches
 
-38×38px circle, surface fill, graphite glyph, 1px border. On hover it fills with Index Wash, turns Index Blue, and **rotates 45°** over 250ms. This is the system's one piece of personality — a gear that visibly turns — and it is worth preserving precisely because it is the only one.
+Engraved switches on the machine: transparent fill, `#ffffff40` hairline border, `{colors.on-film}` label text at Label size (wdth 84, 0.12em, uppercase), 36px tall. Hover inverts hard — fill goes `{colors.on-film}`, text goes `{colors.well}`. Icon-only switches keep a visually-hidden text label (clip-path inset) that becomes visible below 620px rather than being removed.
 
-### Chips
+### Inputs / Fields
 
-- **Style:** Pill (999px), surface fill, graphite text, 1px lattice-line border, `3px 10px` padding, `0.85rem`. A `.small` variant drops to `0.75rem` / `2px 8px`.
-- **State:** Active chips take Index Wash fill, Index Blue text, and an Index Blue border. A count inside a chip is always Index Blue at weight 600.
+- **Style:** panel fill, 1px bench-edge border, 0 radius, `9px 12px`, `min-height: 40px`, body-size type. Textareas swap to mono at Small size with `line-height: 1.75` and vertical-only resize.
+- **Hover:** border to ink-2. **Focus:** border to wax blue, plus the global 2px wax-blue outline at 2px offset.
+- **Search (rail only):** the cut groove. `#00000059` fill, `#ffffff2e` border with the right border removed so it butts against its submit button, on-film text, `-2px` outline offset so the ring stays inside the groove. This override is scoped to `.site-header` specifically so the generic input rule cannot win by source order and turn the groove white.
+- **File input:** not a control, a *place to set something down* — full-width, 1.5px dashed, transparent, `16px` padding, with a wax-red-filled `::file-selector-button`. Hovering turns the dashes wax red.
+- **Required marker:** wax red.
 
-### Cards
+### Tape (tags)
 
-- **Corner:** 10px. **Background:** Surface. **Border:** 1px lattice-line. **Padding:** 16px. **Internal gap:** 8px, column flex.
-- **Shadow strategy:** Flat at rest; on hover, `translateY(-2px)` plus the card-lift shadow at `.08s ease`.
-- Titles run `1.05rem`; summaries and timestamps are graphite at `0.9rem` / `0.78rem`, with the timestamp pushed to the bottom by `margin-top: auto` so cards of unequal length still align their footers.
+Torn paper tape, not a pill. `{colors.tape}` ground shaped by the tape mask, no border, ink-2 text at Fine size, `4px 10px` (Label size and `3px 8px` in the `sm` variant used inside roll frames). Hover deepens the tape and darkens the text. Active state fills with wax red and switches text to `{colors.on-fill}`. A trailing count is carried in a dimmer inline span.
 
-### Inputs
+### Counters
 
-- **Style:** Surface fill, 1px lattice-line border, 10px radius, `10px 12px` padding, inherited font family. The header search and modal inputs use Paper fill instead, to read as recessed inside an already-raised surface.
-- **Textarea:** Same shell, monospace family, `resize: vertical` only.
-- **File input:** A 1.5px dashed drop zone on Paper with graphite text and 16px padding; on hover the border becomes Index Blue and the fill becomes Index Wash. Its `::file-selector-button` is styled as a primary button with an 18px right margin.
-- **Hover:** Border shifts to Graphite (150ms).
-- **Focus:** Border shifts to Index Blue, under the same 2px outline every other control gets. The border moves as well as the ring so the field itself answers, not just the halo around it.
-- **Select:** Selects were unstyled until they were added to the shared input rule; they now match text inputs exactly.
-- **Label caption:** A form label is a column flex container, so every inline child inside it becomes its own row. A caption carrying a required marker or inline code must be wrapped in a single `<span>`, or it breaks across two and three lines. This was live in the note form until a headless screenshot caught it.
-- **Error:** Field-level errors render in the `.errors` block, not on the field.
+The footage counter, `.ctr`: an inline-flex plate of `{colors.well}` with `1px` well border, its segments divided by `#ffffff26` hairlines. Figures are `{colors.on-film}` at Counter size (wdth 116, tabular-nums, `1px 7px`). Separators use `#ffffff73`; unit segments drop to Label size at wdth 84, uppercase, `#ffffffa6`. The `hot` variant recolours figures to `{colors.ctr-hot}` when a quota crosses 80%.
 
-### Navigation
+### The Roll (note list) — signature component
 
-The sticky header is a single `surface` bar with a bottom hairline: wordmark, search field, new-note button, spacer, username, settings gear, logout. Type is small — username at `0.88rem`/600, logout at `0.85rem`. There is no mobile navigation treatment; the header wraps by flex at narrow widths.
+The list is one strip of film, not a stack of cards. A single `.roll` container (panel fill, bench-edge border) holds an unbroken 20px sprocket column on the left and a column of frames on the right. Frames are separated only by a 1px edge rule; the sprocket column runs past all of them without interruption, which is what makes the list read as continuous material rather than as repeated objects.
 
-### Progress Bars
+Each frame is a two-column grid: title, summary (max 78ch, ink-2) and tapes at the left; the **edge code** pinned right and spanning all rows — `GM0115` in ink at Fine size over a `YYYY-MM-DD` date in ink-2, both tabular, letterspaced, at Label size. On hover the frame background steps down to the bench, the edge code's ID turns wax red, and two 8×8px wax-red registration corner-marks fade in at the frame's left edge (top-left and bottom-left, 2px stroke, `.1s linear`). The corner marks are the "this frame is in the gate" indication — deliberately *not* a left accent bar, which is the SaaS convention this world refuses. Below 620px the frame collapses to one column and the edge code moves inline above the title.
 
-The system's signature component, used for both quota and ingest. A `999px` track in `lattice-line`, filled with Index Blue, `overflow: hidden` so the fill's own pill corners are clipped to the track. Two heights carry two meanings: **8px for quota** (a standing measure, `width .3s ease`) and **6px for ingest** (a live process, `width .45s linear` — linear because an eased progress bar reads as decelerating when it is not).
+### The Gate (ingest progress) — signature component
 
-The ingest panel pairs this with a streaming preview: a scrolling `surface` box in `0.85rem`/1.75 with `white-space: pre-wrap`, ending in a blinking Index Blue caret (`1s steps(2, start)`). Both the bar transition and the caret are disabled under `prefers-reduced-motion`.
+The screen the product is built around: 20–35 seconds shown as one pass of transfer. A `{colors.well}` header carries the current stage name and a percent counter. Below it the **advance** — a 30px trough in `{colors.well}` with the exposed portion filling wax red, sprocket strips repeating across the full width on both edges (exposed or not — the perforations belong to the film, not to the progress), and a 2px `{colors.on-film}` gate marker standing at the leading edge of the fill.
 
-### Notices
+Both the fill width and the marker position use `transition: … .45s linear`. **Linear is not a default here, it is a requirement:** an eased progress bar decelerates visually while the real process is not decelerating, which reads as a stall. The quota bar in settings uses `ease` instead, correctly — it is a standing measurement, not a live process.
 
-Full-width, 10px radius, `10px 14px` padding, `0.9rem`. The `ok` variant uses Index Wash with Index Blue text. The `warn` variant uses amber values (`#fdf0d5` / `#8a6d00`, dark `#3a3115` / `#e0c069`) that live **outside** the token system — the one place a component defines its own colour.
+The meter's behaviour lives in `public/js/app.js` and holds two invariants, which any redesign of this component must preserve:
+1. **It never goes backwards.** `Meter.set` refuses any value at or below the current one.
+2. **It never overshoots the next real checkpoint.** Between checkpoints it advances on the server's time estimate, but asymptotically — past the estimate it only closes the remaining 10% of the stage, never arriving until the real stage event lands. The last 6% is reserved for save-and-link.
+
+The gate body holds two more devices: the **trim bin** (a `<details>` of extracted knowledge points, each item hung by a small wax-red hole mark, entering with a `.28s` `hang` rotation staggered up to 600ms — material hanging on a pin) and the **gate output**, a bench-coloured pre-wrap region streaming the note body as it is written, with a blinking wax-red block caret that stops when the stream completes.
+
+### Notices & Errors
+
+Flat, bordered, no icon-circle, no tint background except for warn. `ok` is a transparent box with a wax-blue border and wax-blue text. `warn` is the only filled state in the system: solid `{colors.wax-amber-fill}` with `{colors.on-warn}` near-black text at weight 700, unchanged between themes. Error lists are a square-bullet `<ul>` in a wax-red border with wax-red text and wax-red markers. An empty notice collapses to `display: none` so it never reserves space.
+
+### The Slate (auth) — signature component
+
+Used on login and register only. A 440px panel with a sprocket column spanning its full height, then a 26px clapper stripe, then a `{colors.well}` name plate, then the form body. This is the only place the clapper stripe appears; it is the product introducing itself before the material is loaded, and it must not be reused as decoration on any other surface.
+
+### Pager
+
+Butted square cells, 38×38px minimum, panel fill with a bench-edge border and the left border removed on adjacent cells so the row reads as one continuous strip of frame counters. Tabular figures. The active cell inverts to the well.
+
+### Prose (note body)
+
+Max 74ch. Headings carry an edge rule beneath. **Unordered list bullets are 7px squares, not discs** — sprocket holes; nested levels become 1px outlined squares. Links are wax blue with a 1px underline that becomes a solid wax-blue block with panel-coloured text on hover. Inline code sits on the bench with an edge border; code blocks are wells with `{colors.on-film}` text. An empty body renders as a dashed placement zone carrying the honest message that nothing was extractable.
+
+### Motion
+
+Short, linear, and only where something is genuinely changing: `.12s linear` on colour and border transitions, `.1s linear` on frame hover and registration marks, `.45s linear` on the advance and gate marker, `.3s ease` on the quota fill, `1s steps(2, start)` on the caret, `.28s` on the trim-bin hang.
+
+`prefers-reduced-motion: reduce` stops exactly the things that move: the advance transition, the gate marker, the quota fill, the caret blink, and the trim-bin hang. It deliberately **keeps** colour and border transitions, because removing those would remove the only cue telling a user where the pointer is.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** build depth from a 1px `lattice-line` border and a `paper`/`surface` tonal step before reaching for a shadow. Match the incumbent while the depth question is open.
-- **Do** spend Index Blue only on position and navigation, per **The Index Rule**. Links, current page, selected tag, filled progress, primary action.
-- **Do** reach every colour through the eight custom properties, so the component is correct in both themes without a second rule.
-- **Do** keep containers at 10px radius and reserve pills (999px) for measures — chips, badges, progress tracks.
-- **Do** buy density from chrome, not from reading text. Labels and metadata may go to `0.72–0.85rem`; body copy stays at `1rem`/1.65.
-- **Do** keep state changes small and quick: 80–150ms, a 2px lift at most. The gear's 45° rotation at 250ms is the system's one indulgence and stays unique.
-- **Do** guard new motion with `prefers-reduced-motion`. The single block at the foot of the stylesheet stops what actually moves — the card lift, the gear rotation, both bar fills, the caret — and deliberately keeps colour and border transitions, because removing those would leave no feedback about what the pointer is on.
-- **Do** give every new interactive component a hover, a focus, and (if it can be disabled) a disabled state. The system-wide `:where(...):focus-visible` rule covers focus by default at zero specificity; the other two are yours to write.
-- **Do** derive a hover colour from a token that already exists — `filter: brightness()` on a filled control, `color-mix()` on a tinted one — rather than adding a palette entry for one state.
+- **Do** put every number through the counter component (`.ctr`, wdth 116, tabular) so quota, percent, character counts and totals are recognisably the same object.
+- **Do** express a new role with Archivo's width axis (84 marking / 88–96 heading / 100 prose / 116 counter) rather than by adding a typeface.
+- **Do** separate surfaces with a 1px rule plus the panel/bench material step — `{colors.edge}` for rules on the light box, `{colors.edge-2}` for rules on the bench.
+- **Do** keep the machine dark in both themes: rail, counter plates, gate head, progress troughs, table headers, the slate plate.
+- **Do** draw every red rule with the wax mask asset at 60px tiling, so all of them share one hand.
+- **Do** use `linear` timing on any bar reporting real elapsed time, and reserve `ease` for standing measurements.
+- **Do** give any new world device a job — a sprocket, a counter, a wax rule, or a tape must mark something real, or it does not go on the page.
+- **Do** ship icons from the hand-drawn sprite in `views/partials/header.ejs` at 1.6 stroke, square caps, miter joins, 17px.
 
 ### Don't:
 
-- **Don't** let this look like an "AI product." No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.
-- **Don't** write a literal colour inside a component rule. The stylesheet has none left — the warning notice, the error block, and every white-on-accent label now go through tokens. The only literals outside `:root` are the two shadow alphas, which are not palette entries.
-- **Don't** spread content to fill width. Reading stays within 980px, input surfaces within 720px, per **The 980 Rule**.
-- **Don't** add a second accent. Index Blue is the only orientation colour, and the status family — Alert Red and Amber, each with a soft companion — is closed at two hues and exists only for feedback. A new hue needs a new job that neither orientation nor feedback covers.
-- **Don't** introduce a new radius value. Ten pixels, a pill, `4px`/`8px` for code, and one circle is the complete vocabulary.
-- **Don't** add a font size. The ramp is closed at `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`. Snap to the nearest step; a size that seems to need a new step usually needs a different weight or colour instead.
-- **Don't** ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.
-- **Don't** ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.
+- **Don't** add a border-radius. Anywhere. The system has one shape token and its value is 0.
+- **Don't** add a box-shadow, glow, gradient fill, or backdrop blur. There are none in the build and depth must not be made this way.
+- **Don't** let a wax colour take another wax colour's job — no blue primary buttons, no red links, no amber outside a warning.
+- **Don't** add a dark-theme override for `--on-warn`, `--on-fill`, `--on-film` or `--ctr-hot`; wax is opaque pigment and does not follow the room light.
+- **Don't** mark the current/hovered item with a left accent bar; this world uses registration corner-marks.
+- **Don't** rebuild the note list as cards, or reintroduce a sidebar; the roll is one continuous strip and the navigation is the rail.
+- **Don't** reuse the clapper stripe outside the auth slate, and don't add a second full-width red bar to a page that already has one under its title.
+- **Don't** add a CJK webfont; the system stack is the permanent answer, for the sake of the ingest wait screen.
+- **Don't** use round list bullets in prose; the bullet is a 7px square sprocket hole.
+- **Don't** use emoji or an icon font. Extend the SVG sprite instead.
+
+## Open Items
+
+The spec has no canonical section for unresolved decisions, so they are recorded here. These are known defects the build currently carries. **None of them is a design rule**; do not inherit them on new surfaces.
+
+- **The counter disappears on the slate plate.** `.ctr` sets its own `{colors.well}` background, but `.slate-plate` is also `{colors.well}`, so the "LOGIN" counter on the auth nameplate loses its plate and reads as plain type rather than as a counter. The counter component needs a variant (or a border/inset treatment) for use on well-coloured ground. Do not solve it by removing the counter.
+- **Three surfaces carry no world device.** Sprockets appear on the roll, the gate, the quota bar and the auth slate. The note form, the import form and the settings language panel are plain bordered sheets and read as ordinary forms — the world stops at their edge.
+- **The type never reaches the scale the world allows.** Archivo's width extremes (62 and 125) are never taken; the used range is 84–116. `--t-display` caps at 1.9rem. The world's material would support a much louder display setting than the build takes.
+- **Two declared colour tokens are unused.** `--wax-amber` (amber *text*) and `--on-blue` (type on a blue fill) are defined and theme-mapped but applied nowhere. They are honest reservations for the roles they name, not evidence that those roles ship today.
+- **Tape is nearly invisible on the panel.** `{colors.tape}` against `{colors.panel}` is a very small material step in light theme, so tags inside the roll and the light box read as bare text and the torn-tape silhouette is largely lost. The device is doing its job on the bench, not on the panel.
+
+### Where the build contradicts the direction contract
+
+- The contract states **one lit white light-box that is the only surface allowed to glow**. In the build, `{colors.panel}` is a general material: the roll, sheets, compare panes, the auth slate, pager cells and default buttons all use it. The rule holds literally on the note detail view and as a per-page intent everywhere else, but it is not a global invariant — it is recorded above as *The One Lit Surface Rule*, scoped to reading surfaces, because that is what the code does.
+- The contract names **amber warns** as one of three equal pigments. In the build amber ships on exactly one component and its text token is unused, so the working palette is effectively two pigments plus a warning fill. The three-pencil rule is still the governing rule for new work, but the shipped ratio should not be mistaken for parity.

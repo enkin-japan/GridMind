@@ -1,59 +1,82 @@
 <%- include('../partials/header') %>
 
-<form id="import-form" class="note-form">
-  <h1>ドキュメントを取り込む</h1>
-  <p class="muted">
-    ファイル（PDF / Word / PowerPoint / Excel / html / txt）か、貼り付けたテキストを AI が整理してノート化します。
+<div class="page-head">
+  <h1>資料を取り込む</h1>
+  <p>
+    ファイル（PDF / Word / PowerPoint / Excel / HTML / テキスト）か、貼り付けたテキストから、
+    知識にあたる部分だけを取り出してノートにします。日程・評価基準・ページ番号のような、
+    知識ではないものは落とします。
   </p>
+</div>
 
-  <p class="muted small">
-    今月の取り込み：<strong><%= usage.ingests %> / <%= plan.monthlyIngests %> 回</strong>
-    （<%= plan.label %>プラン・1ファイル <%= plan.maxDocChars.toLocaleString() %> 文字まで）
-    　<a href="/settings">設定</a>
-  </p>
+<form id="import-form" class="sheet form-narrow">
+  <div class="quota-label">
+    <span class="lbl">今月の取り込み</span>
+    <span>
+      <span class="ctr">
+        <span><%= usage.ingests %></span><span class="sep">/</span><span><%= plan.monthlyIngests %></span><span class="unit">回</span>
+      </span>
+      　<a href="/settings"><%= plan.label %>プラン</a>
+    </span>
+  </div>
 
-  <label>ファイルを選択（複数選べます）
+  <label class="field">
+    <span class="cap">ファイル</span>
     <input type="file" id="import-file" name="file" multiple
            accept=".pdf,.docx,.pptx,.pptm,.xlsx,.xlsm,.html,.htm,.txt,.md,.csv">
-    <small class="muted">複数選んだときは、1ファイルずつ順番に処理します（AI が集中して整理できるように）。</small>
+    <small class="hint">
+      複数選べます。そのときは1ファイルずつ順番に処理します（AI が1本ずつに集中できるように）。
+      1ファイルの上限は <%= plan.maxDocChars.toLocaleString() %> 文字です。
+    </small>
   </label>
 
-  <p class="muted" style="text-align:center;">— または —</p>
-
-  <label>テキストを貼り付け
-    <textarea id="import-text" name="text" rows="10" placeholder="ここにテキストを貼り付け…"></textarea>
+  <label class="field">
+    <span class="cap">または、テキストを貼り付け</span>
+    <textarea id="import-text" name="text" rows="8" placeholder="ここにテキストを貼り付け…"></textarea>
   </label>
 
-  <label>知識の出力言語
+  <label class="field">
+    <span class="cap">知識の出力言語</span>
     <select id="import-lang" name="lang">
       <% Object.keys(languages).forEach(function (k) { %>
         <option value="<%= k %>" <%= k === defaultLang ? 'selected' : '' %>><%= languages[k].label %></option>
       <% }); %>
     </select>
-    <small class="muted">
-      英語の資料を日本語のノートにする、といった使い方ができます。「原文のまま」なら翻訳しません。
+    <small class="hint">
+      英語の資料から日本語のノートを作る、といった使い方ができます。「原文のまま」なら翻訳しません。
     </small>
   </label>
 
   <div class="form-actions">
-    <button class="btn primary" type="submit" id="import-submit">AI で整理して取り込む</button>
-    <a class="btn" href="/">キャンセル</a>
+    <button class="btn primary" type="submit" id="import-submit">
+      <svg class="ico"><use href="#i-import"/></svg>取り込む
+    </button>
+    <a class="btn" href="/"><svg class="ico"><use href="#i-back"/></svg>キャンセル</a>
   </div>
-  <p id="import-status" class="muted" role="status" aria-live="polite"></p>
+  <p id="import-status" class="notice" role="status" aria-live="polite"></p>
 
-  <!-- 取り込み中の進捗。段階の切りかわりが来るまでは見積もりで進め、
-       来たらそこへ合わせ直す（進捗は決して戻さない）。 -->
-  <section id="ingest" class="ingest" hidden aria-live="polite">
-    <div class="ingest-bar"><span id="ingest-fill"></span></div>
-    <p class="ingest-head">
-      <span id="ingest-stage">準備しています</span>
-      <span id="ingest-meta" class="muted small"></span>
-    </p>
-    <details id="ingest-inv" hidden>
-      <summary>拾い出した知識点 <span id="ingest-inv-n" class="muted small"></span></summary>
-      <ul id="ingest-inv-list" class="ingest-inv-list"></ul>
-    </details>
-    <div id="ingest-preview" class="ingest-preview" hidden></div>
+  <%# ゲート。20-35 秒かかる転写を、数える・吊るす・書き出すの3つで見せる。
+      段階の切りかわりが来るまでは見積もりで進め、来たらそこへ合わせ直す
+      （進捗は決して戻さない）。 %>
+  <section id="ingest" class="gate" hidden aria-live="polite">
+    <div class="gate-head">
+      <span class="gate-stage" id="ingest-stage">準備しています</span>
+      <span class="ctr"><span id="ingest-meta">0</span><span class="unit">%</span></span>
+    </div>
+    <div class="advance" role="progressbar" aria-labelledby="ingest-stage"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="ingest-bar">
+      <i id="ingest-fill"></i><b id="ingest-gate"></b>
+    </div>
+    <div class="gate-body">
+      <details class="bin" id="ingest-inv" hidden>
+        <summary>
+          <span class="grow">拾い出した知識点</span>
+          <span id="ingest-inv-n"></span>
+        </summary>
+        <ul class="bin-list" id="ingest-inv-list"></ul>
+      </details>
+      <div id="ingest-preview" class="gate-out" hidden></div>
+    </div>
   </section>
 </form>
 

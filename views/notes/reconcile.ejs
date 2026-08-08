@@ -1,37 +1,49 @@
 <%- include('../partials/header') %>
 
-<div class="reconcile">
-  <h1>関連する知識が見つかりました</h1>
-  <p class="muted">
-    取り込んだ知識が、既存のノート「<strong><%= old.title %></strong>」と関連しています。どうしますか？
+<div class="page-head">
+  <h1>2本を見くらべる</h1>
+  <p>
+    いま取り込んだ知識が、既存のノート「<strong><%= old.title %></strong>」とかなり重なっています。
+    2本を並べたので、どう扱うかを決めてください。
   </p>
+</div>
 
-  <div class="compare">
-    <section class="pane pane-new">
-      <div class="pane-label">新規（取り込み）</div>
+<div class="compare">
+  <section class="pane pane-new">
+    <div class="pane-head">
+      <span class="roll-id">A</span>
+      <span class="lbl">新規（取り込み）</span>
+    </div>
+    <div class="pane-body">
       <h3><%= staged.title %></h3>
       <div class="markdown-body"><%- newHtml %></div>
-    </section>
-    <section class="pane pane-old">
-      <div class="pane-label">既存ノート</div>
+    </div>
+  </section>
+  <section class="pane pane-old">
+    <div class="pane-head">
+      <span class="roll-id">B</span>
+      <span class="lbl">既存ノート</span>
+    </div>
+    <div class="pane-body">
       <h3><%= old.title %></h3>
       <div class="markdown-body"><%- oldHtml %></div>
-    </section>
-  </div>
+    </div>
+  </section>
+</div>
 
-  <div class="reconcile-actions">
-    <form action="/notes/reconcile/link" method="post">
-      <button class="btn primary" type="submit">🔗 関連づけて保存</button>
-      <span class="hint">別々のノートとして保存し、相互にリンクします</span>
-    </form>
-    <form action="/notes/reconcile/merge" method="post">
-      <button class="btn" type="submit">⤵ 統合する（プレビュー）</button>
-      <span class="hint">既存ノートに統合。AI が重複を除いてまとめ、確認後に保存します</span>
-    </form>
-    <form action="/notes/reconcile/plain" method="post">
-      <button class="btn ghost" type="submit">リンクせず保存</button>
-    </form>
-  </div>
+<div class="sheet decide">
+  <form action="/notes/reconcile/link" method="post">
+    <button class="btn primary" type="submit"><svg class="ico"><use href="#i-splice"/></svg>関連づけて保存</button>
+    <span class="hint">2本とも別々のノートとして残し、相互にリンクします。</span>
+  </form>
+  <form action="/notes/reconcile/merge" method="post">
+    <button class="btn" type="submit"><svg class="ico"><use href="#i-merge"/></svg>統合する（プレビュー）</button>
+    <span class="hint">B に統合します。AI が重複を除いてまとめ、確認してから保存します。</span>
+  </form>
+  <form action="/notes/reconcile/plain" method="post">
+    <button class="btn ghost" type="submit">リンクせず保存</button>
+    <span class="hint">関連づけずに、A をそのまま別のノートとして保存します。</span>
+  </form>
 </div>
 
 <%- include('../partials/footer') %>

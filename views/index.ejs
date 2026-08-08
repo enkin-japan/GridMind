@@ -1,42 +1,62 @@
 <%- include('partials/header') %>
 
-<% if (tag) { %>
-  <p class="filter-note">タグ「<strong><%= tag %></strong>」で絞り込み中 — <a href="/">解除</a></p>
-<% } %>
+<div class="page-head">
+  <h1><%= q ? '検索：' + q : (tag ? 'タグ：' + tag : 'ノート') %></h1>
+  <p>
+    <span class="ctr"><span><%= total %></span><span class="unit">件</span></span>
+    <% if (q || tag) { %>　<a href="/">すべてに戻す</a><% } %>
+  </p>
+</div>
 
+<%# タグは畳んでおく。開いたままだと一覧の先頭を丸ごと占領してしまう。
+    絞り込み中だけは、何で絞っているかが見えるように開けておく。 %>
 <% if (allTags && allTags.length) { %>
-  <div class="tag-cloud">
-    <% allTags.forEach(function (t) { %>
-      <a class="tag-chip<%= tag === t.name ? ' active' : '' %>" href="/?tag=<%= encodeURIComponent(t.name) %>"><%= t.name %> <span class="count"><%= t.count %></span></a>
-    <% }) %>
-  </div>
+  <details class="tags"<%= tag ? ' open' : '' %>>
+    <summary>
+      <span class="grow">タグで絞り込み</span>
+      <span><%= allTags.length %></span>
+    </summary>
+    <div class="tape-row">
+      <% allTags.forEach(function (t) { %>
+        <a class="tape<%= tag === t.name ? ' active' : '' %>" href="/?tag=<%= encodeURIComponent(t.name) %>"><%= t.name %> <span class="count"><%= t.count %></span></a>
+      <% }) %>
+    </div>
+  </details>
 <% } %>
 
 <% if (rows.length === 0) { %>
   <div class="empty">
-    <p>ノートがまだありません。</p>
-    <a class="btn" href="/notes/new">最初のノートを作成する</a>
+    <p><%= q || tag ? '条件に合うノートはありません。' : 'まだ1本も巻かれていません。資料を取り込むと、ここに並びます。' %></p>
+    <a class="btn primary" href="/notes/import"><svg class="ico"><use href="#i-import"/></svg>資料を取り込む</a>
   </div>
 <% } else { %>
-  <div class="card-grid">
-    <% rows.forEach(function (note) { %>
-      <a class="card" href="/notes/<%= note.id %>">
-        <h2><%= note.title %></h2>
-        <% if (note.summary) { %><p class="summary"><%= note.summary %></p><% } %>
-        <% if (note.tags && note.tags.length) { %>
-          <div class="card-tags">
-            <% note.tags.forEach(function (t) { %><span class="tag-chip small"><%= t %></span><% }) %>
+  <%# 一覧はカードの並びではなく1本のロール。送り穴は左端を途切れず走る。 %>
+  <div class="roll">
+    <div class="perf-col" aria-hidden="true"></div>
+    <div class="roll-frames">
+      <% rows.forEach(function (note) { %>
+        <a class="frame" href="/notes/<%= note.id %>">
+          <h2><%= note.title %></h2>
+          <% if (note.summary) { %><p class="summary"><%= note.summary %></p><% } %>
+          <% if (note.tags && note.tags.length) { %>
+            <div class="frame-tapes">
+              <% note.tags.forEach(function (t) { %><span class="tape sm"><%= t %></span><% }) %>
+            </div>
+          <% } %>
+          <div class="edge-code">
+            <b>GM<%= String(note.id).padStart(4, '0') %></b>
+            <%= note.created_at.slice(0, 10) %>
           </div>
-        <% } %>
-        <time><%= note.created_at.slice(0, 10) %></time>
-      </a>
-    <% }) %>
+        </a>
+      <% }) %>
+    </div>
   </div>
 
   <% if (pages > 1) { %>
-    <nav class="pager">
+    <nav class="pager" aria-label="ページ送り">
       <% for (let p = 1; p <= pages; p++) { %>
         <a class="page<%= p === page ? ' active' : '' %>"
+           <%= p === page ? 'aria-current="page"' : '' %>
            href="/?<%= q ? 'q=' + encodeURIComponent(q) + '&' : '' %><%= tag ? 'tag=' + encodeURIComponent(tag) + '&' : '' %>page=<%= p %>"><%= p %></a>
       <% } %>
     </nav>

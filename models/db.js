@@ -58,6 +58,7 @@ async function init() {
       body_text   TEXT,                        -- 全文検索・将来の embedding 用のプレーンテキスト射影
       summary     TEXT,                        -- AI 要約（任意）
       source_type TEXT DEFAULT 'paste',        -- 'upload' | 'paste'
+      src_chars   INTEGER,                     -- 取り込んだ資料の文字数（削った量を出すため）
       created_at  TEXT NOT NULL,
       updated_at  TEXT NOT NULL
     )
@@ -135,6 +136,12 @@ async function init() {
   // --- マイグレーション：既定の出力言語（'auto' | 'ja' | 'en' | 'zh' | 'ko'）---
   if (!(await columnExists('users', 'out_lang'))) {
     await run("ALTER TABLE users ADD COLUMN out_lang TEXT NOT NULL DEFAULT 'auto'");
+  }
+  // --- マイグレーション：資料の元の文字数 ---
+  // 「どれだけ削ったか」はこの製品の主張そのものなので、ノート側に控えておく。
+  // 既存のノートは null のまま（分からないものを分かったふりに埋めない）。
+  if (!(await columnExists('notes', 'src_chars'))) {
+    await run('ALTER TABLE notes ADD COLUMN src_chars INTEGER');
   }
 }
 

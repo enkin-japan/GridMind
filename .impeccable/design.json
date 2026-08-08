@@ -1,298 +1,253 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-08-08T00:00:00+09:00",
+  "generatedAt": "2026-08-08T00:00:00Z",
   "title": "Design System: GridMind",
   "extensions": {
     "colorMeta": {
-      "index-blue": {
-        "role": "primary",
-        "displayName": "Index Blue",
-        "canonical": "#3b6ef5",
-        "darkValue": "#6d97ff",
-        "cssVar": "--accent",
-        "tonalRamp": [
-          "#0a1433",
-          "#10225c",
-          "#17307f",
-          "#2044a8",
-          "#2b57d0",
-          "#3b6ef5",
-          "#8fb0fb",
-          "#e8efff"
-        ]
+      "bench": {
+        "role": "neutral",
+        "displayName": "Bench Grey",
+        "canonical": "#e4e4df",
+        "oklch": "oklch(91.7% 0.007 106.5)",
+        "dark": "#0d0e0b",
+        "notes": "The bench top: page ground, summary box, hovered frame, current-plan row, disabled button, inline-code ground. Lower of the two material levels; the panel sits 1.28:1 above it in both themes.",
+        "tonalRamp": ["#0b0b08", "#252522", "#42423e", "#61615d", "#83837e", "#a5a5a1", "#c9c9c5", "#efefea"]
       },
-      "index-wash": {
-        "role": "primary",
-        "displayName": "Index Wash",
-        "canonical": "#e8efff",
-        "darkValue": "#1e2740",
-        "cssVar": "--accent-soft",
-        "tonalRamp": [
-          "#0d1424",
-          "#141d33",
-          "#1e2740",
-          "#334160",
-          "#5a6f9e",
-          "#8fa8d6",
-          "#c4d5f5",
-          "#e8efff"
-        ]
+      "panel": {
+        "role": "neutral",
+        "displayName": "Light-Box White",
+        "canonical": "#ffffff",
+        "oklch": "oklch(100% 0.000 89.9)",
+        "dark": "#24271f",
+        "contrast": "ink on panel 17.89:1 light / 12.44:1 dark; ink-2 on panel 6.32:1 light / 5.90:1 dark",
+        "notes": "The lit reading surface. Carries the note body, the roll, sheets, compare panes, the auth slate, pager cells and default buttons.",
+        "tonalRamp": ["#0b0b0b", "#252525", "#424242", "#616161", "#828282", "#a5a5a5", "#c9c9c9", "#eeeeee"]
+      },
+      "well": {
+        "role": "neutral",
+        "displayName": "The Well",
+        "canonical": "#22231e",
+        "oklch": "oklch(25.3% 0.009 116.3)",
+        "dark": "#050603",
+        "contrast": "on-film on well 13.70:1 light / 17.59:1 dark",
+        "notes": "A recess cut into the material, dark in BOTH themes: header rail, counter plates, gate head, progress and quota troughs, table header rows, active pager cell, slate plate and clapper, code blocks. This is the machine, not a surface.",
+        "tonalRamp": ["#0b0c07", "#252621", "#42433d", "#61625c", "#82837d", "#a4a69f", "#c9cac3", "#eeefe8"]
+      },
+      "perf": {
+        "role": "neutral",
+        "displayName": "Perforation Show-Through",
+        "canonical": "#e4e4df",
+        "oklch": "oklch(91.7% 0.007 106.5)",
+        "dark": "#33362c",
+        "notes": "The colour seen through a sprocket hole. Matches the bench in light; deliberately lighter than the well in dark so holes read as punched rather than as black-on-black.",
+        "tonalRamp": ["#0b0b08", "#252522", "#42423e", "#61615d", "#83837e", "#a5a5a1", "#c9c9c5", "#efefea"]
       },
       "ink": {
         "role": "neutral",
         "displayName": "Ink",
-        "canonical": "#1c2128",
-        "darkValue": "#e6e9ef",
-        "cssVar": "--text",
-        "tonalRamp": [
-          "#0f1116",
-          "#1c2128",
-          "#2a2f3a",
-          "#3f4653",
-          "#6a7280",
-          "#9aa2af",
-          "#c8cdd6",
-          "#e6e9ef"
-        ]
+        "canonical": "#17180f",
+        "oklch": "oklch(20.5% 0.017 113.1)",
+        "dark": "#eae9e0",
+        "contrast": "17.89:1 on panel light / 12.44:1 dark",
+        "notes": "Primary type and the hover border for default buttons and inputs.",
+        "tonalRamp": ["#0b0c05", "#25261d", "#424339", "#616257", "#828478", "#a5a69a", "#c9cabe", "#eef0e3"]
       },
-      "graphite": {
+      "ink-2": {
         "role": "neutral",
-        "displayName": "Graphite",
-        "canonical": "#6a7280",
-        "darkValue": "#9aa2af",
-        "cssVar": "--muted",
-        "tonalRamp": [
-          "#14171c",
-          "#22262d",
-          "#343941",
-          "#4d535d",
-          "#6a7280",
-          "#9aa2af",
-          "#c2c7cf",
-          "#e6e9ef"
-        ]
+        "displayName": "Ink Two",
+        "canonical": "#5e6156",
+        "oklch": "oklch(48.6% 0.018 119.5)",
+        "dark": "#a0a396",
+        "contrast": "6.32:1 on panel and 5.36:1 on tape in light; 5.90:1 and 4.79:1 in dark",
+        "notes": "Secondary type: summaries, hints, labels, edge codes, metadata, prose bullets, ghost button.",
+        "tonalRamp": ["#0a0c05", "#24261d", "#414339", "#606358", "#818478", "#a3a79b", "#c7cbbe", "#edf0e3"]
       },
-      "lattice-line": {
+      "on-film": {
         "role": "neutral",
-        "displayName": "Lattice Line",
-        "canonical": "#e2e5ea",
-        "darkValue": "#2a2f3a",
-        "cssVar": "--border",
-        "tonalRamp": [
-          "#14171c",
-          "#1f232b",
-          "#2a2f3a",
-          "#434952",
-          "#767d88",
-          "#a9b0ba",
-          "#cdd2d9",
-          "#e2e5ea"
-        ]
+        "displayName": "On Film",
+        "canonical": "#efefe8",
+        "oklch": "oklch(95.0% 0.009 106.6)",
+        "dark": "#efefe8",
+        "contrast": "13.70:1 on well light / 17.59:1 dark",
+        "notes": "Type and marks on dark material. Does NOT invert between themes; also the quota fill and the gate marker.",
+        "tonalRamp": ["#0c0b07", "#252520", "#42423d", "#62625c", "#83837c", "#a5a59f", "#cacac3", "#efefe8"]
       },
-      "surface": {
+      "edge": {
         "role": "neutral",
-        "displayName": "Surface",
-        "canonical": "#ffffff",
-        "darkValue": "#181b22",
-        "cssVar": "--surface",
-        "tonalRamp": [
-          "#0f1116",
-          "#181b22",
-          "#252932",
-          "#3a3f4a",
-          "#6f7682",
-          "#a8aeb8",
-          "#d8dbe1",
-          "#ffffff"
-        ]
+        "displayName": "Panel Rule",
+        "canonical": "#c6c6be",
+        "oklch": "oklch(82.4% 0.011 106.6)",
+        "dark": "#454940",
+        "notes": "The 1px rule drawn ON the light box: panel-level dividers, frame separators, heading underlines, table cells.",
+        "tonalRamp": ["#0c0b07", "#26251f", "#42423c", "#62625b", "#83837b", "#a6a69e", "#cacac2", "#efefe7"]
       },
-      "paper": {
+      "edge-2": {
         "role": "neutral",
-        "displayName": "Paper",
-        "canonical": "#f6f7f9",
-        "darkValue": "#0f1116",
-        "cssVar": "--bg",
-        "tonalRamp": [
-          "#0f1116",
-          "#1a1d24",
-          "#282c35",
-          "#3e434d",
-          "#737a86",
-          "#abb1bb",
-          "#dcdfe4",
-          "#f6f7f9"
-        ]
+        "displayName": "Bench Rule",
+        "canonical": "#a3a399",
+        "oklch": "oklch(71.3% 0.014 106.8)",
+        "dark": "#55594d",
+        "notes": "The 1px rule drawn ON the bench: outer container borders, form controls, dashed placement zones, footer rule.",
+        "tonalRamp": ["#0c0c05", "#26261e", "#43433a", "#626259", "#838379", "#a6a69c", "#cacabf", "#efefe5"]
       },
-      "alert-red": {
-        "role": "tertiary",
-        "displayName": "Alert Red",
-        "canonical": "#d63b3b",
-        "darkValue": "#d63b3b",
-        "cssVar": "--danger",
-        "tonalRamp": [
-          "#2b0c0c",
-          "#4a1414",
-          "#6d1d1d",
-          "#962828",
-          "#bd3232",
-          "#d63b3b",
-          "#e88585",
-          "#fdecec"
-        ]
-      },
-      "on-accent": {
+      "wax-red": {
         "role": "primary",
-        "displayName": "On-Accent",
-        "canonical": "#ffffff",
-        "darkValue": "#0f1116",
-        "cssVar": "--on-accent",
-        "tonalRamp": [
-          "#0f1116",
-          "#2a2f3a",
-          "#4d535d",
-          "#767d88",
-          "#a9b0ba",
-          "#cdd2d9",
-          "#eceef1",
-          "#ffffff"
-        ]
+        "displayName": "Wax Red",
+        "canonical": "#ba2818",
+        "oklch": "oklch(51.5% 0.184 30.4)",
+        "dark": "#f0705c",
+        "contrast": "6.17:1 on panel light / 5.18:1 dark",
+        "notes": "Grease pencil, text weight. Means cut / destroy / required: delete button, error lists, required marker, hovered edge-code ID, hovered file-drop dashes.",
+        "tonalRamp": ["#3c0000", "#630000", "#8a0000", "#b21e0e", "#db4a37", "#ff705a", "#ff957e", "#ffbba2"]
       },
-      "alert-red-soft": {
-        "role": "tertiary",
-        "displayName": "Alert Red Soft",
-        "canonical": "#fdecec",
-        "darkValue": "#3a1e1e",
-        "cssVar": "--danger-soft",
-        "tonalRamp": [
-          "#2b0c0c",
-          "#3a1e1e",
-          "#5c2b2b",
-          "#8a4040",
-          "#b56666",
-          "#d69a9a",
-          "#f0cfcf",
-          "#fdecec"
-        ]
+      "wax-red-fill": {
+        "role": "primary",
+        "displayName": "Wax Red Fill",
+        "canonical": "#c32b1c",
+        "oklch": "oklch(53.4% 0.190 30.1)",
+        "dark": "#c0301f",
+        "notes": "The same pencil pressed down. The most-used token in the stylesheet (17 uses): every wax rule under a title, primary button, file-selector button, active tape, plan badge, the advance bar, trim-bin hang marks, frame registration corner-marks, the streaming caret.",
+        "tonalRamp": ["#3d0000", "#650000", "#8c0000", "#b41709", "#dd4635", "#ff6d58", "#ff937c", "#ffb9a0"]
       },
-      "amber": {
-        "role": "tertiary",
-        "displayName": "Amber",
-        "canonical": "#8a6d00",
-        "darkValue": "#e0c069",
-        "cssVar": "--warn",
-        "tonalRamp": [
-          "#241c00",
-          "#3a3115",
-          "#584600",
-          "#7a6000",
-          "#8a6d00",
-          "#b89512",
-          "#e0c069",
-          "#fdf0d5"
-        ]
+      "wax-blue": {
+        "role": "secondary",
+        "displayName": "Wax Blue",
+        "canonical": "#2b57a0",
+        "oklch": "oklch(46.5% 0.128 260.0)",
+        "dark": "#7fa6ee",
+        "contrast": "7.06:1 on panel light / 6.20:1 dark",
+        "notes": "Means splice. Links, backlink splice marks, input focus border, the global focus-visible outline, the ok notice. Never a primary action, never a surface fill.",
+        "tonalRamp": ["#00003f", "#001d61", "#123e84", "#335fa9", "#5381ce", "#75a5f5", "#98caff", "#bcf0ff"]
       },
-      "amber-soft": {
+      "wax-amber": {
         "role": "tertiary",
-        "displayName": "Amber Soft",
-        "canonical": "#fdf0d5",
-        "darkValue": "#3a3115",
-        "cssVar": "--warn-soft",
-        "tonalRamp": [
-          "#241c00",
-          "#3a3115",
-          "#5c4d1c",
-          "#867233",
-          "#b09a5c",
-          "#d4c391",
-          "#eee0ba",
-          "#fdf0d5"
-        ]
+        "displayName": "Wax Amber",
+        "canonical": "#8a6200",
+        "oklch": "oklch(52.4% 0.108 80.6)",
+        "dark": "#e0b44a",
+        "contrast": "5.49:1 on panel light / 7.80:1 dark",
+        "notes": "DECLARED AND THEME-MAPPED BUT NOT APPLIED anywhere in the current build. Reserved for amber type on a light surface; any future use is still bound to the warning-only job.",
+        "tonalRamp": ["#200000", "#3f1a00", "#5f3900", "#815900", "#a47a29", "#c89d50", "#eec274", "#ffe799"]
+      },
+      "wax-amber-fill": {
+        "role": "tertiary",
+        "displayName": "Wax Amber Fill",
+        "canonical": "#e5a600",
+        "oklch": "oklch(76.5% 0.158 81.2)",
+        "dark": "#e5a600",
+        "notes": "Means be careful. Ships on exactly one component: the warning notice. Identical in both themes.",
+        "tonalRamp": ["#280000", "#490f00", "#6a3100", "#8d5300", "#b17500", "#d79800", "#fdbd35", "#ffe364"]
+      },
+      "on-fill": {
+        "role": "neutral",
+        "displayName": "On Wax Fill",
+        "canonical": "#efefe8",
+        "oklch": "oklch(95.0% 0.009 106.6)",
+        "dark": "#efefe8",
+        "notes": "Type on a red fill. Does not invert between themes.",
+        "tonalRamp": ["#0c0b07", "#252520", "#42423d", "#62625c", "#83837c", "#a5a59f", "#cacac3", "#efefe8"]
+      },
+      "on-warn": {
+        "role": "neutral",
+        "displayName": "On Amber Fill",
+        "canonical": "#17180f",
+        "oklch": "oklch(20.5% 0.017 113.1)",
+        "dark": "#17180f",
+        "notes": "Near-black on the amber fill. Deliberately does NOT invert between themes; the pigment is opaque and does not follow the room light.",
+        "tonalRamp": ["#0b0c05", "#25261d", "#424339", "#616257", "#828478", "#a5a69a", "#c9cabe", "#eef0e3"]
+      },
+      "ctr-hot": {
+        "role": "primary",
+        "displayName": "Counter Hot",
+        "canonical": "#ffb0a4",
+        "oklch": "oklch(83.0% 0.095 28.8)",
+        "dark": "#ffb0a4",
+        "notes": "The only variant colour a counter may take: figures recolour to this when a quota reaches 80%. Sits on the well plate, which is dark in both themes, so it does not invert.",
+        "tonalRamp": ["#270000", "#490906", "#6c2a23", "#8f4a41", "#b46c61", "#da8e83", "#ffb2a6", "#ffd7ca"]
+      },
+      "tape": {
+        "role": "neutral",
+        "displayName": "Paper Tape",
+        "canonical": "#f0ece1",
+        "oklch": "oklch(94.3% 0.015 90.2)",
+        "dark": "#33362c",
+        "notes": "Tape stock, a separate material from the panel. Used only as the tag chip's ground, shaped by the tape mask, and the chip carries no border at all.",
+        "tonalRamp": ["#0e0b05", "#28251d", "#454239", "#646158", "#868278", "#a9a59a", "#cdc9be", "#f2eee3"]
+      },
+      "tape-hover": {
+        "role": "neutral",
+        "displayName": "Paper Tape Pressed",
+        "canonical": "#e6e0d1",
+        "oklch": "oklch(90.7% 0.021 88.7)",
+        "dark": "#3e4237",
+        "notes": "Tape ground on hover.",
+        "tonalRamp": ["#0f0b03", "#292519", "#474235", "#666154", "#878274", "#aaa596", "#cfc9ba", "#f4eedf"]
       }
     },
     "typographyMeta": {
-      "headline": {
-        "displayName": "Headline",
-        "purpose": "Page titles. Currently inheriting the browser default 2rem — unstyled in the incumbent."
-      },
-      "title": {
-        "displayName": "Title",
-        "purpose": "The GridMind wordmark. Card titles run smaller at 1.05rem."
-      },
-      "body": {
-        "displayName": "Body",
-        "purpose": "Note bodies and everything read at length. Never shrinks to win space."
-      },
-      "label": {
-        "displayName": "Label",
-        "purpose": "The reconcile pane markers. The only uppercase type in the system."
-      },
-      "mono": {
-        "displayName": "Mono",
-        "purpose": "Markdown editing textarea, code blocks, inline code."
-      },
-      "title-sm": {
-        "displayName": "Title-sm",
-        "purpose": "Card titles and the modal heading."
-      },
-      "small": {
-        "displayName": "Small",
-        "purpose": "Form labels, notices, summaries, table text."
-      },
-      "caption": {
-        "displayName": "Caption",
-        "purpose": "Chips, hints, the streaming preview, pane hints."
-      }
+      "display": { "displayName": "Display", "purpose": "Page title and note title. Always followed by a red wax rule. Drops to 1.55rem below 620px." },
+      "headline": { "displayName": "Headline", "purpose": "Sheet headings, prose h1/h2, the slate form title. Carries a 1px edge rule beneath." },
+      "title": { "displayName": "Title", "purpose": "Roll frame titles, prose h3, compare-pane titles." },
+      "body": { "displayName": "Body", "purpose": "Note prose and general copy. Capped at 74ch." },
+      "small": { "displayName": "Small", "purpose": "Summaries, buttons, field captions, table cells, gate output." },
+      "fine": { "displayName": "Fine", "purpose": "Hints, tags, trim-bin items, margin-column lists." },
+      "label": { "displayName": "Label", "purpose": "Machine markings: rail switches, section labels, table headers, footer, badges. Width 84, uppercase, 0.14em (0.10-0.12em inside tighter components)." },
+      "counter": { "displayName": "Counter", "purpose": "Every quantity the user compares or watches. Width 116, tabular. Always rendered through the .ctr plate component." },
+      "mono": { "displayName": "Mono", "purpose": "Textarea input and code only. The only non-Archivo face in the system." }
     },
-    "shadows": [
+    "fonts": [
       {
-        "name": "card-lift",
-        "value": "0 6px 20px rgba(0,0,0,0.08)",
-        "purpose": "The only shadow in the system. Response to hovering a note card, paired with translateY(-2px) at .08s ease."
-      },
-      {
-        "name": "modal-scrim",
-        "value": "rgba(0,0,0,0.45)",
-        "purpose": "Full-viewport backdrop behind a modal. A background, not a box-shadow."
+        "family": "Archivo",
+        "axes": "wght 400-800, wdth 62-125",
+        "files": ["/public/fonts/archivo-latin.woff2", "/public/fonts/archivo-latin-ext.woff2"],
+        "subsets": "latin, latin-ext only",
+        "loading": "font-display: swap; the latin file is preloaded in the head",
+        "note": "CJK deliberately falls through to the system gothic stack (Hiragino Kaku Gothic ProN, Yu Gothic, Noto Sans JP, PingFang SC, Microsoft YaHei). A CJK webfont would be multiple megabytes and would damage the 20-35s ingest wait screen the product is built around. Widths actually used are 84-116; the axis extremes 62 and 125 are never taken."
       }
     ],
-    "motion": [
+    "masks": [
       {
-        "name": "state-fast",
-        "value": "0.08s ease",
-        "purpose": "Card hover lift and shadow. The quickest transition in the system."
+        "name": "wax-mask",
+        "value": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4.8C10 2.6 20 3.5 30 3 40 2.5 50 3.9 60 3.2L60 6.1C50 7.5 40 6.3 30 6.9 20 7.4 10 5.9 0 7.7Z'/%3E%3C/svg%3E\")",
+        "purpose": "Hand-authored grease-pencil stroke, tiled at 60px, applied as a CSS mask so the shape comes from the asset and the colour still comes from a token. Draws every red rule in the product."
       },
       {
-        "name": "state-standard",
-        "value": "0.15s ease",
-        "purpose": "Colour and border transitions on the icon button and file drop zone."
-      },
-      {
-        "name": "gesture-slow",
-        "value": "0.25s ease",
-        "purpose": "The settings gear's 45-degree rotation. The system's one piece of personality."
-      },
-      {
-        "name": "measure-eased",
-        "value": "0.3s ease",
-        "purpose": "Quota bar fill. Eased because it reports a standing measure, not live work."
-      },
-      {
-        "name": "progress-linear",
-        "value": "0.45s linear",
-        "purpose": "Ingest bar fill. Linear because an eased progress bar reads as decelerating when it is not."
-      },
-      {
-        "name": "caret-blink",
-        "value": "1s steps(2, start) infinite",
-        "purpose": "The streaming preview caret. Disabled under prefers-reduced-motion."
+        "name": "tape-mask",
+        "value": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0 2.6 34 1.7 36 2.4 68 1 100 0.7 100 22.3 64 23.1 62 22.5 28 23.7 0 23.1Z'/%3E%3C/svg%3E\")",
+        "purpose": "Hand-authored torn-tape outline. Shapes the .tape chip via a ::before at z-index -1; the chip has no border at all."
       }
+    ],
+    "shadows": [],
+    "shadowPolicy": "There are no box-shadows anywhere in the stylesheet, in either theme. Depth is made only by a 1px rule (edge on the light box, edge-2 on the bench) plus the bench-to-panel material step, measured at 1.28:1 in light and 1.28:1 in dark - deliberately matched so the raise reads identically in both rooms. Do not add a shadow, glow, gradient fill or backdrop blur.",
+    "motion": [
+      { "name": "state", "value": "0.12s linear", "purpose": "Background, colour and border-colour transitions on buttons and rail switches." },
+      { "name": "hover-fast", "value": "0.1s linear", "purpose": "Roll frame background and the fade-in of the red registration corner-marks." },
+      { "name": "advance", "value": "0.45s linear", "purpose": "The ingest advance bar width and the gate marker position. Linear is required, not a default: an eased progress bar reads as decelerating when the real process is not." },
+      { "name": "measure", "value": "0.3s ease", "purpose": "The quota fill. Eased on purpose - it is a standing measurement, not a live process." },
+      { "name": "caret", "value": "1s steps(2, start) infinite", "purpose": "The blinking wax-red block caret on the streaming gate output. Stops when the stream completes." },
+      { "name": "hang", "value": "0.28s cubic-bezier(.2, .9, .3, 1)", "purpose": "Trim-bin items settling onto their pin, staggered 40ms per item up to 600ms." },
+      { "name": "reduced-motion", "value": "@media (prefers-reduced-motion: reduce)", "purpose": "Stops the advance transition, the gate marker, the quota fill, the caret blink and the trim-bin hang. Deliberately KEEPS colour and border transitions - removing those would remove the only cue for where the pointer is." }
     ],
     "breakpoints": [
-      {
-        "name": "compare-collapse",
-        "value": "720px",
-        "purpose": "The only layout media query in the system: the reconcile compare grid collapses to one column."
-      }
+      { "name": "collapse", "value": "860px", "purpose": "Note layout and A/B compare drop to one column; the margin column reflows below the light box as an auto-fit grid of minmax(180px, 1fr) blocks with its dividing rules removed." },
+      { "name": "narrow", "value": "620px", "purpose": "Rail becomes static (it wraps to three rows and would otherwise take a third of the viewport), search takes a full row, icon-only switches reveal their labels, display type drops to 1.55rem, roll frames drop the edge-code column." }
+    ],
+    "widths": [
+      { "name": "page", "value": "1080px" },
+      { "name": "form", "value": "680px" },
+      { "name": "read", "value": "74ch" },
+      { "name": "margin-col", "value": "152px" },
+      { "name": "sprocket-col", "value": "20px" },
+      { "name": "perf-period", "value": "18px vertical / 22px horizontal" }
+    ],
+    "invariants": [
+      "border-radius does not appear in the stylesheet. Radius is 0 everywhere, no exceptions.",
+      "box-shadow does not appear in the stylesheet. Depth is a 1px rule plus the panel/bench material step, full stop.",
+      "The bench-to-panel material step is 1.28:1 in both light and dark, matched deliberately.",
+      "The rail, counter plates, gate head, progress troughs, table headers and slate plate are dark in both themes.",
+      "--on-warn, --on-fill, --on-film and --ctr-hot have no dark-theme override; wax is opaque pigment.",
+      "The progress meter never goes backwards and never overshoots the next real checkpoint (public/js/app.js, Meter.set and Meter.tick).",
+      "Red cuts, blue splices, amber warns. No colour takes another colour's job."
     ]
   },
   "components": [
@@ -300,146 +255,162 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single committing action on a screen. Hover brightens its own fill rather than reaching for a second blue; disabled is what the import button wears for 20-35 seconds during an ingest. On-accent inverts between themes: white on the light fill, near-black on the lighter dark-mode fill, which lifts that pair from 2.79:1 to 6.76:1.",
-      "html": "<button class=\"ds-btn ds-btn-primary\">AI で整理して取り込む</button> <button class=\"ds-btn ds-btn-primary\" disabled>処理中…</button>",
-      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease, filter .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover:not(:disabled) { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; } .ds-btn:disabled { opacity: .55; cursor: default; filter: none; }"
-    },
-    {
-      "name": "Default Button",
-      "kind": "button",
-      "refersTo": "button-default",
-      "description": "Every non-committing action. Surface fill, ink text, hairline border.",
-      "html": "<button class=\"ds-btn ds-btn-default\">キャンセル</button>",
-      "css": ".ds-btn-default { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease; } .ds-btn-default:hover:not(:disabled) { border-color: var(--accent, #3b6ef5); } .ds-btn-default:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+      "description": "The commit action. Wax-red fill, hard rectangle, icon from the hand-drawn sprite.",
+      "html": "<button class=\"ds-btn ds-btn-primary\"><svg class=\"ds-ico\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M3.2 11.8v5h13.6v-5M10 2.8v9\"/><path d=\"m6.4 8.4 3.6 3.6 3.6-3.6\"/></svg>取り込む</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 8px 16px; border: 1px solid var(--edge-2, #a3a399); background: var(--panel, #fff); color: var(--ink, #17180f); font-family: Archivo, system-ui, sans-serif; font-size: 0.875rem; font-weight: 700; border-radius: 0; cursor: pointer; transition: background .12s linear, color .12s linear, border-color .12s linear; } .ds-btn-primary { background: var(--wax-red-fill, #c32b1c); border-color: var(--wax-red-fill, #c32b1c); color: var(--on-fill, #efefe8); } .ds-btn-primary:hover { filter: brightness(1.1); } .ds-btn-primary:focus-visible { outline: 2px solid var(--wax-blue, #2b57a0); outline-offset: 2px; } .ds-ico { width: 17px; height: 17px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; }"
     },
     {
       "name": "Danger Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Delete only. Transparent fill with red text and border. The hover wash is derived from the token with color-mix so no new colour enters the palette.",
-      "html": "<button class=\"ds-btn-danger\">削除</button>",
-      "css": ".ds-btn-danger { padding: 8px 16px; border: 1px solid var(--danger, #d63b3b); border-radius: var(--radius, 10px); background: transparent; color: var(--danger, #d63b3b); font: inherit; cursor: pointer; transition: background .15s ease; } .ds-btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger, #d63b3b) 10%, transparent); } .ds-btn-danger:focus-visible { outline: 2px solid var(--danger, #d63b3b); outline-offset: 2px; }"
+      "description": "Destroy. Outlined in wax red at rest, fills with wax red on hover, and overrides the focus ring to red so the ring cannot contradict the action.",
+      "html": "<button class=\"ds-btn ds-btn-danger\"><svg class=\"ds-ico-d\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M3.4 5.6h13.2\"/><path d=\"M7.2 5.6V3.2h5.6v2.4\"/><path d=\"M5.2 5.6 6 16.8h8L14.8 5.6\"/></svg>削除</button>",
+      "css": ".ds-btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 8px 16px; background: transparent; border: 1px solid var(--wax-red, #ba2818); color: var(--wax-red, #ba2818); font-family: Archivo, system-ui, sans-serif; font-size: 0.875rem; font-weight: 700; border-radius: 0; cursor: pointer; transition: background .12s linear, color .12s linear, border-color .12s linear; } .ds-btn-danger:hover { background: var(--wax-red-fill, #c32b1c); border-color: var(--wax-red-fill, #c32b1c); color: var(--on-fill, #efefe8); } .ds-btn-danger:focus-visible { outline: 2px solid var(--wax-red, #ba2818); outline-offset: 2px; } .ds-ico-d { width: 17px; height: 17px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; }"
     },
     {
-      "name": "Settings Gear",
-      "kind": "button",
-      "refersTo": "icon-button",
-      "description": "The system's one piece of personality: a 38px circle whose gear visibly turns 45 degrees on hover.",
-      "html": "<button class=\"ds-icon-btn\" aria-label=\"設定\">⚙</button>",
-      "css": ".ds-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 1px solid var(--border, #e2e5ea); border-radius: 50%; background: var(--surface, #fff); color: var(--muted, #6a7280); font-size: 1.05rem; line-height: 1; cursor: pointer; transition: color .15s ease, background .15s ease, border-color .15s ease, transform .25s ease; } .ds-icon-btn:hover { background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); border-color: var(--accent, #3b6ef5); transform: rotate(45deg); } .ds-icon-btn:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
-    },
-    {
-      "name": "Tag Chip",
-      "kind": "chip",
-      "refersTo": "chip",
-      "description": "A pill because it behaves like a count, not a container. Active state takes the Index Wash tint.",
-      "html": "<span class=\"ds-chip\">JavaScript <span class=\"ds-chip-count\">7</span></span> <span class=\"ds-chip ds-chip-active\">IoT <span class=\"ds-chip-count\">3</span></span>",
-      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); color: var(--muted, #6a7280); font-size: .85rem; } .ds-chip-active { background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); border-color: var(--accent, #3b6ef5); } .ds-chip-count { color: var(--accent, #3b6ef5); font-weight: 600; }"
-    },
-    {
-      "name": "Note Card",
-      "kind": "card",
-      "refersTo": "card",
-      "description": "The list unit. Flat at rest; the system's only shadow appears on hover, paired with a 2px lift.",
-      "html": "<a class=\"ds-card\" href=\"#\"><h2>極座標と三角関数によるベクトル表現</h2><p class=\"ds-card-summary\">極座標表示は距離と角度でベクトルを表す方法で、類似度の計算がしやすい。</p><div class=\"ds-card-tags\"><span class=\"ds-chip ds-chip-sm\">IoT</span><span class=\"ds-chip ds-chip-sm\">数学</span></div><time class=\"ds-card-time\">2026-08-08</time></a>",
-      "css": ".ds-card { display: flex; flex-direction: column; gap: 8px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); padding: 16px; color: var(--text, #1c2128); text-decoration: none; max-width: 280px; transition: transform .08s ease, box-shadow .08s ease; } .ds-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); } .ds-card h2 { margin: 0; font-size: 1.05rem; } .ds-card-summary { margin: 0; color: var(--muted, #6a7280); font-size: .9rem; line-height: 1.65; } .ds-card-tags { display: flex; flex-wrap: wrap; gap: 6px; } .ds-chip-sm { display: inline-flex; padding: 2px 8px; border-radius: 999px; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); color: var(--muted, #6a7280); font-size: .75rem; } .ds-card-time { color: var(--muted, #6a7280); font-size: .78rem; margin-top: auto; }"
-    },
-    {
-      "name": "Text Input",
-      "kind": "input",
-      "refersTo": "input",
-      "description": "Surface fill inside the page, Paper fill when recessed inside an already-raised surface. Focus moves the border as well as showing the shared outline, so the field itself answers.",
-      "html": "<label class=\"ds-field\">タイトル<input class=\"ds-input\" type=\"text\" value=\"ローカルストレージの基本\"></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--text, #1c2128); max-width: 360px; } .ds-input { padding: 10px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font-family: inherit; font-size: 1rem; font-weight: 400; transition: border-color .15s ease; } .ds-input:hover { border-color: var(--muted, #6a7280); } .ds-input:focus-visible { border-color: var(--accent, #3b6ef5); outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
-    },
-    {
-      "name": "File Drop Zone",
-      "kind": "input",
-      "refersTo": "input",
-      "description": "The one dashed border in the system, at 1.5px, so it reads as a target rather than a container.",
-      "html": "<input class=\"ds-drop\" type=\"file\">",
-      "css": ".ds-drop { display: block; width: 100%; max-width: 420px; padding: 16px; border: 1.5px dashed var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--muted, #6a7280); font-family: inherit; font-weight: 400; cursor: pointer; transition: border-color .15s ease, background .15s ease; } .ds-drop:hover { border-color: var(--accent, #3b6ef5); background: var(--accent-soft, #e8efff); } .ds-drop::file-selector-button { margin-right: 14px; padding: 8px 18px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer; transition: opacity .15s ease; } .ds-drop::file-selector-button:hover { opacity: .85; }"
-    },
-    {
-      "name": "Ingest Progress",
-      "kind": "custom",
-      "refersTo": "card",
-      "description": "The signature component. A 6px pill track filled linearly, because an eased progress bar reads as decelerating when it is not. The caret proves the stream is live.",
-      "html": "<div class=\"ds-ingest\"><div class=\"ds-ingest-bar\"><span style=\"width:62%\"></span></div><p class=\"ds-ingest-head\"><span>本文を書いています</span><span class=\"ds-ingest-pct\">62%</span></p><div class=\"ds-ingest-preview\">## D2Cとデータ駆動型ブランド\n- D2Cは Direct to customer の略で、企業が顧客へ直接商品を販売するビジネスモデル</div></div>",
-      "css": ".ds-ingest { max-width: 480px; border-top: 1px solid var(--border, #e2e5ea); padding-top: 16px; } .ds-ingest-bar { height: 6px; border-radius: 999px; background: var(--border, #e2e5ea); overflow: hidden; } .ds-ingest-bar > span { display: block; height: 100%; border-radius: 999px; background: var(--accent, #3b6ef5); transition: width .45s linear; } .ds-ingest-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 10px 0 0; font-size: .92rem; color: var(--text, #1c2128); } .ds-ingest-pct { color: var(--muted, #6a7280); font-size: .85rem; } .ds-ingest-preview { margin-top: 12px; padding: 12px 14px; max-height: 160px; overflow-y: auto; background: var(--surface, #fff); border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); font-size: .85rem; line-height: 1.75; white-space: pre-wrap; color: var(--text, #1c2128); } .ds-ingest-preview::after { content: ''; display: inline-block; width: .5em; height: 1em; margin-left: 1px; vertical-align: text-bottom; background: var(--accent, #3b6ef5); opacity: .7; animation: ds-caret 1s steps(2, start) infinite; } @keyframes ds-caret { to { opacity: 0; } } @media (prefers-reduced-motion: reduce) { .ds-ingest-bar > span { transition: none; } .ds-ingest-preview::after { animation: none; } }"
-    },
-    {
-      "name": "Header Navigation",
+      "name": "Rail Switch",
       "kind": "nav",
-      "refersTo": "input-search",
-      "description": "A single surface bar with a bottom hairline. Sticky at z-index 10 — one of only two stacking levels in the system.",
-      "html": "<header class=\"ds-header\"><span class=\"ds-brand\">GridMind</span><form class=\"ds-search\"><input type=\"search\" placeholder=\"検索…\"><button type=\"submit\">検索</button></form><a class=\"ds-btn-new\" href=\"#\">＋ 新規</a></header>",
-      "css": ".ds-header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface, #fff); border-bottom: 1px solid var(--border, #e2e5ea); } .ds-brand { font-weight: 700; font-size: 1.2rem; color: var(--text, #1c2128); } .ds-search { display: flex; flex: 1; max-width: 320px; gap: 6px; } .ds-search input { flex: 1; padding: 8px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--text, #1c2128); font: inherit; } .ds-search button { padding: 8px 14px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); font: inherit; cursor: pointer; white-space: nowrap; } .ds-btn-new { padding: 8px 14px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); font-weight: 600; text-decoration: none; white-space: nowrap; }"
+      "refersTo": "rail-switch",
+      "description": "An engraved switch on the always-dark machine rail. Hairline border on the dark ground; hover inverts hard to on-film.",
+      "html": "<div class=\"ds-rail\"><a class=\"ds-rail-btn\" href=\"#\"><svg class=\"ds-ico-r\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M3.2 3.2h13.6v13.6H3.2z\"/><path d=\"M10 6.4v7.2M6.4 10h7.2\"/></svg><span>新規</span></a><a class=\"ds-rail-btn\" href=\"#\"><svg class=\"ds-ico-r\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><circle cx=\"10\" cy=\"10\" r=\"6.4\"/><path d=\"M10 3.6v3.1M10 16.4v-2M3.6 10h2.2M16.4 10h-2.2\"/></svg><span>設定</span></a></div>",
+      "css": ".ds-rail { display: flex; align-items: center; gap: 12px; padding: 8px 16px; min-height: 52px; background: var(--well, #22231e); color: var(--on-film, #efefe8); } .ds-rail-btn { display: inline-flex; align-items: center; gap: 6px; color: var(--on-film, #efefe8); border: 1px solid #ffffff40; padding: 6px 10px; min-height: 36px; font-family: Archivo, system-ui, sans-serif; font-size: 0.6875rem; font-weight: 700; font-variation-settings: 'wdth' 84; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; background: transparent; border-radius: 0; cursor: pointer; transition: background .12s linear, color .12s linear, border-color .12s linear; } .ds-rail-btn:hover { background: var(--on-film, #efefe8); color: var(--well, #22231e); border-color: var(--on-film, #efefe8); } .ds-rail-btn:focus-visible { outline: 2px solid var(--wax-blue, #2b57a0); outline-offset: 2px; } .ds-ico-r { width: 17px; height: 17px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Square field on the panel. Hover deepens the rule to ink; focus turns it wax blue and adds the square blue ring.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-cap\">ユーザー名</span><input class=\"ds-input\" type=\"text\" placeholder=\"\"><small class=\"ds-hint\">半角英数字で入力してください。</small></label>",
+      "css": ".ds-field { display: block; font-family: Archivo, system-ui, sans-serif; color: var(--ink, #17180f); } .ds-cap { display: block; margin-bottom: 6px; font-size: 0.875rem; font-weight: 700; } .ds-input { width: 100%; padding: 9px 12px; border: 1px solid var(--edge-2, #a3a399); background: var(--panel, #fff); color: var(--ink, #17180f); font: inherit; font-size: 1rem; min-height: 40px; border-radius: 0; } .ds-input:hover { border-color: var(--ink-2, #5e6156); } .ds-input:focus { border-color: var(--wax-blue, #2b57a0); } .ds-input:focus-visible { outline: 2px solid var(--wax-blue, #2b57a0); outline-offset: 2px; } .ds-input::placeholder { color: var(--ink-2, #5e6156); opacity: 1; } .ds-hint { display: block; margin-top: 6px; color: var(--ink-2, #5e6156); font-size: 0.8125rem; line-height: 1.55; }"
+    },
+    {
+      "name": "Footage Counter",
+      "kind": "custom",
+      "refersTo": "counter",
+      "description": "Every number in the product goes through this plate, so quota, percent, character counts and totals are recognisably the same object. Expanded tabular Archivo in a dark recess; the hot variant fires at 80% of a quota.",
+      "html": "<span class=\"ds-ctr\"><span>18</span><span class=\"ds-sep\">/</span><span>30</span><span class=\"ds-unit\">回</span></span> <span class=\"ds-ctr ds-ctr-hot\"><span>27</span><span class=\"ds-sep\">/</span><span>30</span><span class=\"ds-unit\">回</span></span>",
+      "css": ".ds-ctr { display: inline-flex; align-items: stretch; background: var(--well, #22231e); border: 1px solid var(--well, #22231e); border-radius: 0; vertical-align: middle; font-family: Archivo, system-ui, sans-serif; } .ds-ctr > span { padding: 1px 7px; font-variation-settings: 'wdth' 116; font-weight: 700; font-size: 0.875rem; font-variant-numeric: tabular-nums; color: var(--on-film, #efefe8); line-height: 1.6; } .ds-ctr > span + span { border-left: 1px solid #ffffff26; } .ds-ctr > .ds-sep { color: #ffffff73; padding-inline: 4px; } .ds-ctr > .ds-unit { color: #ffffffa6; font-size: 0.6875rem; font-variation-settings: 'wdth' 84; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; } .ds-ctr-hot > span { color: var(--ctr-hot, #ffb0a4); }"
+    },
+    {
+      "name": "Tape Tag",
+      "kind": "chip",
+      "refersTo": "tape",
+      "description": "Torn paper tape, not a pill. The silhouette comes from a hand-authored SVG mask on a ::before layer; the chip itself has no border. Active state fills with wax red.",
+      "html": "<a class=\"ds-tape\" href=\"#\">Node.js <span class=\"ds-count\">4</span></a> <a class=\"ds-tape ds-tape-active\" href=\"#\">NAT <span class=\"ds-count\">2</span></a>",
+      "css": ".ds-tape { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; position: relative; color: var(--ink-2, #5e6156); font-family: Archivo, system-ui, sans-serif; font-size: 0.8125rem; font-weight: 700; line-height: 1.5; text-decoration: none; border-radius: 0; } .ds-tape::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--tape, #f0ece1); -webkit-mask-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0 2.6 34 1.7 36 2.4 68 1 100 0.7 100 22.3 64 23.1 62 22.5 28 23.7 0 23.1Z'/%3E%3C/svg%3E\"); mask-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0 2.6 34 1.7 36 2.4 68 1 100 0.7 100 22.3 64 23.1 62 22.5 28 23.7 0 23.1Z'/%3E%3C/svg%3E\"); -webkit-mask-size: 100% 100%; mask-size: 100% 100%; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; } .ds-tape:hover { color: var(--ink, #17180f); } .ds-tape:hover::before { background: var(--tape-hover, #e6e0d1); } .ds-tape:focus-visible { outline: 2px solid var(--wax-blue, #2b57a0); outline-offset: 2px; } .ds-count { color: var(--ink-2, #5e6156); font-variant-numeric: tabular-nums; } .ds-tape-active { color: var(--on-fill, #efefe8); } .ds-tape-active::before { background: var(--wax-red-fill, #c32b1c); } .ds-tape-active .ds-count { color: #ffffffc4; }"
+    },
+    {
+      "name": "The Roll",
+      "kind": "card",
+      "refersTo": "frame",
+      "description": "The signature list. Not cards: one strip of film with an unbroken sprocket column and frames divided only by hairlines. Hovering steps the frame down to the bench, turns the edge-code ID wax red, and fades in two red registration corner-marks.",
+      "html": "<div class=\"ds-roll\"><div class=\"ds-perf\" aria-hidden=\"true\"></div><div class=\"ds-frames\"><a class=\"ds-frame\" href=\"#\"><h2>TCP・UDP・ポート番号・NATの基礎</h2><p class=\"ds-summary\">TCPとUDPの通信方式、ポート番号の範囲と代表的な用途、NATとNAPTによるアドレス変換を扱う。</p><div class=\"ds-edge-code\"><b>GM0115</b>2026-08-08</div></a><a class=\"ds-frame\" href=\"#\"><h2>Node.jsのhttpモジュール</h2><p class=\"ds-summary\">Node.jsのhttpモジュールを使用してサーバを作成する方法についての基本的な知識を提供する。</p><div class=\"ds-edge-code\"><b>GM0021</b>2026-07-20</div></a></div></div>",
+      "css": ".ds-roll { display: flex; border: 1px solid var(--edge-2, #a3a399); background: var(--panel, #fff); font-family: Archivo, system-ui, sans-serif; } .ds-perf { width: 20px; flex: 0 0 20px; background: var(--well, #22231e); position: relative; } .ds-perf::before { content: ''; position: absolute; inset: 0 5px; background-image: repeating-linear-gradient(to bottom, var(--perf, #e4e4df) 0 6px, transparent 6px 18px); } .ds-frames { flex: 1; min-width: 0; } .ds-frame { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: start; padding: 16px 16px 16px 24px; color: var(--ink, #17180f); text-decoration: none; position: relative; transition: background .1s linear; } .ds-frame + .ds-frame { border-top: 1px solid var(--edge, #c6c6be); } .ds-frame:hover { background: var(--bench, #e4e4df); } .ds-frame::before, .ds-frame::after { content: ''; position: absolute; left: 6px; width: 8px; height: 8px; border: 2px solid var(--wax-red-fill, #c32b1c); opacity: 0; transition: opacity .1s linear; } .ds-frame::before { top: 10px; border-right: 0; border-bottom: 0; } .ds-frame::after { bottom: 10px; border-right: 0; border-top: 0; } .ds-frame:hover::before, .ds-frame:hover::after, .ds-frame:focus-visible::before, .ds-frame:focus-visible::after { opacity: 1; } .ds-frame h2 { margin: 0; grid-column: 1; font-size: 1.0625rem; font-weight: 800; line-height: 1.3; font-variation-settings: 'wdth' 96; letter-spacing: -0.01em; } .ds-summary { grid-column: 1; margin: 0; color: var(--ink-2, #5e6156); font-size: 0.875rem; line-height: 1.6; max-width: 78ch; } .ds-edge-code { grid-column: 2; grid-row: 1 / span 2; text-align: right; font-size: 0.6875rem; font-weight: 700; font-variation-settings: 'wdth' 84; letter-spacing: 0.1em; color: var(--ink-2, #5e6156); font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1.7; } .ds-edge-code b { display: block; color: var(--ink, #17180f); font-size: 0.8125rem; letter-spacing: 0.08em; } .ds-frame:hover .ds-edge-code b { color: var(--wax-red, #ba2818); }"
+    },
+    {
+      "name": "The Gate (advance bar)",
+      "kind": "custom",
+      "refersTo": "sprocket-column",
+      "description": "The ingest progress surface, the screen the product is built around. Exposed film fills wax red, a 2px on-film gate marker stands at its leading edge, and sprocket strips run the full width on both edges whether exposed or not. Width and marker transition at 0.45s LINEAR - an eased bar reads as decelerating when the process is not. Backed by a meter that never goes backwards and never overshoots the next real checkpoint.",
+      "html": "<section class=\"ds-gate\"><div class=\"ds-gate-head\"><span class=\"ds-gate-stage\">本文を書いています</span><span class=\"ds-ctr\"><span>62</span><span class=\"ds-unit\">%</span></span></div><div class=\"ds-advance\" role=\"progressbar\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\"62\"><i style=\"width:62%\"></i><b style=\"left:62%\"></b></div></section>",
+      "css": ".ds-gate { border: 1px solid var(--well, #22231e); background: var(--panel, #fff); font-family: Archivo, system-ui, sans-serif; } .ds-gate-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; background: var(--well, #22231e); color: var(--on-film, #efefe8); } .ds-gate-stage { font-size: 0.875rem; font-weight: 700; flex: 1 1 160px; min-width: 0; } .ds-advance { position: relative; height: 30px; background: var(--well, #22231e); overflow: hidden; } .ds-advance > i { display: block; height: 100%; background: var(--wax-red-fill, #c32b1c); transition: width .45s linear; } .ds-advance > b { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--on-film, #efefe8); transition: left .45s linear; } .ds-advance::after { content: ''; position: absolute; inset: 0; pointer-events: none; background-image: repeating-linear-gradient(to right, var(--perf, #e4e4df) 0 9px, transparent 9px 22px), repeating-linear-gradient(to right, var(--perf, #e4e4df) 0 9px, transparent 9px 22px); background-repeat: no-repeat; background-size: 100% 5px, 100% 5px; background-position: 0 4px, 0 calc(100% - 4px); } @media (prefers-reduced-motion: reduce) { .ds-advance > i, .ds-advance > b { transition: none; } }"
+    },
+    {
+      "name": "Warning Notice",
+      "kind": "custom",
+      "refersTo": "notice-warn",
+      "description": "The only filled status surface in the system and the only place amber appears. Near-black type on solid amber, identical in both themes, because wax is opaque pigment.",
+      "html": "<p class=\"ds-notice ds-notice-warn\"><svg class=\"ds-ico-n\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"M10 3 17.4 16.6H2.6z\"/><path d=\"M10 8v3.6M10 13.8v.8\"/></svg>プロプランの受付は準備中です。もうしばらくお待ちください。</p><p class=\"ds-notice ds-notice-ok\"><svg class=\"ds-ico-n\" viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path d=\"m3.6 10.4 4.2 4.2L16.4 6\"/></svg>出力言語を保存しました。</p>",
+      "css": ".ds-notice { display: flex; align-items: center; gap: 8px; padding: 10px 14px; margin: 0 0 16px; font-family: Archivo, system-ui, sans-serif; font-size: 0.875rem; border: 1px solid; border-radius: 0; } .ds-notice-warn { background: var(--wax-amber-fill, #e5a600); border-color: var(--wax-amber-fill, #e5a600); color: var(--on-warn, #17180f); font-weight: 700; } .ds-notice-ok { background: transparent; border-color: var(--wax-blue, #2b57a0); color: var(--wax-blue, #2b57a0); } .ds-ico-n { width: 17px; height: 17px; flex: 0 0 auto; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: square; stroke-linejoin: miter; }"
     }
   ],
   "narrative": {
-    "northStar": "The Lattice",
-    "overview": "Knowledge arrives as a mess — a slide deck padded with schedules, grading rules, and page numbers. GridMind's job is to cut that away and leave cells of knowledge that snap into a structure. The interface is that structure made visible: a lattice of hairline rules dividing the screen into cells, where every cell holds something worth keeping and nothing holds filler. The 1px border is not a decorative edge here; it is the wall of the cell, and it is why almost nothing in this system needs a shadow to be understood.\n\nThe character is dense, precise, and calm enough to sit in for a long time. Dense because a wasted line is a defect in the product itself — the extraction refuses to pad, and the interface must not undo that by spreading five facts across a screen of whitespace. Precise because this is an instrument: it reports measured usage, real costs, and real progress, and it should look like something that knows the number rather than something that guesses. Calm because the actual work here is reading — long Japanese and English notes, read at length — so borders stay soft, contrast stays comfortable, and colour never raises its voice without cause.\n\nThe system commits to one accent and spends it carefully. Index Blue appears where the user needs to know where they are or where they can go — a link, the current page, the selected tag, the filling progress bar — and essentially nowhere else. Everything not carrying that job is ink, graphite, or a hairline. Confirmed rejection: this must never read as an \"AI product.\" No violet gradients, no glowing edges, no sparkle iconography, no chrome that advertises the model.",
+    "northStar": "The Cutting Bench",
+    "overview": "GridMind's product value is subtraction — it deletes everything in a document that is not knowledge — so its interface is a film editor's cutting bench, not a dashboard. The whole world is built from one physical fiction: material runs through a machine, the machine throws most of it away, and what survives is laid on a light box to be read. Every surface in the build answers to that fiction. The page ground is bench grey. The rail across the top is the machine: always dark, in both themes, because a machine is not paper and does not change colour when the room lights come on. The note list is not a card grid; it is one continuous strip of film with an unbroken sprocket column down its left edge and frames divided by hairlines. Numbers are footage counters — dark recessed plates with expanded tabular figures. Marks are grease pencil in three colours that each have exactly one job.\n\nThe system is aggressively flat and aggressively square. There is no border radius anywhere and no box-shadow anywhere; those are not defaults that happened, they are the two hardest invariants in the file. Depth is made only two ways: a 1px rule, and a material step between the bench and the panel. That step is measured at 1.28:1 in light and 1.28:1 in dark — deliberately matched, so the bench and the light box sit the same distance apart in both rooms. The result is dense, tool-like, and quiet: pure geometry, one accent that means \"cut\", and a lot of restraint about where light is allowed.\n\nIt refuses the arrangement its category ships. There is no left sidebar, no card grid, no rounded surface floating on a soft shadow, no pastel status pill. What it also refuses is decoration for its own sake — the world's devices (sprockets, counters, wax rules, tape, the clapper stripe) are structural, they mark where the machine touched the material, and none of them is applied twice for effect. The clapper stripe appears on the auth slate and nowhere else.",
     "keyCharacteristics": [
-      "Hairline lattice (1px lattice-line) as the primary structural device, not shadow",
-      "One accent, spent only on position and navigation",
-      "Full light/dark parity through twelve CSS custom properties — no component owns a colour",
-      "A closed seven-step type ramp (0.75rem–2rem) tuned for CJK and Latin side by side",
-      "A single radius (10px) with pills reserved for count-like objects",
-      "Small, fast state changes — 80–150ms, a 2px lift at most"
+      "Bench-grey ground, one lit panel; zero radius, zero shadow",
+      "Depth from a 1px rule plus a 1.28:1 material step, matched in both themes",
+      "An always-dark machine rail, identical in light and dark",
+      "Sprocket perforations as the structural signature, not as ornament",
+      "Footage counters: dark plates, expanded tabular Archivo, one component for every number",
+      "Three grease-pencil colours with fixed, non-overlapping jobs",
+      "Hand-authored SVG applied as CSS masks so shape comes from the asset and colour from a token",
+      "Hand-drawn single-weight SVG icon sprite; no icon font, no emoji"
     ],
     "rules": [
       {
-        "name": "The Index Rule",
-        "body": "Index Blue answers exactly one question: where. Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.",
+        "name": "The Three Pencils Rule",
+        "body": "Red cuts, blue splices, amber warns. A colour never takes another colour's job. Red is the only colour a primary action may use; blue is the only colour a link or focus ring may use; amber appears on warnings only, and today on exactly one component. Two review rounds were spent enforcing this after earlier drafts let red and blue drift into decoration — if a new surface needs a fourth meaning, it gets a shape or a rule, not a fourth pigment.",
         "section": "colors"
       },
       {
-        "name": "The On-Accent Rule",
-        "body": "Never hard-code the text colour that sits on an accent fill. --on-accent exists because the accent is lighter in dark mode: white on it measured 2.79:1, below even the large-text floor, on the primary button. The fill is identical in both themes; the text on it inverts.",
+        "name": "The Opaque Pigment Rule",
+        "body": "--on-warn, --on-fill, --on-film and --ctr-hot do not invert between themes, and --wax-amber-fill and --wax-red-fill keep their dark-mode-adjacent values. Wax is opaque pigment on physical material; it does not change because the room lights changed. Never add a dark-theme override for an on-* token.",
         "section": "colors"
       },
       {
-        "name": "The Two-Theme Rule",
-        "body": "No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.",
+        "name": "The One Lit Surface Rule",
+        "body": "On any reading surface, exactly one panel glows and the bench does not. On the note detail view this is literal — the light box is the only lit thing on the page, the margin column sits directly on the bench with no surface of its own.",
         "section": "colors"
       },
       {
-        "name": "The Reading Text Is Sacred Rule",
-        "body": "Body copy stays at 1rem/1.65 and never shrinks to win space. Density is bought from chrome — labels, metadata, chips, timestamps — never from the text the user came to read.",
+        "name": "The Width-Is-Role Rule",
+        "body": "Role is expressed by font-variation-settings: 'wdth', not by adding a family. 84 = machine marking, 88-96 = heading, 100 = prose, 116 = counter. A new role picks a width on that scale; it does not introduce a second typeface.",
         "section": "typography"
       },
       {
-        "name": "The 980 Rule",
-        "body": "Reading content never exceeds 980px, and input surfaces never exceed 720px. A screen that wants more width is a screen that should have been split.",
-        "section": "layout"
+        "name": "The One Counter Rule",
+        "body": "Every quantity the user compares — quota, percent complete, character counts, note totals, the cut ratio — goes through the .ctr component so that they are all the same object. A number typeset as plain prose is a defect, not a variant.",
+        "section": "typography"
       },
       {
-        "name": "The One Radius Rule",
-        "body": "Containers are 10px. If something is not 10px, it must be because it is a measure (pill), inline code (4px), or a circle — not because it looked better.",
-        "section": "shapes"
+        "name": "The No-Webfont-For-CJK Rule",
+        "body": "Latin is self-hosted; CJK falls through to the system stack, permanently. The wait screen is the product's signature surface and must not carry a multi-megabyte font download.",
+        "section": "typography"
+      },
+      {
+        "name": "The Rule-And-Step Rule",
+        "body": "If a surface needs to separate from what is behind it, give it a 1px rule in the correct edge token and, if it is a reading surface, the panel material. Never a shadow, never a glow, never a gradient, never a blur.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Dark Machine Rule",
+        "body": "Machine parts — the rail, counter plates, gate head, progress troughs, table header rows, the slate plate — use the well and on-film tokens in both themes. They are not surfaces that respond to the room; they are the equipment.",
+        "section": "elevation"
       }
     ],
     "dos": [
-      "Do build depth from a 1px lattice-line border and a paper/surface tonal step before reaching for a shadow. Match the incumbent while the depth question is open.",
-      "Do spend Index Blue only on position and navigation, per The Index Rule. Links, current page, selected tag, filled progress, primary action.",
-      "Do reach every colour through the eight custom properties, so the component is correct in both themes without a second rule.",
-      "Do keep containers at 10px radius and reserve pills (999px) for measures — chips, badges, progress tracks.",
-      "Do buy density from chrome, not from reading text. Labels and metadata may go to 0.72–0.85rem; body copy stays at 1rem/1.65.",
-      "Do keep state changes small and quick: 80–150ms, a 2px lift at most. The gear's 45-degree rotation at 250ms is the system's one indulgence and stays unique.",
-      "Do guard new motion with prefers-reduced-motion. The single block at the foot of the stylesheet stops what actually moves — the card lift, the gear rotation, both bar fills, the caret — and deliberately keeps colour and border transitions, because removing those would leave no feedback about what the pointer is on.",
-      "Do give every new interactive component a hover, a focus, and (if it can be disabled) a disabled state. The system-wide :where(...):focus-visible rule covers focus by default at zero specificity; the other two are yours to write.",
-      "Do derive a hover colour from a token that already exists — filter: brightness() on a filled control, color-mix() on a tinted one — rather than adding a palette entry for one state."
+      "Do put every number through the counter component (.ctr, wdth 116, tabular) so quota, percent, character counts and totals are recognisably the same object.",
+      "Do express a new role with Archivo's width axis (84 marking / 88-96 heading / 100 prose / 116 counter) rather than by adding a typeface.",
+      "Do separate surfaces with a 1px rule plus the panel/bench material step — edge for rules on the light box, edge-2 for rules on the bench.",
+      "Do keep the machine dark in both themes: rail, counter plates, gate head, progress troughs, table headers, the slate plate.",
+      "Do draw every red rule with the wax mask asset at 60px tiling, so all of them share one hand.",
+      "Do use linear timing on any bar reporting real elapsed time, and reserve ease for standing measurements.",
+      "Do give any new world device a job — a sprocket, a counter, a wax rule, or a tape must mark something real, or it does not go on the page.",
+      "Do ship icons from the hand-drawn sprite in views/partials/header.ejs at 1.6 stroke, square caps, miter joins, 17px."
     ],
     "donts": [
-      "Don't let this look like an \"AI product.\" No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.",
-      "Don't write a literal colour inside a component rule. The stylesheet has none left — the warning notice, the error block, and every white-on-accent label now go through tokens. The only literals outside :root are the two shadow alphas, which are not palette entries.",
-      "Don't spread content to fill width. Reading stays within 980px, input surfaces within 720px, per The 980 Rule.",
-      "Don't add a second accent. Index Blue is the only orientation colour, and the status family — Alert Red and Amber, each with a soft companion — is closed at two hues and exists only for feedback. A new hue needs a new job that neither orientation nor feedback covers.",
-      "Don't introduce a new radius value. Ten pixels, a pill, 4px/8px for code, and one circle is the complete vocabulary.",
-      "Don't ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.",
-      "Don't ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.",
-      "Don't add a font size. The ramp is closed at 2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem. Snap to the nearest step; a size that seems to need a new step usually needs a different weight or colour instead."
+      "Don't add a border-radius. Anywhere. The system has one shape token and its value is 0.",
+      "Don't add a box-shadow, glow, gradient fill, or backdrop blur. There are none in the build and depth must not be made this way.",
+      "Don't let a wax colour take another wax colour's job — no blue primary buttons, no red links, no amber outside a warning.",
+      "Don't add a dark-theme override for --on-warn, --on-fill, --on-film or --ctr-hot; wax is opaque pigment and does not follow the room light.",
+      "Don't mark the current/hovered item with a left accent bar; this world uses registration corner-marks.",
+      "Don't rebuild the note list as cards, or reintroduce a sidebar; the roll is one continuous strip and the navigation is the rail.",
+      "Don't reuse the clapper stripe outside the auth slate, and don't add a second full-width red bar to a page that already has one under its title.",
+      "Don't add a CJK webfont; the system stack is the permanent answer, for the sake of the ingest wait screen.",
+      "Don't use round list bullets in prose; the bullet is a 7px square sprocket hole.",
+      "Don't use emoji or an icon font. Extend the SVG sprite instead."
+    ],
+    "openItems": [
+      "The counter disappears on the slate plate. .ctr sets its own well background, but .slate-plate is also well, so the LOGIN counter on the auth nameplate loses its plate and reads as plain type rather than as a counter. The counter component needs a variant (or a border/inset treatment) for use on well-coloured ground. Do not solve it by removing the counter.",
+      "Three surfaces carry no world device. Sprockets appear on the roll, the gate, the quota bar and the auth slate. The note form, the import form and the settings language panel are plain bordered sheets and read as ordinary forms — the world stops at their edge.",
+      "The type never reaches the scale the world allows. Archivo's width extremes (62 and 125) are never taken; the used range is 84-116. --t-display caps at 1.9rem. The world's material would support a much louder display setting than the build takes.",
+      "Two declared colour tokens are unused. --wax-amber (amber text) and --on-blue (type on a blue fill) are defined and theme-mapped but applied nowhere. They are honest reservations for the roles they name, not evidence that those roles ship today.",
+      "Tape is nearly invisible on the panel. The tape token against the panel token is a very small material step in light theme, so tags inside the roll and the light box read as bare text and the torn-tape silhouette is largely lost. The device is doing its job on the bench, not on the panel."
+    ],
+    "contractDivergences": [
+      "The direction contract states one lit white light-box that is the only surface allowed to glow. In the build the panel token is a general material: the roll, sheets, compare panes, the auth slate, pager cells and default buttons all use it. The rule holds literally on the note detail view and as a per-page intent everywhere else, but it is not a global invariant, so The One Lit Surface Rule is recorded scoped to reading surfaces.",
+      "The contract names amber warns as one of three equal pigments. In the build amber ships on exactly one component and its text token is unused, so the working palette is effectively two pigments plus a warning fill. The three-pencil rule still governs new work, but the shipped ratio should not be mistaken for parity."
     ]
   }
 }

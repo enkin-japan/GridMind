@@ -1,334 +1,1077 @@
-/* GridMind スタイル。ライト/ダーク両対応。グリッド＝知識の格子をテーマにした配色。 */
-:root {
-  --bg: #f6f7f9;
-  --surface: #ffffff;
-  --border: #e2e5ea;
-  --text: #1c2128;
-  --muted: #6a7280;
-  --accent: #3b6ef5;
-  --accent-soft: #e8efff;
-  --on-accent: #ffffff;
-  --danger: #d63b3b;
-  --danger-soft: #fdecec;
-  --warn: #8a6d00;
-  --warn-soft: #fdf0d5;
-  --radius: 10px;
+/* ===========================================================================
+   GridMind — The Cutting Bench（切り台）
+   フィルム編集台の視覚言語。台・ライトボックス・パーフォレーション・カウンタ・
+   ロウ書きの印（赤＝切る、青＝つなぐ、黄＝要注意）で組み立てる。
+   角丸なし・影なし。奥行きは「罫」と「素材の段差」だけで作る。
+   =========================================================================== */
+
+/* --- 書体 ---------------------------------------------------------------
+   ラテンは Archivo（可変：wdth 62-125 / wght 400-800）を自前で持つ。
+   幅の軸が役割の differentiator になる：ラベルは狭く、カウンタは広く。
+   和文・中文・韓文はシステムのゴシックに落とす（CJK を webfont にすると数 MB
+   になり、20-35 秒の取り込みを待つ画面の初期表示を確実に損なうため）。 */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/archivo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
 }
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 400 800;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url('/fonts/archivo-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* --- トークン ----------------------------------------------------------- */
+:root {
+  /* 素材 */
+  --bench: #e4e4df;      /* 台の天板。ページの地。 */
+  --panel: #ffffff;      /* ライトボックス。読む面はここだけが光る。 */
+  --well: #22231e;       /* フィルム本体・カウンタの窪み。明暗どちらでも暗い。 */
+  --perf: #e4e4df;       /* パーフォレーションの穴から透ける色 */
+
+  /* インク */
+  --ink: #17180f;
+  --ink-2: #5e6156;
+  --on-film: #efefe8;    /* 暗い素材（レール・フィルム・窪み）の上の字 */
+
+  /* 罫。奥行きはすべてこの2本で作る。 */
+  --edge: #c6c6be;       /* ライトボックスの上の罫 */
+  --edge-2: #a3a399;     /* 台の上の罫 */
+
+  /* ロウ書き（グリースペンシル）。3本とも職務が決まっている。 */
+  --wax-red: #ba2818;         /* 切る・消す・確定する。文字と印。 */
+  --wax-red-fill: #c32b1c;    /* 同・塗り */
+  --wax-blue: #2b57a0;        /* つなぐ・参照する・現在地 */
+  --wax-amber: #8a6200;       /* 気をつける（文字） */
+  --wax-amber-fill: #e5a600;  /* 同・塗り */
+  --on-fill: #efefe8;         /* 赤の塗りの上の字 */
+  --on-warn: #17180f;         /* 黄の塗りの上の字。明暗で反転しない。 */
+  --ctr-hot: #ffb0a4;         /* 残りが少ないカウンタの字 */
+  --on-blue: #efefe8;         /* 青の塗りの上の字 */
+  --tape: #f0ece1;            /* 紙テープの地。パネルとは別の素材。 */
+  --tape-hover: #e6e0d1;
+
+  /* 文字の段。7段で閉じる。 */
+  --t-display: 1.9rem;
+  --t-h2: 1.25rem;
+  --t-h3: 1.0625rem;
+  --t-body: 1rem;
+  --t-sm: 0.875rem;
+  --t-xs: 0.8125rem;
+  --t-label: 0.6875rem;
+
+  /* 間隔。8段で閉じる。 */
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+
+  /* 幅 */
+  --w-page: 1080px;
+  --w-form: 680px;
+  --w-read: 74ch;
+
+  --perf-h: 18px;   /* 送り穴1つぶんの周期（縦） */
+  --perf-w: 22px;   /* 同・横 */
+}
+
+/* 暗色＝夜の編集室。台は沈み、ライトボックスだけが起きている。 */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1116; --surface: #181b22; --border: #2a2f3a;
-    --text: #e6e9ef; --muted: #9aa2af; --accent: #6d97ff; --accent-soft: #1e2740;
-    --danger-soft: #3a1e1e; --warn: #e0c069; --warn-soft: #3a3115;
-    /* 暗色では accent が明るくなるので、白を載せると 2.79:1 まで落ちて読めない。
-       濃い地色を載せると 6.76:1 になる。塗りの色は変えず、上の文字だけ入れかえる。 */
-    --on-accent: #0f1116;
+    --bench: #0d0e0b;
+    --panel: #24271f;
+    --well: #050603;
+    --perf: #33362c;
+    --ink: #eae9e0;
+    --ink-2: #a0a396;
+    --edge: #454940;
+    --edge-2: #55594d;
+    --wax-red: #f0705c;
+    --wax-red-fill: #c0301f;
+    --wax-blue: #7fa6ee;
+    --wax-amber: #e0b44a;
+    --on-blue: #17180f;
+    --tape: #33362c;
+    --tape-hover: #3e4237;
   }
 }
-* { box-sizing: border-box; }
-body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-  line-height: 1.65;
-}
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
 
-/* キーボードで操作している人に、いまどこにいるかを必ず見せる。
-   これまでは .btn も入力欄も焦点の指定が無く、ブラウザ既定の輪郭だけが頼りだった。
-   :where() は詳細度が 0 なので、個別の部品でいつでも上書きできる。
-   輪郭は要素の角丸に自動でならうため、丸でも錠剤形でも形が崩れない。 */
-:where(a, button, input, select, textarea, summary, details):focus-visible {
-  outline: 2px solid var(--accent);
+/* --- 土台 --------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bench);
+  color: var(--ink);
+  font-family: 'Archivo', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Noto Sans JP',
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: var(--t-body);
+  font-variation-settings: 'wdth' 100;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.3; font-weight: 800; letter-spacing: -0.015em; }
+
+a { color: var(--wax-blue); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+img, svg { max-width: 100%; }
+
+/* 焦点。角丸が無い世界なので輪郭も四角のまま出る。 */
+:where(a, button, input, select, textarea, summary, details, [tabindex]):focus-visible {
+  outline: 2px solid var(--wax-blue);
   outline-offset: 2px;
 }
 
-/* ヘッダー */
+
+/* --- 手で引いた素材 ------------------------------------------------------
+   蝋筆の線と紙テープの縁は、CSS の矩形では出ない。形は描き起こした SVG を
+   マスクとして与え、色はトークンから流しこむ（明暗の切りかえがそのまま効く）。 */
+:root {
+  --wax-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4.8C10 2.6 20 3.5 30 3 40 2.5 50 3.9 60 3.2L60 6.1C50 7.5 40 6.3 30 6.9 20 7.4 10 5.9 0 7.7Z'/%3E%3C/svg%3E");
+  --tape-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0 2.6 34 1.7 36 2.4 68 1 100 0.7 100 22.3 64 23.1 62 22.5 28 23.7 0 23.1Z'/%3E%3C/svg%3E");
+}
+.wax {
+  background-color: var(--wax-red-fill);
+  -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
+  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+
+/* --- 共通部品：ラベル（テープに書いた文字）------------------------------ */
+/* ラテンは幅を詰めて大文字＋字間。CJK は幅軸を持たないので素直に太字で出る。 */
+.lbl {
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+
+/* --- 共通部品：カウンタ（フッテージ計）---------------------------------- */
+/* 数字はすべてこの部品を通す。額度・進捗・文字数・費用が同じ見た目になる。 */
+.ctr {
+  display: inline-flex;
+  align-items: stretch;
+  background: var(--well);
+  border: 1px solid var(--well);
+  vertical-align: middle;
+}
+.ctr > span {
+  padding: 1px 7px;
+  font-variation-settings: 'wdth' 116;
+  font-weight: 700;
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--on-film);
+  line-height: 1.6;
+}
+.ctr > span + span { border-left: 1px solid #ffffff26; }
+.ctr > .sep { color: #ffffff73; padding-inline: 4px; }
+.ctr > .unit {
+  color: #ffffffa6;
+  font-size: var(--t-label);
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+.ctr.hot > span { color: var(--ctr-hot); }
+
+/* --- 共通部品：パーフォレーション --------------------------------------- */
+/* 縦に走る送り穴。一覧が「1本のロール」に見えるための背骨。 */
+.perf-col {
+  width: 20px;
+  flex: 0 0 20px;
+  background: var(--well);
+  position: relative;
+}
+.perf-col::before {
+  content: '';
+  position: absolute;
+  inset: 0 5px;
+  background-image: repeating-linear-gradient(
+    to bottom, var(--perf) 0 6px, transparent 6px var(--perf-h)
+  );
+}
+
+/* --- 共通部品：アイコン -------------------------------------------------- */
+.ico {
+  width: 17px; height: 17px;
+  flex: 0 0 auto;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+}
+
+/* --- レール（ヘッダ）----------------------------------------------------- */
+/* 明暗どちらでも暗い。これは「機械」であって、紙ではないから。 */
 .site-header {
-  display: flex; align-items: center; gap: 16px;
-  padding: 12px 20px; background: var(--surface);
-  border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10;
-}
-.brand { font-weight: 700; font-size: 1.2rem; color: var(--text); }
-.search { display: flex; flex: 1; max-width: 520px; gap: 6px; }
-.search input {
-  flex: 1; padding: 8px 12px; border: 1px solid var(--border);
-  border-radius: var(--radius); background: var(--bg); color: var(--text);
-}
-.search button, .btn-new {
-  padding: 8px 14px; border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--accent); color: var(--on-accent); cursor: pointer; white-space: nowrap;
-}
-.btn-new { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.search button:hover:not(:disabled) { filter: brightness(1.08); }
-.btn-new:hover { border-color: var(--accent); text-decoration: none; }
-
-.container { max-width: 980px; margin: 0 auto; padding: 24px 20px 64px; }
-
-/* タグ */
-.tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-.tag-chip {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 3px 10px; border-radius: 999px; background: var(--surface);
-  border: 1px solid var(--border); color: var(--muted); font-size: .85rem;
-}
-.tag-chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
-.tag-chip.small { font-size: .75rem; padding: 2px 8px; }
-a.tag-chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-.tag-chip .count { color: var(--accent); font-weight: 600; }
-
-/* カード一覧 */
-.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-.card {
-  display: flex; flex-direction: column; gap: 8px;
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 16px; color: var(--text);
-  transition: transform .08s ease, box-shadow .08s ease;
-}
-.card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.08); text-decoration: none; }
-.card h2 { margin: 0; font-size: 1.05rem; }
-.card .summary { margin: 0; color: var(--muted); font-size: .9rem; }
-.card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-.card time { color: var(--muted); font-size: .75rem; margin-top: auto; }
-
-/* 空状態 */
-.empty { text-align: center; padding: 64px 20px; color: var(--muted); }
-
-/* ページャ */
-.pager { display: flex; gap: 6px; justify-content: center; margin-top: 28px; }
-.page { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
-.page.active { background: var(--accent); color: var(--on-accent); }
-.page:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
-.page.active:hover { color: var(--on-accent); }
-
-/* ボタン */
-.btn { display: inline-block; padding: 8px 16px; border: 1px solid var(--border);
-  border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
-.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
-.btn.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
-.btn { transition: border-color .15s ease, background .15s ease, filter .15s ease; }
-.btn:hover:not(:disabled) { border-color: var(--accent); text-decoration: none; }
-.btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
-.btn.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); border-color: var(--danger); }
-.btn.danger:focus-visible { outline-color: var(--danger); }
-/* 送信中はボタンを disabled にして「処理中…」に変えている（public/js/app.js）。
-   これまで見た目が変わらず、押せるままに見えていた。 */
-.btn:disabled, .search button:disabled, .icon-btn:disabled { opacity: .55; cursor: default; filter: none; }
-
-/* ノート詳細 */
-.note-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.note-head h1 { margin: 0; }
-.actions { display: flex; gap: 8px; }
-.actions form { margin: 0; }
-.note-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
-.summary-box { background: var(--accent-soft); border-radius: var(--radius); padding: 12px 16px; margin: 16px 0; }
-.markdown-body { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; }
-.markdown-body h1, .markdown-body h2 { border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-.markdown-body pre { background: var(--bg); padding: 12px; border-radius: 8px; overflow-x: auto; }
-.markdown-body code { background: var(--bg); padding: 2px 5px; border-radius: 4px; }
-.markdown-body table { border-collapse: collapse; }
-.markdown-body th, .markdown-body td { border: 1px solid var(--border); padding: 6px 10px; }
-.backlinks { margin-top: 28px; }
-.backlinks h3 { font-size: .9rem; color: var(--muted); }
-.muted { color: var(--muted); }
-.meta { color: var(--muted); font-size: .75rem; margin-top: 20px; }
-
-/* フォーム */
-.note-form { display: flex; flex-direction: column; gap: 14px; max-width: 720px; }
-.note-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; }
-/* ラベルは縦並びの flex なので、中の文字・<span>・<code> がそれぞれ別の段になる。
-   見出しに補足（必須の * や <code>）を入れるときは <span> でひとまとめにすること。
-   ここは、まとめ忘れても崩れないようにするための受け皿。 */
-.note-form label > span:first-child { display: block; }
-.note-form label > span:first-child .req,
-.note-form label > span:first-child code { display: inline; }
-.note-form input, .note-form textarea, .note-form select {
-  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); color: var(--text); font-family: inherit; font-size: 1rem; font-weight: 400;
-  transition: border-color .15s ease;
-}
-/* 輪郭だけでなく枠線も動かす。視線が輪郭に行く前に、欄そのものが応える。 */
-.note-form input:hover, .note-form textarea:hover, .note-form select:hover,
-.search input:hover, .modal-box input:hover { border-color: var(--muted); }
-.note-form input:focus-visible, .note-form textarea:focus-visible, .note-form select:focus-visible,
-.search input:focus-visible, .modal-box input:focus-visible { border-color: var(--accent); }
-.note-form textarea { resize: vertical; font-family: ui-monospace, monospace; }
-
-/* ファイル選択（ドロップゾーン風＋ボタン修飾）*/
-.note-form input[type="file"] {
-  padding: 16px; border: 1.5px dashed var(--border); border-radius: var(--radius);
-  background: var(--bg); color: var(--muted); cursor: pointer; font-weight: 400;
-  transition: border-color .15s ease, background .15s ease;
-}
-.note-form input[type="file"]:hover { border-color: var(--accent); background: var(--accent-soft); }
-.note-form input[type="file"]::file-selector-button {
-  margin-right: 14px; padding: 8px 18px;
-  border: 1px solid var(--accent); border-radius: var(--radius);
-  background: var(--accent); color: var(--on-accent);
-  font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer;
-  transition: opacity .15s ease;
-}
-.note-form input[type="file"]::file-selector-button:hover { opacity: .85; }
-
-.req { color: var(--danger); }
-.form-actions { display: flex; gap: 10px; }
-.errors { background: var(--danger-soft); color: var(--danger); border-radius: var(--radius); padding: 10px 16px; }
-.filter-note { color: var(--muted); }
-
-/* アイコンボタン（⚙）*/
-.icon-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 38px; height: 38px; padding: 0; flex: 0 0 auto;
-  border: 1px solid var(--border); border-radius: 50%;
-  background: var(--surface); color: var(--muted); cursor: pointer;
-  font-size: 1.05rem; line-height: 1;
-  transition: color .15s ease, background .15s ease, border-color .15s ease, transform .25s ease;
-}
-.icon-btn:hover {
-  background: var(--accent-soft); color: var(--accent);
-  border-color: var(--accent); transform: rotate(45deg); text-decoration: none;
+  background: var(--well);
+  color: var(--on-film);
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) var(--s4);
+  min-height: 52px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-/* ヘッダーのユーザー領域 */
-.header-spacer { flex: 1; }
-.user-box { display: inline-flex; align-items: center; gap: 10px; margin-left: 4px; }
-.username { color: var(--muted); font-size: .85rem; font-weight: 600; }
-.logout-form { margin: 0; }
-.link-btn {
-  background: none; border: none; color: var(--muted); cursor: pointer;
-  font: inherit; font-size: .85rem; padding: 4px 6px; text-decoration: underline;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--on-film);
+  font-weight: 800;
+  font-size: var(--t-h3);
+  font-variation-settings: 'wdth' 88;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  border: 1px solid #ffffff40;
 }
-.link-btn:hover { color: var(--accent); }
+.brand:hover { text-decoration: none; border-color: var(--on-film); }
+.brand .ico { color: var(--on-film); }
 
-/* 認証・設定カード */
-.auth-card {
-  max-width: 440px; margin: 40px auto; background: var(--surface);
-  border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 28px 24px;
+.header-spacer { flex: 1 1 auto; }
+
+/* 検索は「機械に切られた溝」。レールの中でだけ凹んで見える。 */
+/* レール内の溝は、下の汎用 input 規則より後に効かせる必要があるので
+   .site-header で一段強くしておく（同じ強さだと後勝ちで白くなる）。 */
+.search { display: flex; flex: 1 1 240px; max-width: 400px; }
+.site-header .search input {
+  flex: 1;
+  min-width: 0;
+  background: #00000059;
+  border: 1px solid #ffffff2e;
+  border-right: 0;
+  color: var(--on-film);
+  font: inherit;
+  font-size: var(--t-sm);
+  padding: 7px 10px;
+  min-height: 36px;
 }
-.auth-card h1 { margin-top: 0; }
-.auth-card h2 { font-size: 1rem; margin-bottom: 4px; }
-.clear-form { margin-top: 16px; }
-
-/* 通知 */
-.notice { padding: 10px 14px; border-radius: var(--radius); font-size: .9rem; }
-.notice.ok { background: var(--accent-soft); color: var(--accent); }
-.notice.warn { background: var(--warn-soft); color: var(--warn); }
-
-/* モーダル */
-.modal {
-  display: none; position: fixed; inset: 0; z-index: 50;
-  background: rgba(0,0,0,.45); align-items: center; justify-content: center; padding: 20px;
+.site-header .search input::placeholder { color: #ffffff87; }
+.site-header .search input:focus { border-color: var(--on-film); outline-offset: -2px; }
+.site-header .search button {
+  background: #ffffff1a;
+  border: 1px solid #ffffff2e;
+  color: var(--on-film);
+  cursor: pointer;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
 }
-.modal.open { display: flex; }
-.modal-box {
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 24px; width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 12px;
+.site-header .search button:hover { background: var(--on-film); color: var(--well); border-color: var(--on-film); }
+
+/* レール上の操作は「刻印されたスイッチ」。 */
+.rail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--on-film);
+  border: 1px solid #ffffff40;
+  padding: 6px 10px;
+  min-height: 36px;
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .12s linear, color .12s linear, border-color .12s linear;
 }
-.modal-box h2 { margin: 0; }
-.modal-box label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; }
-.modal-box input {
-  padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--bg); color: var(--text); font-weight: 400;
+.rail-btn:hover { text-decoration: none; background: var(--on-film); color: var(--well); border-color: var(--on-film); }
+.rail-btn.icon-only { padding: 6px 8px; }
+/* アイコンだけのスイッチも文字は持たせておく（読み上げ用。細い画面では見せる）。 */
+.rail-btn.icon-only .txt {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
 }
 
-/* 二次整理：対照ページ */
-.reconcile h1 { margin-bottom: 4px; }
-.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
-@media (max-width: 720px) { .compare { grid-template-columns: 1fr; } }
-.pane {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 16px 18px; overflow-x: auto;
+.user-box { display: inline-flex; align-items: center; gap: var(--s2); }
+.username {
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffffffb8;
 }
-.pane-new { border-top: 3px solid var(--accent); }
-.pane-old { border-top: 3px solid var(--muted); }
-.pane-label { font-size: .75rem; font-weight: 700; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; }
-.pane h3 { margin: 6px 0 12px; }
-.pane .markdown-body { border: none; padding: 0; background: none; }
-.reconcile-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
-.reconcile-actions form { display: flex; align-items: center; gap: 12px; margin: 0; }
-.reconcile-actions .hint { color: var(--muted); font-size: .85rem; }
-.btn.ghost { color: var(--muted); border-style: dashed; }
+.logout-form { margin: 0; display: inline-flex; }
 
-/* フッター */
-.site-footer { text-align: center; padding: 24px; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--border); }
-
-/* --- プラン・使用量（設定画面） --- */
-.small { font-size: .85rem; }
-
-.quota { margin: 14px 0 18px; }
-.quota-label {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-size: .9rem; margin-bottom: 6px;
+/* --- ページの器 ---------------------------------------------------------- */
+.container {
+  max-width: var(--w-page);
+  margin: 0 auto;
+  padding: var(--s6) var(--s4) var(--s8);
 }
+
+.site-footer {
+  border-top: 1px solid var(--edge-2);
+  padding: var(--s4);
+  text-align: center;
+}
+.site-footer span {
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+/* --- 見出し -------------------------------------------------------------- */
+/* 赤い罫は「ここに手が入った」の印。見出しの下にだけ引く。 */
+.page-head { margin-bottom: var(--s5); }
+.page-head h1 {
+  font-size: var(--t-display);
+  font-variation-settings: 'wdth' 90;
+  text-wrap: balance;
+}
+.page-head h1::after {
+  content: '';
+  display: block;
+  width: 52px;
+  height: 7px;
+  margin-top: var(--s3);
+  background-color: var(--wax-red-fill);
+  -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
+  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+.page-head p { margin: var(--s3) 0 0; color: var(--ink-2); font-size: var(--t-sm); max-width: 68ch; }
+
+/* --- ボタン -------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 8px 16px;
+  border: 1px solid var(--edge-2);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: background .12s linear, color .12s linear, border-color .12s linear;
+}
+.btn:hover { text-decoration: none; border-color: var(--ink); }
+.btn.primary { background: var(--wax-red-fill); border-color: var(--wax-red-fill); color: var(--on-fill); }
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.danger { background: transparent; border-color: var(--wax-red); color: var(--wax-red); }
+.btn.danger:hover { background: var(--wax-red-fill); border-color: var(--wax-red-fill); color: var(--on-fill); }
+.btn.danger:focus-visible { outline-color: var(--wax-red); }
+.btn.ghost { background: transparent; border-style: dashed; color: var(--ink-2); }
+.btn.ghost:hover { color: var(--ink); border-color: var(--ink-2); }
+.btn:disabled,
+.btn:disabled:hover,
+.btn.primary:disabled,
+.btn.primary:disabled:hover {
+  background: var(--bench);
+  border-color: var(--edge-2);
+  color: var(--ink-2);
+  cursor: default;
+  filter: none;
+}
+
+.form-actions { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; margin-top: var(--s5); }
+
+/* --- 入力 ---------------------------------------------------------------- */
+.field { display: block; margin-bottom: var(--s5); }
+.field > .cap { display: block; margin-bottom: 6px; font-size: var(--t-sm); font-weight: 700; }
+.field .hint { display: block; margin-top: 6px; color: var(--ink-2); font-size: var(--t-xs); line-height: 1.55; font-weight: 400; }
+.req { color: var(--wax-red); }
+
+input[type=text], input[type=password], input[type=search], select, textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--edge-2);
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--t-body);
+  min-height: 40px;
+}
+textarea { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: var(--t-sm); line-height: 1.75; resize: vertical; }
+input:hover, select:hover, textarea:hover { border-color: var(--ink-2); }
+input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
+::placeholder { color: var(--ink-2); opacity: 1; }
+
+/* ファイル欄は「台に置く場所」。破線で置き場を示す。 */
+input[type=file] {
+  width: 100%;
+  padding: var(--s4);
+  border: 1.5px dashed var(--edge-2);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--t-sm);
+}
+input[type=file]:hover { border-color: var(--wax-red); color: var(--ink); }
+input[type=file]::file-selector-button {
+  margin-right: var(--s4);
+  padding: 7px 14px;
+  border: 1px solid var(--wax-red-fill);
+  background: var(--wax-red-fill);
+  color: var(--on-fill);
+  font: inherit;
+  font-size: var(--t-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* --- 面（フォーム・囲み）------------------------------------------------- */
+.sheet {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  padding: var(--s5);
+}
+.sheet + .sheet { margin-top: var(--s5); }
+.sheet h2 {
+  font-size: var(--t-h2);
+  font-variation-settings: 'wdth' 92;
+  margin-bottom: var(--s4);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--edge);
+}
+.sheet > p { color: var(--ink-2); font-size: var(--t-sm); }
+.sheet > p:first-of-type { margin-top: 0; }
+.form-narrow { max-width: var(--w-form); }
+
+/* --- 知らせ／エラー ------------------------------------------------------ */
+.notice {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 10px 14px;
+  font-size: var(--t-sm);
+  border: 1px solid;
+  margin-bottom: var(--s4);
+}
+.notice.ok { background: transparent; border-color: var(--wax-blue); color: var(--wax-blue); }
+.notice.warn { background: var(--wax-amber-fill); border-color: var(--wax-amber-fill); color: var(--on-warn); font-weight: 700; }
+.notice:empty { display: none; }
+
+.errors {
+  margin: 0 0 var(--s4);
+  padding: 10px 14px 10px 32px;
+  list-style: square;
+  border: 1px solid var(--wax-red);
+  color: var(--wax-red);
+  font-size: var(--t-sm);
+}
+.errors li::marker { color: var(--wax-red); }
+
+/* --- テープ札（タグ）----------------------------------------------------- */
+.tape {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  position: relative;
+  color: var(--ink-2);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  line-height: 1.5;
+}
+.tape::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--tape);
+  -webkit-mask-image: var(--tape-mask); mask-image: var(--tape-mask);
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+}
+.tape:hover { text-decoration: none; color: var(--ink); }
+.tape:hover::before { background: var(--tape-hover); }
+.tape .count { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.tape.active { color: var(--on-fill); }
+.tape.active::before { background: var(--wax-red-fill); }
+.tape.active .count { color: #ffffffc4; }
+.tape.sm { font-size: var(--t-label); padding: 3px 8px; }
+
+.tape-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--s5); }
+
+.filter-note {
+  display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap;
+  margin: 0 0 var(--s4);
+  padding: 9px 14px;
+  border: 1px solid var(--edge-2);
+  font-size: var(--t-sm);
+}
+
+/* ===========================================================================
+   ロール（ノート一覧）
+   カードの並びではなく、1本のフィルム。左の送り穴は途切れず流れ、
+   コマの区切りだけが横罫で入る。
+   =========================================================================== */
+.roll {
+  display: flex;
+  border: 1px solid var(--edge-2);
+  background: var(--panel);
+}
+.roll-frames { flex: 1; min-width: 0; }
+
+.frame {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s2) var(--s4);
+  align-items: start;
+  padding: var(--s4) var(--s4) var(--s4) var(--s5);
+  color: inherit;
+  position: relative;
+  transition: background .1s linear;
+}
+.frame + .frame { border-top: 1px solid var(--edge); }
+.frame:hover { text-decoration: none; background: var(--bench); }
+/* 「いまゲートに入っているコマ」の見当合わせ印。左の縦罫ではない。 */
+.frame::before,
+.frame::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid var(--wax-red-fill);
+  opacity: 0;
+  transition: opacity .1s linear;
+}
+.frame::before { top: 10px; border-right: 0; border-bottom: 0; }
+.frame::after { bottom: 10px; border-right: 0; border-top: 0; }
+.frame:hover::before, .frame:hover::after,
+.frame:focus-visible::before, .frame:focus-visible::after { opacity: 1; }
+
+.frame h2 {
+  font-size: var(--t-h3);
+  font-variation-settings: 'wdth' 96;
+  letter-spacing: -0.01em;
+  grid-column: 1;
+}
+.frame .summary {
+  grid-column: 1;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.6;
+  max-width: 78ch;
+}
+.frame .frame-tapes { grid-column: 1; display: flex; flex-wrap: wrap; gap: 5px; }
+
+/* エッジコード＝そのコマの住所。数字は必ずカウンタの字組で。 */
+.edge-code {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  text-align: right;
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.1em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  line-height: 1.7;
+}
+.edge-code b { display: block; color: var(--ink); font-size: var(--t-xs); letter-spacing: 0.08em; }
+.frame:hover .edge-code b { color: var(--wax-red); }
+
+/* --- 何も無いとき -------------------------------------------------------- */
+.empty {
+  border: 1.5px dashed var(--edge-2);
+  padding: var(--s8) var(--s5);
+  text-align: center;
+}
+.empty p { margin: 0 0 var(--s5); color: var(--ink-2); }
+.empty h1 { font-size: var(--t-h2); margin-bottom: var(--s3); }
+
+/* --- 送り（ページ送り）--------------------------------------------------- */
+.pager { display: flex; gap: 0; margin-top: var(--s5); flex-wrap: wrap; }
+.page {
+  min-width: 38px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid var(--edge-2);
+  background: var(--panel);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.page + .page { border-left: 0; }
+.page:hover { text-decoration: none; background: var(--bench); }
+.page.active { background: var(--well); border-color: var(--well); color: var(--on-film); }
+
+/* ===========================================================================
+   ライトボックス（ノート本文）
+   読む面だけが光る。周りの台は光らない。
+   =========================================================================== */
+.note-layout {
+  display: grid;
+  grid-template-columns: 152px minmax(0, 1fr);
+  gap: var(--s6);
+  align-items: start;
+}
+.note-layout > .margin-col { grid-column: 1; grid-row: 1; }
+.note-layout > .lightbox { grid-column: 2; grid-row: 1; }
+
+/* 左の欄外＝フィルムの縁。素性と行き先だけが住む。 */
+.margin-col { position: sticky; top: 78px; }
+.margin-block + .margin-block { margin-top: var(--s5); padding-top: var(--s4); border-top: 1px solid var(--edge-2); }
+.margin-block > .lbl { display: block; margin-bottom: var(--s3); color: var(--ink); padding-bottom: 7px; position: relative; }
+.margin-block > .lbl::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
+  background-color: var(--wax-red-fill);
+  -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
+  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+.margin-block dl { margin: 0; font-size: var(--t-xs); }
+.margin-block dt { color: var(--ink-2); font-size: var(--t-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
+.margin-block dd { margin: 0 0 var(--s4); font-size: var(--t-sm); font-weight: 700; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.margin-block ul { margin: 0; padding: 0; list-style: none; }
+.margin-block li { margin-bottom: var(--s2); font-size: var(--t-xs); line-height: 1.5; }
+.margin-block .none { color: var(--ink-2); font-size: var(--t-xs); margin: 0; }
+/* 継ぎ目（被リンク）は、スプライステープの印を頭につける。 */
+.splice { display: flex; gap: 7px; align-items: flex-start; }
+.splice::before {
+  content: '';
+  flex: 0 0 9px;
+  height: 9px;
+  margin-top: 5px;
+  background: var(--wax-blue);
+  clip-path: polygon(0 35%, 100% 0, 100% 65%, 0 100%);
+}
+
+.lightbox {
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  padding: var(--s6);
+  min-width: 0;
+}
+.note-title {
+  font-size: var(--t-display);
+  font-variation-settings: 'wdth' 90;
+  text-wrap: balance;
+  margin-bottom: var(--s4);
+}
+.note-bar {
+  display: flex;
+  gap: var(--s4);
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding-bottom: var(--s4);
+  margin-bottom: var(--s5);
+  position: relative;
+}
+.note-bar::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 7px;
+  background-color: var(--wax-red-fill);
+  -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
+  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+.note-bar .note-title { flex: 1 1 300px; margin-bottom: 0; }
+.note-bar .acts { display: flex; gap: var(--s2); flex: 0 0 auto; }
+.note-bar form { margin: 0; }
+
+.summary-box {
+  border: 1px solid var(--edge);
+  background: var(--bench);
+  padding: var(--s4);
+  margin-bottom: var(--s5);
+  font-size: var(--t-sm);
+  line-height: 1.7;
+}
+.summary-box .lbl { display: block; margin-bottom: 5px; }
+
+/* --- 本文 ---------------------------------------------------------------- */
+.markdown-body { max-width: var(--w-read); }
+.markdown-body > *:first-child { margin-top: 0; }
+.markdown-body h1, .markdown-body h2 {
+  font-size: var(--t-h2);
+  font-variation-settings: 'wdth' 92;
+  margin: var(--s6) 0 var(--s3);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--edge);
+}
+.markdown-body h3 { font-size: var(--t-h3); margin: var(--s5) 0 var(--s2); }
+.markdown-body p { margin: 0 0 var(--s4); }
+.markdown-body ol { margin: 0 0 var(--s4); padding-left: var(--s5); }
+.markdown-body li { margin-bottom: 7px; }
+/* 箇条書きの点は「送り穴」。丸ではない。 */
+.markdown-body ul { list-style: none; margin: 0 0 var(--s4); padding-left: var(--s3); }
+.markdown-body ul > li { position: relative; padding-left: var(--s4); }
+.markdown-body ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  background: var(--ink-2);
+}
+.markdown-body ul ul { margin-top: 7px; margin-bottom: 0; }
+.markdown-body ul ul > li::before { background: transparent; border: 1px solid var(--ink-2); }
+.markdown-body a { color: var(--wax-blue); border-bottom: 1px solid currentColor; }
+.markdown-body a:hover { text-decoration: none; background: var(--wax-blue); color: var(--panel); }
+.markdown-body code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.9em;
+  background: var(--bench);
+  border: 1px solid var(--edge);
+  padding: 1px 5px;
+}
+.markdown-body pre {
+  background: var(--well);
+  color: var(--on-film);
+  padding: var(--s4);
+  overflow-x: auto;
+  font-size: var(--t-sm);
+}
+.markdown-body pre code { background: none; border: 0; padding: 0; color: inherit; }
+.markdown-body blockquote {
+  margin: 0 0 var(--s4);
+  padding: var(--s2) var(--s4);
+  border: 1px solid var(--edge);
+  color: var(--ink-2);
+}
+.markdown-body table { border-collapse: collapse; width: 100%; font-size: var(--t-sm); margin-bottom: var(--s4); }
+.markdown-body th, .markdown-body td { border: 1px solid var(--edge); padding: 7px 10px; text-align: left; }
+.markdown-body th { background: var(--bench); font-weight: 700; }
+.markdown-body hr { border: 0; border-top: 1px solid var(--edge); margin: var(--s5) 0; }
+.markdown-body.empty-body { color: var(--ink-2); border: 1.5px dashed var(--edge-2); padding: var(--s5); max-width: none; }
+
+/* ===========================================================================
+   ゲート（取り込み中）
+   20-35 秒を「転写のひと巻き」として見せる面。数える・吊るす・書き出す。
+   =========================================================================== */
+.gate {
+  margin-top: var(--s5);
+  border: 1px solid var(--well);
+  background: var(--panel);
+}
+
+.gate-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  flex-wrap: wrap;
+  padding: var(--s3) var(--s4);
+  background: var(--well);
+  color: var(--on-film);
+}
+.gate-stage { font-size: var(--t-sm); font-weight: 700; flex: 1 1 160px; min-width: 0; }
+
+/* 送り。露光済み＝明るい、未露光＝暗い。境目にゲート印が立つ。 */
+.advance {
+  position: relative;
+  height: 30px;
+  background: var(--well);
+  overflow: hidden;
+}
+.advance > i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--wax-red-fill);
+  transition: width .45s linear;   /* 実時間を報せる帯は必ず等速。 */
+}
+/* 送り穴は上下の縁に並ぶ。露光済みかどうかに関わらず、フィルムの持ち物。 */
+.advance::after, .quota-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(to right, var(--perf) 0 9px, transparent 9px var(--perf-w)),
+    repeating-linear-gradient(to right, var(--perf) 0 9px, transparent 9px var(--perf-w));
+  background-repeat: no-repeat;
+  background-size: 100% 5px, 100% 5px;
+  background-position: 0 4px, 0 calc(100% - 4px);
+}
+/* ゲート印：露光済みの先端に立つ見当。 */
+.advance > b {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  width: 2px;
+  background: var(--on-film);
+  transition: left .45s linear;
+}
+
+.gate-body { padding: var(--s4); display: grid; gap: var(--s4); }
+
+/* 書き出し中の本文。 */
+.gate-out {
+  border: 1px solid var(--edge);
+  background: var(--bench);
+  padding: var(--s3) var(--s4);
+  max-height: 240px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--t-sm);
+  line-height: 1.75;
+}
+.gate-out::after {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 1.05em;
+  margin-left: 2px;
+  background: var(--wax-red-fill);
+  vertical-align: text-bottom;
+  animation: blink 1s steps(2, start) infinite;
+}
+.gate-out.done::after { animation: none; opacity: 0; }
+@keyframes blink { to { visibility: hidden; } }
+
+/* トリムビン：拾い出した知識点が1本ずつ、穴で吊り下がっていく。 */
+.bin > summary,
+.tags > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 8px 10px;
+  border: 1px solid var(--edge-2);
+  background: var(--bench);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.bin > summary::-webkit-details-marker,
+.tags > summary::-webkit-details-marker { display: none; }
+.bin > summary .grow,
+.tags > summary .grow { flex: 1 1 auto; }
+.bin > summary:hover,
+.tags > summary:hover { border-color: var(--ink-2); }
+.tags { margin-bottom: var(--s5); }
+.tags[open] > summary { border-bottom-color: var(--edge); }
+.tags .tape-row { margin: var(--s3) 0 0; }
+.bin-list {
+  margin: 0;
+  padding: var(--s3) 0 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.bin-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: 5px 10px 5px 0;
+  border-bottom: 1px solid var(--edge);
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  transform-origin: 12px 0;
+  animation: hang .28s cubic-bezier(.2, .9, .3, 1) both;
+}
+/* 穴で吊るされている印。 */
+.bin-list li::before {
+  content: '';
+  flex: 0 0 7px;
+  height: 7px;
+  margin-top: 5px;
+  background: var(--wax-red-fill);
+}
+@keyframes hang {
+  from { opacity: 0; transform: rotate(1.2deg) translateY(-5px); }
+  to { opacity: 1; transform: rotate(0) translateY(0); }
+}
+
+/* ===========================================================================
+   台帳（設定）
+   =========================================================================== */
+.quota { margin: var(--s4) 0; }
+.quota-label { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); margin-bottom: var(--s2); font-size: var(--t-sm); }
 .quota-bar {
-  height: 8px; border-radius: 999px; overflow: hidden;
-  background: var(--border);
+  position: relative;
+  height: 18px;
+  background: var(--well);
+  overflow: hidden;
 }
+.quota-bar::after { background-size: 100% 4px, 100% 4px; background-position: 0 3px, 0 calc(100% - 3px); }
 .quota-fill {
-  height: 100%; border-radius: 999px; background: var(--accent);
+  height: 100%;
+  background: var(--on-film);   /* 使った分＝露光済み。量に色の意味は持たせない。 */
   transition: width .3s ease;
 }
+.quota-fill.hot { background-color: var(--wax-red-fill); }
 
-.plan-table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: .9rem; }
-.plan-table th, .plan-table td {
-  padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border);
+.spec-table { width: 100%; border-collapse: collapse; font-size: var(--t-sm); margin-top: var(--s4); }
+.spec-table th, .spec-table td { border: 1px solid var(--edge); padding: 9px 12px; text-align: left; vertical-align: middle; }
+.spec-table thead th {
+  background: var(--well);
+  color: var(--on-film);
+  border-color: var(--well);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-.plan-table th { color: var(--muted); font-weight: 600; }
-.plan-table tr.current { background: var(--accent-soft); }
-.plan-table form { margin: 0; }
-.plan-table .btn { padding: 4px 12px; font-size: .85rem; }
-
+.spec-table td { font-variant-numeric: tabular-nums; }
+.spec-table tr.current td { background: var(--bench); }
+.spec-table form { margin: 0; }
 .badge {
-  display: inline-block; padding: 1px 8px; border-radius: 999px;
-  background: var(--accent); color: var(--on-accent); font-size: .75rem; vertical-align: middle;
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 7px;
+  background: var(--wax-red-fill);
+  color: var(--on-fill);
+  font-size: var(--t-label);
+  font-weight: 700;
+  font-variation-settings: 'wdth' 84;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
-/* ===== 取り込みの進捗表示 ===== */
-/* 待ち時間そのものは 20〜35 秒あって縮められないので、
-   「いまどこにいるか」と「書かれつつある本文」を見せて待ちに中身を持たせる。 */
-/* 中身が無いときの状態表示が、空のまま1行ぶんの高さを取っていた。
-   進捗の区切り線との間に 120px ほどの空白ができていたので、空なら畳む。 */
-#import-status:empty { display: none; }
-.ingest { margin-top: 18px; border-top: 1px solid var(--border); padding-top: 16px; }
-.ingest-bar {
-  height: 6px; border-radius: 999px; background: var(--border); overflow: hidden;
+/* ===========================================================================
+   A巻・B巻（二次整理）
+   新旧を並べるのは、素材を2本ならべて繋ぎ目を決める作業そのもの。
+   =========================================================================== */
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin: var(--s5) 0; }
+.pane { border: 1px solid var(--edge); background: var(--panel); min-width: 0; }
+.pane-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 8px 14px;
+  background: var(--well);
+  color: var(--on-film);
 }
-.ingest-bar > span {
-  display: block; height: 100%; width: 0; border-radius: 999px; background: var(--accent);
-  /* 見積もりで進めるぶんは滑らかに、実際の段階に合わせ直すときも跳ねないように */
-  transition: width .45s linear;
+.pane-head .roll-id {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  font-size: var(--t-label);
+  font-weight: 800;
+  background: var(--on-film);
+  color: var(--well);
 }
-.ingest-head {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  margin: 10px 0 0; font-size: .9rem;
-}
-.ingest-inv-list {
-  margin: 8px 0 0; padding-left: 20px; max-height: 180px; overflow-y: auto;
-  color: var(--muted); font-size: .85rem; line-height: 1.7;
-}
-.ingest-preview {
-  margin-top: 12px; padding: 12px 14px; max-height: 260px; overflow-y: auto;
-  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  font-size: .85rem; line-height: 1.75; white-space: pre-wrap; word-break: break-word;
-}
-/* 書かれている位置に点滅するカーソルを置く。動きがあるだけで「止まっていない」と伝わる。 */
-.ingest-preview::after {
-  content: ''; display: inline-block; width: .5em; height: 1em; margin-left: 1px;
-  vertical-align: text-bottom; background: var(--accent); opacity: .7;
-  animation: ingest-caret 1s steps(2, start) infinite;
-}
-.ingest-preview.done::after { display: none; }
-@keyframes ingest-caret { to { opacity: 0; } }
+.pane-new .pane-head .roll-id { background: var(--wax-red-fill); color: var(--on-fill); }
+.pane-head .lbl { color: #ffffffcc; }
+.pane-body { padding: var(--s4); max-height: 460px; overflow-y: auto; }
+.pane-body h3 { font-size: var(--t-h3); margin-bottom: var(--s3); }
 
-/* ===== 動きを減らす設定への対応 ===== */
-/* 以前はこの取り込み表示のところだけを守っていて、カードの浮き上がりと
-   歯車の回転が残っていた。動きに弱い人にこたえるのは、位置が変わるものと
-   繰り返し動き続けるものなので、そこだけを止める。
-   色や枠線の変化は動きではないため残す（残さないと、どこを触っているのか
-   分からなくなってしまう）。 */
+.decide { display: grid; gap: var(--s3); }
+.decide form { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; margin: 0; }
+.decide .hint { color: var(--ink-2); font-size: var(--t-xs); flex: 1 1 240px; }
+
+/* ===========================================================================
+   スレート（ログイン・新規登録）
+   カチンコの帯を1回だけ使う。ここ以外には出さない。
+   =========================================================================== */
+.slate {
+  max-width: 440px;
+  margin: var(--s7) auto;
+  border: 1px solid var(--well);
+  background: var(--panel);
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+}
+.slate .slate-clap, .slate .slate-plate, .slate .slate-body { grid-column: 2; }
+.slate .perf-col { grid-column: 1; grid-row: 1 / span 3; }
+.slate-clap {
+  height: 26px;
+  background-color: var(--well);
+  background-image: repeating-linear-gradient(
+    -68deg, var(--well) 0 18px, var(--on-film) 18px 36px
+  );
+}
+.slate-plate {
+  display: flex;
+  gap: var(--s2);
+  align-items: center;
+  padding: 9px var(--s5);
+  background: var(--well);
+  color: var(--on-film);
+}
+.slate-plate .lbl { color: #ffffffb8; }
+.slate-plate .grow { flex: 1 1 auto; }
+.slate-body { padding: var(--s5); }
+.slate-body h1 { font-size: var(--t-h2); font-variation-settings: 'wdth' 90; margin-bottom: var(--s5); }
+.slate-body h1::after {
+  content: ''; display: block; width: 46px; height: 7px; margin-top: var(--s3);
+  background-color: var(--wax-red-fill);
+  -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
+  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
+  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+}
+.slate-body .foot { margin: var(--s5) 0 0; padding-top: var(--s4); border-top: 1px solid var(--edge); color: var(--ink-2); font-size: var(--t-sm); }
+
+/* ===========================================================================
+   細い画面
+   =========================================================================== */
+@media (max-width: 860px) {
+  .note-layout { grid-template-columns: minmax(0, 1fr); gap: var(--s4); }
+  .note-layout > .lightbox, .note-layout > .margin-col { grid-column: 1; grid-row: auto; }
+  .margin-col { position: static; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--s4); }
+  .margin-block + .margin-block { margin-top: 0; padding-top: 0; border-top: 0; }
+  .compare { grid-template-columns: minmax(0, 1fr); }
+  .pane-body { max-height: 300px; }
+}
+@media (max-width: 620px) {
+  :root { --t-display: 1.55rem; }
+  .container { padding: var(--s5) var(--s3) var(--s7); }
+  .site-header { padding: var(--s2) var(--s3); gap: var(--s2); }
+  /* 細い画面ではレールが3段になる。3割の高さを固定で取られるので、
+     ここだけ貼りつけをやめて一緒に流す。 */
+  .site-header { position: static; gap: 6px; }
+  .rail-btn { padding: 6px 9px; }
+  .rail-btn.icon-only .txt { position: static; width: auto; height: auto; clip-path: none; }
+  .search { flex-basis: 100%; order: 5; max-width: none; }
+  .lightbox, .sheet { padding: var(--s4); }
+  .frame { grid-template-columns: minmax(0, 1fr); }
+  .edge-code { grid-column: 1; grid-row: auto; text-align: left; }
+  .edge-code b { display: inline; margin-right: var(--s2); }
+}
+
+/* ===========================================================================
+   動きを控える設定
+   実際に動くものだけを止める。色と罫の変化は残す（残さないと、
+   ポインタがどこにあるのかの手がかりが無くなるため）。
+   =========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-  .card, .icon-btn { transition: none; }
-  .card:hover { transform: none; }         /* 影は残す。位置が動かなければ問題ない */
-  .icon-btn:hover { transform: none; }     /* 歯車は回さず、色の変化だけで伝える */
-  .quota-fill, .ingest-bar > span { transition: none; }
-  .ingest-preview::after { animation: none; }
+  .advance > i, .advance > b, .quota-fill { transition: none; }
+  .gate-out::after { animation: none; }
+  .bin-list li { animation: none; }
 }
