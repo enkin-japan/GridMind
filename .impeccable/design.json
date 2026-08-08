@@ -139,6 +139,74 @@
           "#e88585",
           "#fdecec"
         ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "On-Accent",
+        "canonical": "#ffffff",
+        "darkValue": "#0f1116",
+        "cssVar": "--on-accent",
+        "tonalRamp": [
+          "#0f1116",
+          "#2a2f3a",
+          "#4d535d",
+          "#767d88",
+          "#a9b0ba",
+          "#cdd2d9",
+          "#eceef1",
+          "#ffffff"
+        ]
+      },
+      "alert-red-soft": {
+        "role": "tertiary",
+        "displayName": "Alert Red Soft",
+        "canonical": "#fdecec",
+        "darkValue": "#3a1e1e",
+        "cssVar": "--danger-soft",
+        "tonalRamp": [
+          "#2b0c0c",
+          "#3a1e1e",
+          "#5c2b2b",
+          "#8a4040",
+          "#b56666",
+          "#d69a9a",
+          "#f0cfcf",
+          "#fdecec"
+        ]
+      },
+      "amber": {
+        "role": "tertiary",
+        "displayName": "Amber",
+        "canonical": "#8a6d00",
+        "darkValue": "#e0c069",
+        "cssVar": "--warn",
+        "tonalRamp": [
+          "#241c00",
+          "#3a3115",
+          "#584600",
+          "#7a6000",
+          "#8a6d00",
+          "#b89512",
+          "#e0c069",
+          "#fdf0d5"
+        ]
+      },
+      "amber-soft": {
+        "role": "tertiary",
+        "displayName": "Amber Soft",
+        "canonical": "#fdf0d5",
+        "darkValue": "#3a3115",
+        "cssVar": "--warn-soft",
+        "tonalRamp": [
+          "#241c00",
+          "#3a3115",
+          "#5c4d1c",
+          "#867233",
+          "#b09a5c",
+          "#d4c391",
+          "#eee0ba",
+          "#fdf0d5"
+        ]
       }
     },
     "typographyMeta": {
@@ -232,9 +300,9 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single committing action on a screen. Hover brightens its own fill rather than reaching for a second blue; disabled is what the import button wears for 20-35 seconds during an ingest.",
+      "description": "The single committing action on a screen. Hover brightens its own fill rather than reaching for a second blue; disabled is what the import button wears for 20-35 seconds during an ingest. On-accent inverts between themes: white on the light fill, near-black on the lighter dark-mode fill, which lifts that pair from 2.79:1 to 6.76:1.",
       "html": "<button class=\"ds-btn ds-btn-primary\">AI で整理して取り込む</button> <button class=\"ds-btn ds-btn-primary\" disabled>処理中…</button>",
-      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease, filter .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: #fff; border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover:not(:disabled) { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; } .ds-btn:disabled { opacity: .55; cursor: default; filter: none; }"
+      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease, filter .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover:not(:disabled) { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; } .ds-btn:disabled { opacity: .55; cursor: default; filter: none; }"
     },
     {
       "name": "Default Button",
@@ -290,7 +358,7 @@
       "refersTo": "input",
       "description": "The one dashed border in the system, at 1.5px, so it reads as a target rather than a container.",
       "html": "<input class=\"ds-drop\" type=\"file\">",
-      "css": ".ds-drop { display: block; width: 100%; max-width: 420px; padding: 16px; border: 1.5px dashed var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--muted, #6a7280); font-family: inherit; font-weight: 400; cursor: pointer; transition: border-color .15s ease, background .15s ease; } .ds-drop:hover { border-color: var(--accent, #3b6ef5); background: var(--accent-soft, #e8efff); } .ds-drop::file-selector-button { margin-right: 14px; padding: 8px 18px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: #fff; font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer; transition: opacity .15s ease; } .ds-drop::file-selector-button:hover { opacity: .85; }"
+      "css": ".ds-drop { display: block; width: 100%; max-width: 420px; padding: 16px; border: 1.5px dashed var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--muted, #6a7280); font-family: inherit; font-weight: 400; cursor: pointer; transition: border-color .15s ease, background .15s ease; } .ds-drop:hover { border-color: var(--accent, #3b6ef5); background: var(--accent-soft, #e8efff); } .ds-drop::file-selector-button { margin-right: 14px; padding: 8px 18px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); font-family: inherit; font-weight: 600; font-size: .9rem; cursor: pointer; transition: opacity .15s ease; } .ds-drop::file-selector-button:hover { opacity: .85; }"
     },
     {
       "name": "Ingest Progress",
@@ -306,7 +374,7 @@
       "refersTo": "input-search",
       "description": "A single surface bar with a bottom hairline. Sticky at z-index 10 — one of only two stacking levels in the system.",
       "html": "<header class=\"ds-header\"><span class=\"ds-brand\">GridMind</span><form class=\"ds-search\"><input type=\"search\" placeholder=\"検索…\"><button type=\"submit\">検索</button></form><a class=\"ds-btn-new\" href=\"#\">＋ 新規</a></header>",
-      "css": ".ds-header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface, #fff); border-bottom: 1px solid var(--border, #e2e5ea); } .ds-brand { font-weight: 700; font-size: 1.2rem; color: var(--text, #1c2128); } .ds-search { display: flex; flex: 1; max-width: 320px; gap: 6px; } .ds-search input { flex: 1; padding: 8px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--text, #1c2128); font: inherit; } .ds-search button { padding: 8px 14px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: #fff; font: inherit; cursor: pointer; white-space: nowrap; } .ds-btn-new { padding: 8px 14px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); font-weight: 600; text-decoration: none; white-space: nowrap; }"
+      "css": ".ds-header { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--surface, #fff); border-bottom: 1px solid var(--border, #e2e5ea); } .ds-brand { font-weight: 700; font-size: 1.2rem; color: var(--text, #1c2128); } .ds-search { display: flex; flex: 1; max-width: 320px; gap: 6px; } .ds-search input { flex: 1; padding: 8px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--bg, #f6f7f9); color: var(--text, #1c2128); font: inherit; } .ds-search button { padding: 8px 14px; border: 1px solid var(--accent, #3b6ef5); border-radius: var(--radius, 10px); background: var(--accent, #3b6ef5); color: var(--on-accent, #fff); font: inherit; cursor: pointer; white-space: nowrap; } .ds-btn-new { padding: 8px 14px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--accent-soft, #e8efff); color: var(--accent, #3b6ef5); font-weight: 600; text-decoration: none; white-space: nowrap; }"
     }
   ],
   "narrative": {
@@ -315,8 +383,8 @@
     "keyCharacteristics": [
       "Hairline lattice (1px lattice-line) as the primary structural device, not shadow",
       "One accent, spent only on position and navigation",
-      "Full light/dark parity through eight CSS custom properties",
-      "Compact type scale (0.72rem–1.2rem) tuned for CJK and Latin side by side",
+      "Full light/dark parity through twelve CSS custom properties — no component owns a colour",
+      "A closed seven-step type ramp (0.75rem–2rem) tuned for CJK and Latin side by side",
       "A single radius (10px) with pills reserved for count-like objects",
       "Small, fast state changes — 80–150ms, a 2px lift at most"
     ],
@@ -324,6 +392,11 @@
       {
         "name": "The Index Rule",
         "body": "Index Blue answers exactly one question: where. Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.",
+        "section": "colors"
+      },
+      {
+        "name": "The On-Accent Rule",
+        "body": "Never hard-code the text colour that sits on an accent fill. --on-accent exists because the accent is lighter in dark mode: white on it measured 2.79:1, below even the large-text floor, on the primary button. The fill is identical in both themes; the text on it inverts.",
         "section": "colors"
       },
       {
@@ -360,13 +433,13 @@
     ],
     "donts": [
       "Don't let this look like an \"AI product.\" No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.",
-      "Don't write a literal hex inside a component rule. The warn notice and the .errors block do this and are the exceptions to fix, not the precedent to follow.",
+      "Don't write a literal colour inside a component rule. The stylesheet has none left — the warning notice, the error block, and every white-on-accent label now go through tokens. The only literals outside :root are the two shadow alphas, which are not palette entries.",
       "Don't spread content to fill width. Reading stays within 980px, input surfaces within 720px, per The 980 Rule.",
-      "Don't add a second accent colour. Alert Red is a text and stroke colour for destructive and invalid states only; it is not a palette slot to expand from.",
+      "Don't add a second accent. Index Blue is the only orientation colour, and the status family — Alert Red and Amber, each with a soft companion — is closed at two hues and exists only for feedback. A new hue needs a new job that neither orientation nor feedback covers.",
       "Don't introduce a new radius value. Ten pixels, a pill, 4px/8px for code, and one circle is the complete vocabulary.",
       "Don't ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.",
       "Don't ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.",
-      "Don't add a font size. The ramp is 2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem; the six one-offs already in the stylesheet are drift to be absorbed, not precedent to extend."
+      "Don't add a font size. The ramp is closed at 2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem. Snap to the nearest step; a size that seems to need a new step usually needs a different weight or colour instead."
     ]
   }
 }

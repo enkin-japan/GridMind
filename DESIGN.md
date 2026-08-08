@@ -9,7 +9,11 @@ colors:
   lattice-line: "#e2e5ea"
   surface: "#ffffff"
   paper: "#f6f7f9"
+  on-accent: "#ffffff"
   alert-red: "#d63b3b"
+  alert-red-soft: "#fdecec"
+  amber: "#8a6d00"
+  amber-soft: "#fdf0d5"
 typography:
   headline:
     fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
@@ -70,7 +74,7 @@ spacing:
 components:
   button-primary:
     backgroundColor: "{colors.index-blue}"
-    textColor: "#ffffff"
+    textColor: "{colors.on-accent}"
     rounded: "{rounded.lg}"
     padding: "8px 16px"
   button-default:
@@ -129,7 +133,7 @@ components:
     padding: "8px 12px"
   badge:
     backgroundColor: "{colors.index-blue}"
-    textColor: "#ffffff"
+    textColor: "{colors.on-accent}"
     rounded: "{rounded.pill}"
     padding: "1px 8px"
 ---
@@ -149,14 +153,14 @@ The system commits to one accent and spends it carefully. Index Blue appears whe
 **Key Characteristics:**
 - Hairline lattice (1px `lattice-line`) as the primary structural device, not shadow
 - One accent, spent only on position and navigation
-- Full light/dark parity through eight CSS custom properties
-- Compact type scale (0.72rem–1.2rem) tuned for CJK and Latin side by side
+- Full light/dark parity through twelve CSS custom properties — no component owns a colour
+- A closed seven-step type ramp (0.75rem–2rem) tuned for CJK and Latin side by side
 - A single radius (10px) with pills reserved for count-like objects
 - Small, fast state changes — 80–150ms, a 2px lift at most
 
 ## Colors
 
-A cool, near-neutral field crossed by hairlines, with one saturated blue reserved for orientation. The palette is defined once as eight CSS custom properties on `:root` and redefined wholesale under `prefers-color-scheme: dark`, so every component inherits both themes without knowing they exist.
+A cool, near-neutral field crossed by hairlines, with one saturated blue reserved for orientation and two status hues reserved for feedback. The palette is defined once as twelve CSS custom properties on `:root` and redefined wholesale under `prefers-color-scheme: dark`, so every component inherits both themes without knowing they exist. **No component rule contains a literal colour.**
 
 ### Primary
 
@@ -171,13 +175,38 @@ A cool, near-neutral field crossed by hairlines, with one saturated blue reserve
 - **Surface** (light `#ffffff` / dark `#181b22`): Raised cells — cards, panes, inputs, the sticky header, modals, the auth card.
 - **Paper** (light `#f6f7f9` / dark `#0f1116`): The page ground behind the lattice. Also used *inside* raised surfaces for recessed elements: code blocks, the search field, the file drop zone, modal inputs.
 
-### Tertiary
+### On-Accent
 
-- **Alert Red** (`#d63b3b`, identical in both themes): Required-field markers, the delete button's text and border, and validation error text. It is a text and stroke colour only — no red fill exists in the system.
+- **On-Accent** (light `#ffffff` / dark `#0f1116`): The text colour that sits on an Index Blue fill — the primary button, the active pager page, the plan badge, the search button, the file-selector button. It is the one token whose value *inverts* between themes rather than shifting.
+
+### Status
+
+Two hues, each with a soft companion, used only for feedback. This family is closed.
+
+- **Alert Red** (`#d63b3b`, identical in both themes): Required-field markers, the delete button's text and border, validation error text. A text and stroke colour — no red fill exists in the system.
+- **Alert Red Soft** (light `#fdecec` / dark `#3a1e1e`): The background of the form-error block.
+- **Amber** (light `#8a6d00` / dark `#e0c069`): The text of a warning notice.
+- **Amber Soft** (light `#fdf0d5` / dark `#3a3115`): The background of a warning notice.
+
+### Measured contrast
+
+| Pair | Light | Dark |
+|---|---|---|
+| On-Accent on Index Blue | 4.44:1 | 6.76:1 |
+| Ink on Surface | 16.18:1 | 14.17:1 |
+| Graphite on Surface | 4.85:1 | 6.70:1 |
+| Amber on Amber Soft | 4.36:1 | 7.31:1 |
+| Index Blue on Index Wash | 3.85:1 | 5.30:1 |
+| Index Blue link on Surface | 4.44:1 | 6.17:1 |
+| Alert Red on Alert Red Soft | 4.04:1 | 3.29:1 |
+
+Reading text and secondary text clear AA comfortably. **The accent-on-tint and link pairs sit in the 3.85–4.44 band** — above the 3:1 large-text floor, below the 4.5:1 normal-text bar. Closing that gap means darkening Index Blue itself in the light theme, which is an identity change and is deliberately not made here.
 
 ### Named Rules
 
 **The Index Rule.** Index Blue answers exactly one question: *where.* Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.
+
+**The On-Accent Rule.** Never hard-code the text colour that sits on an accent fill. `--on-accent` exists because the accent is *lighter* in dark mode: white on it measured 2.79:1, below even the large-text floor, on the primary button. The fill is identical in both themes; the text on it inverts.
 
 **The Two-Theme Rule.** No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.
 
@@ -197,7 +226,7 @@ A cool, near-neutral field crossed by hairlines, with one saturated blue reserve
 - **Title-sm** (700, `1.05rem`): Card titles and the modal heading.
 - **Small** (400, `0.9rem`) and **Caption** (400, `0.85rem`): The dense secondary band. Small carries form labels, notices, summaries, and table text; Caption carries chips, hints, the streaming preview, and pane hints. Together they account for most secondary text in the system, and this compression is how the interface stays dense without shrinking the reading text.
 
-**Known drift:** six further one-off sizes exist in the stylesheet — `0.95`, `0.92`, `0.88`, `0.82`, `0.8`, `0.78`, `0.72rem` — each used exactly once. They are not part of the ramp; they are values that were picked to look right in one place. New work uses a documented step and snaps to the nearest one rather than adding another.
+**The ramp is closed at seven steps:** `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`. Seven one-off sizes (`0.95`, `0.92`, `0.88`, `0.82`, `0.8`, `0.78`, `0.72rem`, each used exactly once) were snapped to their nearest step — the largest single move was 0.05rem, under one pixel at a 16px root. Timestamps in both the card grid and the note footer now share one step, which they did not before.
 
 ### Named Rules
 
@@ -322,10 +351,10 @@ Full-width, 10px radius, `10px 14px` padding, `0.9rem`. The `ok` variant uses In
 ### Don't:
 
 - **Don't** let this look like an "AI product." No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.
-- **Don't** write a literal hex inside a component rule. The `warn` notice and the `.errors` block do this and are the exceptions to fix, not the precedent to follow.
+- **Don't** write a literal colour inside a component rule. The stylesheet has none left — the warning notice, the error block, and every white-on-accent label now go through tokens. The only literals outside `:root` are the two shadow alphas, which are not palette entries.
 - **Don't** spread content to fill width. Reading stays within 980px, input surfaces within 720px, per **The 980 Rule**.
-- **Don't** add a second accent colour. Alert Red is a text and stroke colour for destructive and invalid states only; it is not a palette slot to expand from.
+- **Don't** add a second accent. Index Blue is the only orientation colour, and the status family — Alert Red and Amber, each with a soft companion — is closed at two hues and exists only for feedback. A new hue needs a new job that neither orientation nor feedback covers.
 - **Don't** introduce a new radius value. Ten pixels, a pill, `4px`/`8px` for code, and one circle is the complete vocabulary.
-- **Don't** add a font size. The ramp is `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`; the six one-offs already in the stylesheet are drift to be absorbed, not precedent to extend.
+- **Don't** add a font size. The ramp is closed at `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`. Snap to the nearest step; a size that seems to need a new step usually needs a different weight or colour instead.
 - **Don't** ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.
 - **Don't** ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.
