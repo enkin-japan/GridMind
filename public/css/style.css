@@ -25,6 +25,15 @@ body {
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
+/* キーボードで操作している人に、いまどこにいるかを必ず見せる。
+   これまでは .btn も入力欄も焦点の指定が無く、ブラウザ既定の輪郭だけが頼りだった。
+   :where() は詳細度が 0 なので、個別の部品でいつでも上書きできる。
+   輪郭は要素の角丸に自動でならうため、丸でも錠剤形でも形が崩れない。 */
+:where(a, button, input, select, textarea, summary, details):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* ヘッダー */
 .site-header {
   display: flex; align-items: center; gap: 16px;
@@ -42,6 +51,8 @@ a:hover { text-decoration: underline; }
   background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap;
 }
 .btn-new { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.search button:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-new:hover { border-color: var(--accent); text-decoration: none; }
 
 .container { max-width: 980px; margin: 0 auto; padding: 24px 20px 64px; }
 
@@ -54,6 +65,7 @@ a:hover { text-decoration: underline; }
 }
 .tag-chip.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); }
 .tag-chip.small { font-size: .75rem; padding: 2px 8px; }
+a.tag-chip:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
 .tag-chip .count { color: var(--accent); font-weight: 600; }
 
 /* カード一覧 */
@@ -77,12 +89,22 @@ a:hover { text-decoration: underline; }
 .pager { display: flex; gap: 6px; justify-content: center; margin-top: 28px; }
 .page { padding: 6px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); }
 .page.active { background: var(--accent); color: #fff; }
+.page:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.page.active:hover { color: #fff; }
 
 /* ボタン */
 .btn { display: inline-block; padding: 8px 16px; border: 1px solid var(--border);
   border-radius: var(--radius); background: var(--surface); color: var(--text); cursor: pointer; }
 .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
 .btn.danger { background: transparent; color: var(--danger); border-color: var(--danger); }
+.btn { transition: border-color .15s ease, background .15s ease, filter .15s ease; }
+.btn:hover:not(:disabled) { border-color: var(--accent); text-decoration: none; }
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn.danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger) 10%, transparent); border-color: var(--danger); }
+.btn.danger:focus-visible { outline-color: var(--danger); }
+/* 送信中はボタンを disabled にして「処理中…」に変えている（public/js/app.js）。
+   これまで見た目が変わらず、押せるままに見えていた。 */
+.btn:disabled, .search button:disabled, .icon-btn:disabled { opacity: .55; cursor: default; filter: none; }
 
 /* ノート詳細 */
 .note-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
@@ -105,10 +127,16 @@ a:hover { text-decoration: underline; }
 /* フォーム */
 .note-form { display: flex; flex-direction: column; gap: 14px; max-width: 720px; }
 .note-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; }
-.note-form input, .note-form textarea {
+.note-form input, .note-form textarea, .note-form select {
   padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius);
-  background: var(--surface); color: var(--text); font-family: inherit; font-weight: 400;
+  background: var(--surface); color: var(--text); font-family: inherit; font-size: 1rem; font-weight: 400;
+  transition: border-color .15s ease;
 }
+/* 輪郭だけでなく枠線も動かす。視線が輪郭に行く前に、欄そのものが応える。 */
+.note-form input:hover, .note-form textarea:hover, .note-form select:hover,
+.search input:hover, .modal-box input:hover { border-color: var(--muted); }
+.note-form input:focus-visible, .note-form textarea:focus-visible, .note-form select:focus-visible,
+.search input:focus-visible, .modal-box input:focus-visible { border-color: var(--accent); }
 .note-form textarea { resize: vertical; font-family: ui-monospace, monospace; }
 
 /* ファイル選択（ドロップゾーン風＋ボタン修飾）*/
@@ -275,7 +303,17 @@ a:hover { text-decoration: underline; }
 }
 .ingest-preview.done::after { display: none; }
 @keyframes ingest-caret { to { opacity: 0; } }
+
+/* ===== 動きを減らす設定への対応 ===== */
+/* 以前はこの取り込み表示のところだけを守っていて、カードの浮き上がりと
+   歯車の回転が残っていた。動きに弱い人にこたえるのは、位置が変わるものと
+   繰り返し動き続けるものなので、そこだけを止める。
+   色や枠線の変化は動きではないため残す（残さないと、どこを触っているのか
+   分からなくなってしまう）。 */
 @media (prefers-reduced-motion: reduce) {
-  .ingest-bar > span { transition: none; }
+  .card, .icon-btn { transition: none; }
+  .card:hover { transform: none; }         /* 影は残す。位置が動かなければ問題ない */
+  .icon-btn:hover { transform: none; }     /* 歯車は回さず、色の変化だけで伝える */
+  .quota-fill, .ingest-bar > span { transition: none; }
   .ingest-preview::after { animation: none; }
 }

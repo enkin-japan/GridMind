@@ -10,7 +10,16 @@
         "canonical": "#3b6ef5",
         "darkValue": "#6d97ff",
         "cssVar": "--accent",
-        "tonalRamp": ["#0a1433", "#10225c", "#17307f", "#2044a8", "#2b57d0", "#3b6ef5", "#8fb0fb", "#e8efff"]
+        "tonalRamp": [
+          "#0a1433",
+          "#10225c",
+          "#17307f",
+          "#2044a8",
+          "#2b57d0",
+          "#3b6ef5",
+          "#8fb0fb",
+          "#e8efff"
+        ]
       },
       "index-wash": {
         "role": "primary",
@@ -18,7 +27,16 @@
         "canonical": "#e8efff",
         "darkValue": "#1e2740",
         "cssVar": "--accent-soft",
-        "tonalRamp": ["#0d1424", "#141d33", "#1e2740", "#334160", "#5a6f9e", "#8fa8d6", "#c4d5f5", "#e8efff"]
+        "tonalRamp": [
+          "#0d1424",
+          "#141d33",
+          "#1e2740",
+          "#334160",
+          "#5a6f9e",
+          "#8fa8d6",
+          "#c4d5f5",
+          "#e8efff"
+        ]
       },
       "ink": {
         "role": "neutral",
@@ -26,7 +44,16 @@
         "canonical": "#1c2128",
         "darkValue": "#e6e9ef",
         "cssVar": "--text",
-        "tonalRamp": ["#0f1116", "#1c2128", "#2a2f3a", "#3f4653", "#6a7280", "#9aa2af", "#c8cdd6", "#e6e9ef"]
+        "tonalRamp": [
+          "#0f1116",
+          "#1c2128",
+          "#2a2f3a",
+          "#3f4653",
+          "#6a7280",
+          "#9aa2af",
+          "#c8cdd6",
+          "#e6e9ef"
+        ]
       },
       "graphite": {
         "role": "neutral",
@@ -34,7 +61,16 @@
         "canonical": "#6a7280",
         "darkValue": "#9aa2af",
         "cssVar": "--muted",
-        "tonalRamp": ["#14171c", "#22262d", "#343941", "#4d535d", "#6a7280", "#9aa2af", "#c2c7cf", "#e6e9ef"]
+        "tonalRamp": [
+          "#14171c",
+          "#22262d",
+          "#343941",
+          "#4d535d",
+          "#6a7280",
+          "#9aa2af",
+          "#c2c7cf",
+          "#e6e9ef"
+        ]
       },
       "lattice-line": {
         "role": "neutral",
@@ -42,7 +78,16 @@
         "canonical": "#e2e5ea",
         "darkValue": "#2a2f3a",
         "cssVar": "--border",
-        "tonalRamp": ["#14171c", "#1f232b", "#2a2f3a", "#434952", "#767d88", "#a9b0ba", "#cdd2d9", "#e2e5ea"]
+        "tonalRamp": [
+          "#14171c",
+          "#1f232b",
+          "#2a2f3a",
+          "#434952",
+          "#767d88",
+          "#a9b0ba",
+          "#cdd2d9",
+          "#e2e5ea"
+        ]
       },
       "surface": {
         "role": "neutral",
@@ -50,7 +95,16 @@
         "canonical": "#ffffff",
         "darkValue": "#181b22",
         "cssVar": "--surface",
-        "tonalRamp": ["#0f1116", "#181b22", "#252932", "#3a3f4a", "#6f7682", "#a8aeb8", "#d8dbe1", "#ffffff"]
+        "tonalRamp": [
+          "#0f1116",
+          "#181b22",
+          "#252932",
+          "#3a3f4a",
+          "#6f7682",
+          "#a8aeb8",
+          "#d8dbe1",
+          "#ffffff"
+        ]
       },
       "paper": {
         "role": "neutral",
@@ -58,7 +112,16 @@
         "canonical": "#f6f7f9",
         "darkValue": "#0f1116",
         "cssVar": "--bg",
-        "tonalRamp": ["#0f1116", "#1a1d24", "#282c35", "#3e434d", "#737a86", "#abb1bb", "#dcdfe4", "#f6f7f9"]
+        "tonalRamp": [
+          "#0f1116",
+          "#1a1d24",
+          "#282c35",
+          "#3e434d",
+          "#737a86",
+          "#abb1bb",
+          "#dcdfe4",
+          "#f6f7f9"
+        ]
       },
       "alert-red": {
         "role": "tertiary",
@@ -66,15 +129,51 @@
         "canonical": "#d63b3b",
         "darkValue": "#d63b3b",
         "cssVar": "--danger",
-        "tonalRamp": ["#2b0c0c", "#4a1414", "#6d1d1d", "#962828", "#bd3232", "#d63b3b", "#e88585", "#fdecec"]
+        "tonalRamp": [
+          "#2b0c0c",
+          "#4a1414",
+          "#6d1d1d",
+          "#962828",
+          "#bd3232",
+          "#d63b3b",
+          "#e88585",
+          "#fdecec"
+        ]
       }
     },
     "typographyMeta": {
-      "headline": { "displayName": "Headline", "purpose": "Page titles. Currently inheriting the browser default 2rem — unstyled in the incumbent." },
-      "title": { "displayName": "Title", "purpose": "The GridMind wordmark. Card titles run smaller at 1.05rem." },
-      "body": { "displayName": "Body", "purpose": "Note bodies and everything read at length. Never shrinks to win space." },
-      "label": { "displayName": "Label", "purpose": "The reconcile pane markers. The only uppercase type in the system." },
-      "mono": { "displayName": "Mono", "purpose": "Markdown editing textarea, code blocks, inline code." }
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles. Currently inheriting the browser default 2rem — unstyled in the incumbent."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "The GridMind wordmark. Card titles run smaller at 1.05rem."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Note bodies and everything read at length. Never shrinks to win space."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "The reconcile pane markers. The only uppercase type in the system."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Markdown editing textarea, code blocks, inline code."
+      },
+      "title-sm": {
+        "displayName": "Title-sm",
+        "purpose": "Card titles and the modal heading."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Form labels, notices, summaries, table text."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Chips, hints, the streaming preview, pane hints."
+      }
     },
     "shadows": [
       {
@@ -89,15 +188,43 @@
       }
     ],
     "motion": [
-      { "name": "state-fast", "value": "0.08s ease", "purpose": "Card hover lift and shadow. The quickest transition in the system." },
-      { "name": "state-standard", "value": "0.15s ease", "purpose": "Colour and border transitions on the icon button and file drop zone." },
-      { "name": "gesture-slow", "value": "0.25s ease", "purpose": "The settings gear's 45-degree rotation. The system's one piece of personality." },
-      { "name": "measure-eased", "value": "0.3s ease", "purpose": "Quota bar fill. Eased because it reports a standing measure, not live work." },
-      { "name": "progress-linear", "value": "0.45s linear", "purpose": "Ingest bar fill. Linear because an eased progress bar reads as decelerating when it is not." },
-      { "name": "caret-blink", "value": "1s steps(2, start) infinite", "purpose": "The streaming preview caret. Disabled under prefers-reduced-motion." }
+      {
+        "name": "state-fast",
+        "value": "0.08s ease",
+        "purpose": "Card hover lift and shadow. The quickest transition in the system."
+      },
+      {
+        "name": "state-standard",
+        "value": "0.15s ease",
+        "purpose": "Colour and border transitions on the icon button and file drop zone."
+      },
+      {
+        "name": "gesture-slow",
+        "value": "0.25s ease",
+        "purpose": "The settings gear's 45-degree rotation. The system's one piece of personality."
+      },
+      {
+        "name": "measure-eased",
+        "value": "0.3s ease",
+        "purpose": "Quota bar fill. Eased because it reports a standing measure, not live work."
+      },
+      {
+        "name": "progress-linear",
+        "value": "0.45s linear",
+        "purpose": "Ingest bar fill. Linear because an eased progress bar reads as decelerating when it is not."
+      },
+      {
+        "name": "caret-blink",
+        "value": "1s steps(2, start) infinite",
+        "purpose": "The streaming preview caret. Disabled under prefers-reduced-motion."
+      }
     ],
     "breakpoints": [
-      { "name": "compare-collapse", "value": "720px", "purpose": "The only layout media query in the system: the reconcile compare grid collapses to one column." }
+      {
+        "name": "compare-collapse",
+        "value": "720px",
+        "purpose": "The only layout media query in the system: the reconcile compare grid collapses to one column."
+      }
     ]
   },
   "components": [
@@ -105,9 +232,9 @@
       "name": "Primary Button",
       "kind": "button",
       "refersTo": "button-primary",
-      "description": "The single committing action on a screen. Note: the incumbent defines no hover state for this component — the rule below is the recommended fill of that gap.",
-      "html": "<button class=\"ds-btn ds-btn-primary\">AI で整理して取り込む</button>",
-      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: background .15s ease, border-color .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: #fff; border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+      "description": "The single committing action on a screen. Hover brightens its own fill rather than reaching for a second blue; disabled is what the import button wears for 20-35 seconds during an ingest.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">AI で整理して取り込む</button> <button class=\"ds-btn ds-btn-primary\" disabled>処理中…</button>",
+      "css": ".ds-btn { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease, background .15s ease, filter .15s ease; } .ds-btn-primary { background: var(--accent, #3b6ef5); color: #fff; border-color: var(--accent, #3b6ef5); } .ds-btn-primary:hover:not(:disabled) { filter: brightness(1.08); } .ds-btn-primary:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; } .ds-btn:disabled { opacity: .55; cursor: default; filter: none; }"
     },
     {
       "name": "Default Button",
@@ -115,15 +242,15 @@
       "refersTo": "button-default",
       "description": "Every non-committing action. Surface fill, ink text, hairline border.",
       "html": "<button class=\"ds-btn ds-btn-default\">キャンセル</button>",
-      "css": ".ds-btn-default { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease; } .ds-btn-default:hover { border-color: var(--accent, #3b6ef5); } .ds-btn-default:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
+      "css": ".ds-btn-default { padding: 8px 16px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font: inherit; cursor: pointer; transition: border-color .15s ease; } .ds-btn-default:hover:not(:disabled) { border-color: var(--accent, #3b6ef5); } .ds-btn-default:focus-visible { outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
     },
     {
       "name": "Danger Button",
       "kind": "button",
       "refersTo": "button-danger",
-      "description": "Delete only. Transparent fill with red text and border — the system has no filled destructive button.",
+      "description": "Delete only. Transparent fill with red text and border. The hover wash is derived from the token with color-mix so no new colour enters the palette.",
       "html": "<button class=\"ds-btn-danger\">削除</button>",
-      "css": ".ds-btn-danger { padding: 8px 16px; border: 1px solid var(--danger, #d63b3b); border-radius: var(--radius, 10px); background: transparent; color: var(--danger, #d63b3b); font: inherit; cursor: pointer; transition: background .15s ease; } .ds-btn-danger:hover { background: rgba(214,59,59,0.08); } .ds-btn-danger:focus-visible { outline: 2px solid var(--danger, #d63b3b); outline-offset: 2px; }"
+      "css": ".ds-btn-danger { padding: 8px 16px; border: 1px solid var(--danger, #d63b3b); border-radius: var(--radius, 10px); background: transparent; color: var(--danger, #d63b3b); font: inherit; cursor: pointer; transition: background .15s ease; } .ds-btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--danger, #d63b3b) 10%, transparent); } .ds-btn-danger:focus-visible { outline: 2px solid var(--danger, #d63b3b); outline-offset: 2px; }"
     },
     {
       "name": "Settings Gear",
@@ -153,9 +280,9 @@
       "name": "Text Input",
       "kind": "input",
       "refersTo": "input",
-      "description": "Surface fill inside the page, Paper fill when recessed inside an already-raised surface. The incumbent defines no focus treatment; the rule below fills that gap.",
+      "description": "Surface fill inside the page, Paper fill when recessed inside an already-raised surface. Focus moves the border as well as showing the shared outline, so the field itself answers.",
       "html": "<label class=\"ds-field\">タイトル<input class=\"ds-input\" type=\"text\" value=\"ローカルストレージの基本\"></label>",
-      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--text, #1c2128); max-width: 360px; } .ds-input { padding: 10px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font-family: inherit; font-size: 1rem; font-weight: 400; transition: border-color .15s ease; } .ds-input:hover { border-color: var(--muted, #6a7280); } .ds-input:focus-visible { outline: none; border-color: var(--accent, #3b6ef5); box-shadow: 0 0 0 3px var(--accent-soft, #e8efff); }"
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: .9rem; color: var(--text, #1c2128); max-width: 360px; } .ds-input { padding: 10px 12px; border: 1px solid var(--border, #e2e5ea); border-radius: var(--radius, 10px); background: var(--surface, #fff); color: var(--text, #1c2128); font-family: inherit; font-size: 1rem; font-weight: 400; transition: border-color .15s ease; } .ds-input:hover { border-color: var(--muted, #6a7280); } .ds-input:focus-visible { border-color: var(--accent, #3b6ef5); outline: 2px solid var(--accent, #3b6ef5); outline-offset: 2px; }"
     },
     {
       "name": "File Drop Zone",
@@ -194,11 +321,31 @@
       "Small, fast state changes — 80–150ms, a 2px lift at most"
     ],
     "rules": [
-      { "name": "The Index Rule", "body": "Index Blue answers exactly one question: where. Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.", "section": "colors" },
-      { "name": "The Two-Theme Rule", "body": "No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.", "section": "colors" },
-      { "name": "The Reading Text Is Sacred Rule", "body": "Body copy stays at 1rem/1.65 and never shrinks to win space. Density is bought from chrome — labels, metadata, chips, timestamps — never from the text the user came to read.", "section": "typography" },
-      { "name": "The 980 Rule", "body": "Reading content never exceeds 980px, and input surfaces never exceed 720px. A screen that wants more width is a screen that should have been split.", "section": "layout" },
-      { "name": "The One Radius Rule", "body": "Containers are 10px. If something is not 10px, it must be because it is a measure (pill), inline code (4px), or a circle — not because it looked better.", "section": "shapes" }
+      {
+        "name": "The Index Rule",
+        "body": "Index Blue answers exactly one question: where. Links, current page, selected tag, filled progress, primary action. If a proposed use of the accent does not tell the user where they are or where they can go, it is decoration and must be graphite or ink instead.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Theme Rule",
+        "body": "No component defines its own colour. Every colour reaches a component through one of the eight custom properties, so a component written correctly is dark-mode-correct for free. Any literal hex inside a component rule is a bug, not a style choice.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reading Text Is Sacred Rule",
+        "body": "Body copy stays at 1rem/1.65 and never shrinks to win space. Density is bought from chrome — labels, metadata, chips, timestamps — never from the text the user came to read.",
+        "section": "typography"
+      },
+      {
+        "name": "The 980 Rule",
+        "body": "Reading content never exceeds 980px, and input surfaces never exceed 720px. A screen that wants more width is a screen that should have been split.",
+        "section": "layout"
+      },
+      {
+        "name": "The One Radius Rule",
+        "body": "Containers are 10px. If something is not 10px, it must be because it is a measure (pill), inline code (4px), or a circle — not because it looked better.",
+        "section": "shapes"
+      }
     ],
     "dos": [
       "Do build depth from a 1px lattice-line border and a paper/surface tonal step before reaching for a shadow. Match the incumbent while the depth question is open.",
@@ -207,8 +354,9 @@
       "Do keep containers at 10px radius and reserve pills (999px) for measures — chips, badges, progress tracks.",
       "Do buy density from chrome, not from reading text. Labels and metadata may go to 0.72–0.85rem; body copy stays at 1rem/1.65.",
       "Do keep state changes small and quick: 80–150ms, a 2px lift at most. The gear's 45-degree rotation at 250ms is the system's one indulgence and stays unique.",
-      "Do guard new motion with prefers-reduced-motion, as the ingest panel does. The card hover and gear rotation currently do not, and should be brought in.",
-      "Do define hover and focus states for any new interactive component. .btn currently has none — do not treat that omission as the pattern."
+      "Do guard new motion with prefers-reduced-motion. The single block at the foot of the stylesheet stops what actually moves — the card lift, the gear rotation, both bar fills, the caret — and deliberately keeps colour and border transitions, because removing those would leave no feedback about what the pointer is on.",
+      "Do give every new interactive component a hover, a focus, and (if it can be disabled) a disabled state. The system-wide :where(...):focus-visible rule covers focus by default at zero specificity; the other two are yours to write.",
+      "Do derive a hover colour from a token that already exists — filter: brightness() on a filled control, color-mix() on a tinted one — rather than adding a palette entry for one state."
     ],
     "donts": [
       "Don't let this look like an \"AI product.\" No violet or gradient fills, no glowing borders, no sparkle or wand iconography, no chrome that advertises the model. The extraction is the product; the model is plumbing.",
@@ -217,7 +365,8 @@
       "Don't add a second accent colour. Alert Red is a text and stroke colour for destructive and invalid states only; it is not a palette slot to expand from.",
       "Don't introduce a new radius value. Ten pixels, a pill, 4px/8px for code, and one circle is the complete vocabulary.",
       "Don't ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.",
-      "Don't ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output."
+      "Don't ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.",
+      "Don't add a font size. The ramp is 2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem; the six one-offs already in the stylesheet are drift to be absorbed, not precedent to extend."
     ]
   }
 }

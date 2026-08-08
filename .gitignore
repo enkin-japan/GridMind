@@ -28,3 +28,4 @@ nodejs_notes_temp.md
 
 # --- report-only tooling (not part of the app) ---
 tools/shots.js
+.impeccable/live/

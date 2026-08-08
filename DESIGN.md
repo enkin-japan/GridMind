@@ -26,6 +26,21 @@ typography:
     fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.65
+  title-sm:
+    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
+    fontSize: "1.05rem"
+    fontWeight: 700
+    lineHeight: 1.65
+  small:
+    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
+    fontSize: "0.9rem"
+    fontWeight: 400
+    lineHeight: 1.65
+  caption:
+    fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
+    fontSize: "0.85rem"
+    fontWeight: 400
+    lineHeight: 1.65
   label:
     fontFamily: "-apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif"
     fontSize: "0.75rem"
@@ -179,7 +194,10 @@ A cool, near-neutral field crossed by hairlines, with one saturated blue reserve
 - **Title** (700, `1.2rem`): The `GridMind` wordmark in the header. Card titles run smaller at `1.05rem`, weight inherited.
 - **Body** (400, `1rem`, line-height 1.65): Note bodies, form values, everything read at length. The 1.65 line-height is set once on `body` and inherited everywhere — including into headings, which is what gives headings their generous, unhurried set.
 - **Label** (700, `0.75rem`, letter-spacing `0.04em`, uppercase): The `新しい知識` / `既存のノート` markers on the reconcile panes. The only uppercase type in the system.
-- **Small** (400, `0.85rem`) and **Micro** (400, `0.72–0.82rem`): A dense band of secondary sizes — chips at `0.85rem`, the footer at `0.82rem`, metadata at `0.8rem`, card timestamps at `0.78rem`, the plan badge at `0.72rem`. This compression is deliberate: it is how the interface stays dense without shrinking the reading text.
+- **Title-sm** (700, `1.05rem`): Card titles and the modal heading.
+- **Small** (400, `0.9rem`) and **Caption** (400, `0.85rem`): The dense secondary band. Small carries form labels, notices, summaries, and table text; Caption carries chips, hints, the streaming preview, and pane hints. Together they account for most secondary text in the system, and this compression is how the interface stays dense without shrinking the reading text.
+
+**Known drift:** six further one-off sizes exist in the stylesheet — `0.95`, `0.92`, `0.88`, `0.82`, `0.8`, `0.78`, `0.72rem` — each used exactly once. They are not part of the ramp; they are values that were picked to look right in one place. New work uses a documented step and snaps to the nearest one rather than adding another.
 
 ### Named Rules
 
@@ -214,6 +232,8 @@ Until that decision is made: match the incumbent. Add depth with a border and a 
 - **Card lift** (`box-shadow: 0 6px 20px rgba(0,0,0,.08)`, paired with `translateY(-2px)`, both at `.08s ease`): The response to hovering a note card in the list. The only shadow in the system.
 - **Modal scrim** (`background: rgba(0,0,0,.45)`): Full-viewport backdrop behind a modal.
 
+Note that the system-wide focus ring is an `outline`, not a shadow. Focus deliberately did not become a third entry in this vocabulary: an outline follows each element's own radius, works on pills and circles unchanged, and keeps the open depth question from being quietly answered by an accessibility fix.
+
 ## Shapes
 
 One radius does nearly all the work: **10px** (`--radius`) on cards, buttons, inputs, panes, modals, the summary box, notices, and the file drop zone. Two exceptions are principled rather than accidental:
@@ -242,7 +262,9 @@ Components are **restrained and precise**: thin strokes, one radius, and state c
 - **Ghost:** Graphite text with a dashed border — used for "save without linking" on the reconcile screen, where the action is valid but deliberately de-emphasised.
 - **Accent soft** (`.btn-new`): Index Wash fill, Index Blue text, weight 600. The header's "new note" affordance — present but quieter than a primary button.
 - **Link button:** No border, no background, graphite underlined text at `0.85rem`; goes Index Blue on hover. Used for logout.
-- **Hover / Focus:** **Not currently defined for `.btn` or any of its variants.** Only the icon button, file input, and cards have hover treatments. This is a gap in the incumbent, not a rule.
+- **Hover:** The border goes Index Blue on every variant (150ms). Primary additionally brightens its own fill (`filter: brightness(1.08)`) rather than reaching for a second blue; Danger takes a 10% wash of Alert Red derived from the token with `color-mix`, so neither hover introduces a colour the palette does not already own.
+- **Focus:** A 2px Index Blue outline at 2px offset, inherited from the system-wide focus rule. Danger swaps the outline to Alert Red so the ring agrees with the button.
+- **Disabled:** `opacity: .55` with `cursor: default`, and every hover suppressed via `:not(:disabled)`. The import button spends 20–35 seconds disabled during an ingest; before this existed it looked fully pressable the whole time.
 
 ### Icon Button
 
@@ -264,7 +286,9 @@ Components are **restrained and precise**: thin strokes, one radius, and state c
 - **Style:** Surface fill, 1px lattice-line border, 10px radius, `10px 12px` padding, inherited font family. The header search and modal inputs use Paper fill instead, to read as recessed inside an already-raised surface.
 - **Textarea:** Same shell, monospace family, `resize: vertical` only.
 - **File input:** A 1.5px dashed drop zone on Paper with graphite text and 16px padding; on hover the border becomes Index Blue and the fill becomes Index Wash. Its `::file-selector-button` is styled as a primary button with an 18px right margin.
-- **Focus:** **Not currently defined.** Inputs rely on the browser default focus ring. This is a gap.
+- **Hover:** Border shifts to Graphite (150ms).
+- **Focus:** Border shifts to Index Blue, under the same 2px outline every other control gets. The border moves as well as the ring so the field itself answers, not just the halo around it.
+- **Select:** Selects were unstyled until they were added to the shared input rule; they now match text inputs exactly.
 - **Error:** Field-level errors render in the `.errors` block, not on the field.
 
 ### Navigation
@@ -291,8 +315,9 @@ Full-width, 10px radius, `10px 14px` padding, `0.9rem`. The `ok` variant uses In
 - **Do** keep containers at 10px radius and reserve pills (999px) for measures — chips, badges, progress tracks.
 - **Do** buy density from chrome, not from reading text. Labels and metadata may go to `0.72–0.85rem`; body copy stays at `1rem`/1.65.
 - **Do** keep state changes small and quick: 80–150ms, a 2px lift at most. The gear's 45° rotation at 250ms is the system's one indulgence and stays unique.
-- **Do** guard new motion with `prefers-reduced-motion`, as the ingest panel does. The card hover and gear rotation currently do not, and should be brought in.
-- **Do** define hover and focus states for any new interactive component. `.btn` currently has none — do not treat that omission as the pattern.
+- **Do** guard new motion with `prefers-reduced-motion`. The single block at the foot of the stylesheet stops what actually moves — the card lift, the gear rotation, both bar fills, the caret — and deliberately keeps colour and border transitions, because removing those would leave no feedback about what the pointer is on.
+- **Do** give every new interactive component a hover, a focus, and (if it can be disabled) a disabled state. The system-wide `:where(...):focus-visible` rule covers focus by default at zero specificity; the other two are yours to write.
+- **Do** derive a hover colour from a token that already exists — `filter: brightness()` on a filled control, `color-mix()` on a tinted one — rather than adding a palette entry for one state.
 
 ### Don't:
 
@@ -301,5 +326,6 @@ Full-width, 10px radius, `10px 14px` padding, `0.9rem`. The `ok` variant uses In
 - **Don't** spread content to fill width. Reading stays within 980px, input surfaces within 720px, per **The 980 Rule**.
 - **Don't** add a second accent colour. Alert Red is a text and stroke colour for destructive and invalid states only; it is not a palette slot to expand from.
 - **Don't** introduce a new radius value. Ten pixels, a pill, `4px`/`8px` for code, and one circle is the complete vocabulary.
+- **Don't** add a font size. The ramp is `2 / 1.2 / 1.05 / 1 / 0.9 / 0.85 / 0.75rem`; the six one-offs already in the stylesheet are drift to be absorbed, not precedent to extend.
 - **Don't** ease a live progress bar. Linear is correct for anything reporting real elapsed work; easing reads as slowing down.
 - **Don't** ship an interaction whose only feedback is that a spinner is turning. Progress in this system reports a real stage, a real count, or real output.
