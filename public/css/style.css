@@ -300,6 +300,19 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* 画面の言語ごとに書体の優先順を替える。同じ漢字でも字形が違うので、
+   簡体字の書体で正體を出すと形が崩れる（骨・角・門などで目に見えて出る）。
+   基準は和文。ラテンは Archivo が先頭で共通。 */
+html[lang='zh'] body {
+  font-family: 'Archivo', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+}
+html[lang='zh-TW'] body {
+  font-family: 'Archivo', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+}
+html[lang='ko'] body {
+  font-family: 'Archivo', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+}
+
 h1, h2, h3 { margin: 0; line-height: 1.3; font-weight: 800; letter-spacing: -0.015em; }
 
 a { color: var(--wax-blue); text-decoration: none; }

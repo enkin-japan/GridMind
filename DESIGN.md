@@ -271,7 +271,9 @@ Two greys, one white, one near-black, and three pigments — the pigments never 
 ## Typography
 
 **Display / Body / Label / Counter Font:** Archivo variable (wght 400–800, wdth 62–125), self-hosted at `/fonts/archivo-latin.woff2` and `/fonts/archivo-latin-ext.woff2`, latin and latin-ext subsets only, `font-display: swap`, with the latin file preloaded.
-**CJK fallback:** Hiragino Kaku Gothic ProN → Yu Gothic → Noto Sans JP → PingFang SC → Microsoft YaHei → sans-serif.
+**CJK fallback:** Japanese base — Hiragino Kaku Gothic ProN → Yu Gothic → Noto Sans JP → PingFang SC → Microsoft YaHei → sans-serif.
+
+**Per-language stacks.** The same han character is drawn differently in each region, so the interface language reorders the fallback: `html[lang='zh']` leads with PingFang SC / Hiragino Sans GB / Microsoft YaHei, `html[lang='zh-TW']` with PingFang TC / Microsoft JhengHei, `html[lang='ko']` with Apple SD Gothic Neo / Malgun Gothic. Archivo stays first in every one; only the CJK tail moves. **Known limitation:** the note body inherits the interface language's stack, so a Japanese note read under a Traditional Chinese interface gets Traditional glyph forms for its kanji. Closing that gap means storing each note's own language and stamping `lang` on `.markdown-body`; it is not done, and no code should pretend otherwise.
 **Mono:** `ui-monospace, 'SFMono-Regular', Menlo, monospace`, used only for textareas and code.
 
 **Character:** One grotesque doing every job, differentiated by *width* rather than by family. Archivo's width axis is the role signal: labels compress to 84 and go uppercase with wide letterspacing so they read as stamped-on markings; headings sit at 88–96 so they stay dense without shouting; counters expand to 116 so figures read as machined dials. Weight is nearly binary — 400 for prose, 700–800 for everything structural — which leaves width free to carry hierarchy on its own.
@@ -296,7 +298,7 @@ The stack deliberately drops CJK to the system gothic. A CJK webfont would be mu
 
 **The One Counter Rule.** Every quantity the user compares — quota, percent complete, character counts, note totals, the cut ratio — goes through the `.ctr` component so that they are all the same object. A number typeset as plain prose is a defect, not a variant.
 
-**The No-Webfont-For-CJK Rule.** Latin is self-hosted; CJK falls through to the system stack, permanently. The wait screen is the product's signature surface and must not carry a multi-megabyte font download.
+**The No-Webfont-For-CJK Rule.** Latin is self-hosted; CJK falls through to the system stack, permanently — for all five interface languages, including the two han variants, which are separated by stack order rather than by shipping two more fonts. The wait screen is the product's signature surface and must not carry a multi-megabyte font download.
 
 ## Layout
 

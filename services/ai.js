@@ -172,6 +172,7 @@ const LANGUAGES = {
   ja: { label: '日本語', instruction: 'Japanese (日本語)', code: 'ja' },
   en: { label: 'English', instruction: 'English', code: 'en' },
   zh: { label: '简体中文', instruction: 'Simplified Chinese (简体中文)', code: 'zh' },
+  'zh-TW': { label: '正體中文', instruction: 'Traditional Chinese (正體中文, Taiwan usage)', code: 'zh-TW' },
   ko: { label: '한국어', instruction: 'Korean (한국어)', code: 'ko' },
 };
 

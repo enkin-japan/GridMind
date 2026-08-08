@@ -7,6 +7,8 @@ const LOCALES = {
   ja: require('../locales/ja'),
   en: require('../locales/en'),
   zh: require('../locales/zh'),
+  'zh-TW': require('../locales/zh-TW'),
+  ko: require('../locales/ko'),
 };
 
 const DEFAULT = 'ja';
@@ -28,7 +30,17 @@ const LOOK_KEYS = Object.keys(LOOK);
 
 function isLook(kind, v) { return LOOK[kind] && LOOK[kind].values.indexOf(v) >= 0; }
 
-function isLang(v) { return CODES.indexOf(v) >= 0; }
+// 表記ゆれを1つに寄せる。ブラウザは zh-Hant-TW のような書きかたもしてくる。
+const CANON = {};
+for (const c of CODES) CANON[c.toLowerCase()] = c;
+Object.assign(CANON, {
+  'zh-hant': 'zh-TW', 'zh-hk': 'zh-TW', 'zh-mo': 'zh-TW',   // 繁体を使う地域
+  'zh-hans': 'zh', 'zh-cn': 'zh', 'zh-sg': 'zh',
+});
+
+// 正式なコードに直す。知らない言語なら null。
+function canon(v) { return v ? CANON[String(v).toLowerCase()] || null : null; }
+function isLang(v) { return canon(v) !== null; }
 function isTheme(v) { return THEMES.indexOf(v) >= 0; }
 
 // Accept-Language から、こちらが持っている言語を1つ選ぶ。
@@ -42,9 +54,12 @@ function fromHeader(header = '') {
     })
     .sort((a, b) => b.q - a.q);
   for (const { tag } of wanted) {
-    if (isLang(tag)) return tag;
-    const base = tag.split('-')[0];
-    if (isLang(base)) return base;
+    // 後ろから1段ずつ落として当てる：zh-Hant-TW → zh-Hant → zh
+    const parts = tag.split('-');
+    for (let n = parts.length; n > 0; n--) {
+      const hit = canon(parts.slice(0, n).join('-'));
+      if (hit) return hit;
+    }
   }
   return null;
 }
@@ -63,9 +78,10 @@ function cookie(req, name) {
 }
 
 function pickLang(req, user) {
-  if (user && isLang(user.ui_lang)) return user.ui_lang;
-  const c = cookie(req, 'gm_lang');
-  if (isLang(c)) return c;
+  const own = user && canon(user.ui_lang);
+  if (own) return own;
+  const c = canon(cookie(req, 'gm_lang'));
+  if (c) return c;
   return fromHeader(req.headers['accept-language']) || DEFAULT;
 }
 
@@ -122,4 +138,4 @@ function clientDict(lang) {
 }
 
 module.exports = { LOCALES, CODES, DEFAULT, UI_LANGS, THEMES, LOOK, LOOK_KEYS,
-  isLang, isTheme, isLook, pickLang, pickTheme, pickLook, lookAttrs, t, fill, clientDict };
+  canon, isLang, isTheme, isLook, pickLang, pickTheme, pickLook, lookAttrs, t, fill, clientDict };

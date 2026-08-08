@@ -14,7 +14,7 @@ Drop in a document (PDF / Word / PowerPoint / Excel / HTML / text) and GridMind 
 - **Notes** — create / read / update / delete, written in Markdown.
 - **AI ingest** — upload a file (converted to Markdown by [MarkItDown](https://github.com/microsoft/markitdown)) or paste text; an LLM extracts **only the knowledge** and generates a title, summary, and tags. Noise (objectives, grading, schedules, layout) is deliberately excluded, and it never pads when a document is thin.
 - **Output language** — choose the note's language independently of the source. An English PDF can become a Japanese note. A guard re-translates if the output drifts back toward the source language.
-- **Interface language and theme** — the UI itself ships in Japanese, English and Simplified Chinese, picked in settings or resolved from the browser. Light and dark are an explicit choice, not only a system preference.
+- **Interface language, theme and stock** — the UI ships in Japanese, English, Simplified Chinese, Traditional Chinese and Korean, picked in settings or resolved from the browser. Light and dark are an explicit choice rather than only a system preference, alongside four measured palettes, a density switch and a sprocket-texture switch.
 - **Long documents** — anything over ~15,000 characters is split, extracted in parallel, and consolidated into one note, so nothing is lost to a truncation limit.
 - **Live progress** — ingest takes 20–35 seconds. The screen shows the real stage, the list of knowledge points found, and the note body streaming in as it is written.
 - **Search & organize** — keyword search (title/body), tag filtering, pagination.

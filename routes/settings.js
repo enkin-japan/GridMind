@@ -44,7 +44,7 @@ router.post('/language', async (req, res, next) => {
 // アカウントを読めないので、cookie が無いとせっかくの設定が効かない。
 router.post('/display', async (req, res, next) => {
   try {
-    const uiLang = i18n.isLang(req.body.ui_lang) ? req.body.ui_lang : null;
+    const uiLang = i18n.canon(req.body.ui_lang);   // 表記ゆれをここで正式なコードに直す
     const theme = i18n.isTheme(req.body.theme) ? req.body.theme : 'auto';
     const look = {};
     for (const kind of i18n.LOOK_KEYS) {
