@@ -22,6 +22,9 @@ function localize(req, res, next) {
   const lang = i18n.pickLang(req, user);
   res.locals.lang = lang;
   res.locals.theme = i18n.pickTheme(req, user);
+  res.locals.look = i18n.pickLook(req, user);
+  res.locals.lookAttrs = i18n.lookAttrs(res.locals.look);
+  res.locals.lookKinds = i18n.LOOK;
   res.locals.uiLangs = i18n.UI_LANGS;
   res.locals.clientDict = i18n.clientDict(lang);
   res.locals.titleKey = null;

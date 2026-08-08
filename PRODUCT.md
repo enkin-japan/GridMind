@@ -65,6 +65,10 @@ Three commitments a neighbouring "AI summarizer" could not truthfully copy:
 - **Extraction is not reproducible.** The model in use forces a fixed temperature, so completeness varies between runs on identical input. Any claim of deterministic output would be false.
 - The course deliverable is still open; until it closes, running reliably on demo day is a first-class requirement.
 
+**Decided against**
+
+- **The visual world is not a user preference.** Palette (four measured film stocks), density and sprocket texture are selectable; the world itself — the film-roll list, the light box, the gate, the dark machine rail — is not, and no theming architecture will be built for it. With no logo or wordmark established, this world is what carries the product's position, and a product that offers to look like anything has stated no position. Users who want a different palette get one; users who want a different product do not get one here.
+
 **Explicitly undecided**
 
 - **Whether the pro tier will take real payment.** Not decided.

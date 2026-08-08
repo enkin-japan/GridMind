@@ -126,6 +126,163 @@
     --tape-hover: #3e4237;
 }
 
+
+/* ===========================================================================
+   片基（フィルムストック）
+   室内灯と素材だけを替える。蝋の3色は顔料なので、どの片基でも動かさない
+   ——「赤＝切る／青＝つなぐ／黄＝気をつける」が片基ごとに変わったら、
+   職務が職務でなくなる。全ペアを実測して通したものだけを置く。
+   =========================================================================== */
+
+/* tungsten — タングステン球の下の編集室。地と紙だけを温める（蝋は顔料なので変えない）。 */
+:root[data-stock='tungsten'] {
+  --bench: #e7e1d4;
+  --panel: #fffdf6;
+  --well: #241d13;
+  --perf: #e7e1d4;
+  --ink: #1b1710;
+  --ink-2: #615748;
+  --edge: #ccc3b0;
+  --edge-2: #a69b85;
+  --tape: #f4ecd8;
+  --tape-hover: #eae0c6;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-stock='tungsten']:not([data-theme='light']) {
+    --bench: #100d08;
+    --panel: #27221a;
+    --well: #070502;
+    --perf: #37301f;
+    --ink: #ece5d7;
+    --ink-2: #a39882;
+    --edge: #484035;
+    --edge-2: #584f41;
+    --tape: #37301f;
+    --tape-hover: #423a28;
+  }
+}
+:root[data-stock='tungsten'][data-theme='dark'] {
+  --bench: #100d08;
+  --panel: #27221a;
+  --well: #070502;
+  --perf: #37301f;
+  --ink: #ece5d7;
+  --ink-2: #a39882;
+  --edge: #484035;
+  --edge-2: #584f41;
+  --tape: #37301f;
+  --tape-hover: #423a28;
+}
+
+/* daylight — 窓のある編集室。タングステンの対。 */
+:root[data-stock='daylight'] {
+  --bench: #dee2e5;
+  --panel: #ffffff;
+  --well: #1b2126;
+  --perf: #dee2e5;
+  --ink: #101619;
+  --ink-2: #535e66;
+  --edge: #bec5ca;
+  --edge-2: #98a1a8;
+  --tape: #e9eef1;
+  --tape-hover: #dde4e8;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-stock='daylight']:not([data-theme='light']) {
+    --bench: #0a0d10;
+    --panel: #1e2529;
+    --well: #04070a;
+    --perf: #2d3439;
+    --ink: #e3eaef;
+    --ink-2: #93a0a9;
+    --edge: #3f484f;
+    --edge-2: #4e5961;
+    --tape: #2d3439;
+    --tape-hover: #384046;
+  }
+}
+:root[data-stock='daylight'][data-theme='dark'] {
+  --bench: #0a0d10;
+  --panel: #1e2529;
+  --well: #04070a;
+  --perf: #2d3439;
+  --ink: #e3eaef;
+  --ink-2: #93a0a9;
+  --edge: #3f484f;
+  --edge-2: #4e5961;
+  --tape: #2d3439;
+  --tape-hover: #384046;
+}
+
+/* contrast — 罫を最も強く、字を最も濃く。素材の段差は 1.12:1 まで痩せるが、
+     ここでは構造を罫が全部背負う（意図した交換）。 */
+:root[data-stock='contrast'] {
+  --bench: #f2f2f0;
+  --panel: #ffffff;
+  --well: #000000;
+  --perf: #f2f2f0;
+  --ink: #000000;
+  --ink-2: #3f3f3d;
+  --edge: #6b6b68;
+  --edge-2: #000000;
+  --tape: #e4e4e0;
+  --tape-hover: #d3d3ce;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-stock='contrast']:not([data-theme='light']) {
+    --bench: #000000;
+    --panel: #14140f;
+    --well: #000000;
+    --perf: #26261f;
+    --ink: #ffffff;
+    --ink-2: #cfcfc8;
+    --edge: #9a9a94;
+    --edge-2: #ffffff;
+    --tape: #26261f;
+    --tape-hover: #33332a;
+  }
+}
+:root[data-stock='contrast'][data-theme='dark'] {
+  --bench: #000000;
+  --panel: #14140f;
+  --well: #000000;
+  --perf: #26261f;
+  --ink: #ffffff;
+  --ink-2: #cfcfc8;
+  --edge: #9a9a94;
+  --edge-2: #ffffff;
+  --tape: #26261f;
+  --tape-hover: #33332a;
+}
+
+/* ===========================================================================
+   密度
+   詰めるのは余白と行送りだけ。本文の字の大きさは動かさない。
+   =========================================================================== */
+:root[data-density='compact'] {
+  --s1: 3px;  --s2: 6px;  --s3: 9px;  --s4: 12px;
+  --s5: 18px; --s6: 24px; --s7: 36px; --s8: 48px;
+}
+[data-density='compact'] body { line-height: 1.6; }
+[data-density='compact'] .btn { min-height: 34px; padding: 6px 12px; }
+[data-density='compact'] input[type=text],
+[data-density='compact'] input[type=password],
+[data-density='compact'] input[type=search],
+[data-density='compact'] select,
+[data-density='compact'] textarea { min-height: 34px; padding: 7px 10px; }
+[data-density='compact'] .page { min-width: 34px; min-height: 34px; }
+[data-density='compact'] .tape { padding: 3px 8px; }
+
+/* ===========================================================================
+   送り穴
+   目が疲れるという人のために、穴だけ抜けるようにしてある。
+   フィルムの縁そのもの（暗い帯）は残る——構造だから。
+   =========================================================================== */
+:root[data-perf='off'] .perf-col::before,
+:root[data-perf='off'] .advance::after,
+:root[data-perf='off'] .quota-bar::after { display: none; }
+
+
 /* --- 土台 --------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -189,7 +346,7 @@ img, svg { max-width: 100%; }
   display: inline-flex;
   align-items: stretch;
   background: var(--well);
-  border: 1px solid var(--well);
+  border: 1px solid var(--edge-2);
   vertical-align: middle;
 }
 .ctr > span {
@@ -489,6 +646,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 .sheet > p { color: var(--ink-2); font-size: var(--t-sm); }
 .sheet > p:first-of-type { margin-top: 0; }
 .form-narrow { max-width: var(--w-form); }
+/* 設定の選択肢が増えたので、広い画面では2列に組む。 */
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 var(--s4); }
+.field-row .field { margin-bottom: var(--s4); }
 
 /* --- 知らせ／エラー ------------------------------------------------------ */
 .notice {
@@ -678,8 +838,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 6px;
   background-color: var(--wax-red-fill);
   -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
-  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
-  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
 .margin-block dl { margin: 0; font-size: var(--t-xs); }
 .margin-block dt { color: var(--ink-2); font-size: var(--t-label); letter-spacing: .1em; text-transform: uppercase; font-weight: 700; margin-bottom: 1px; }
@@ -723,8 +883,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
   content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 7px;
   background-color: var(--wax-red-fill);
   -webkit-mask-image: var(--wax-mask); mask-image: var(--wax-mask);
-  -webkit-mask-size: 60px 100%; mask-size: 60px 100%;
-  -webkit-mask-repeat: repeat-x; mask-repeat: repeat-x;
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
 }
 .note-bar .note-title { flex: 1 1 300px; margin-bottom: 0; }
 .note-bar .acts { display: flex; gap: var(--s2); flex: 0 0 auto; }
@@ -964,7 +1124,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 .spec-table thead th {
   background: var(--well);
   color: var(--on-film);
-  border-color: var(--well);
+  border-color: var(--edge);
   font-size: var(--t-label);
   font-weight: 700;
   font-variation-settings: 'wdth' 84;

@@ -46,10 +46,15 @@ router.post('/display', async (req, res, next) => {
   try {
     const uiLang = i18n.isLang(req.body.ui_lang) ? req.body.ui_lang : null;
     const theme = i18n.isTheme(req.body.theme) ? req.body.theme : 'auto';
-    await users.setDisplay(req.session.userId, { uiLang, theme });
+    const look = {};
+    for (const kind of i18n.LOOK_KEYS) {
+      look[kind] = i18n.isLook(kind, req.body[kind]) ? req.body[kind] : i18n.LOOK[kind].def;
+    }
+    await users.setDisplay(req.session.userId, { uiLang, theme, ...look });
     const year = { maxAge: 365 * 24 * 60 * 60 * 1000, httpOnly: false, sameSite: 'lax', path: '/' };
     if (uiLang) res.cookie('gm_lang', uiLang, year); else res.clearCookie('gm_lang', { path: '/' });
     res.cookie('gm_theme', theme, year);
+    for (const kind of i18n.LOOK_KEYS) res.cookie('gm_' + kind, look[kind], year);
     res.redirect('/settings?saved=display');
   } catch (e) {
     next(e);

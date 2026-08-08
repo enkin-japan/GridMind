@@ -33,14 +33,43 @@
       </select>
     </label>
 
-    <label class="field">
-      <span class="cap"><%= t('set.theme') %></span>
-      <select name="theme">
-        <% ['auto', 'light', 'dark'].forEach(function (k) { %>
-          <option value="<%= k %>" <%= k === theme ? 'selected' : '' %>><%= t('set.theme.' + k) %></option>
-        <% }); %>
-      </select>
-    </label>
+    <div class="field-row">
+      <label class="field">
+        <span class="cap"><%= t('set.theme') %></span>
+        <select name="theme">
+          <% ['auto', 'light', 'dark'].forEach(function (k) { %>
+            <option value="<%= k %>" <%= k === theme ? 'selected' : '' %>><%= t('set.theme.' + k) %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="cap"><%= t('set.stock') %></span>
+        <select name="stock">
+          <% lookKinds.stock.values.forEach(function (k) { %>
+            <option value="<%= k %>" <%= k === look.stock ? 'selected' : '' %>><%= t('set.stock.' + k) %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="cap"><%= t('set.density') %></span>
+        <select name="density">
+          <% lookKinds.density.values.forEach(function (k) { %>
+            <option value="<%= k %>" <%= k === look.density ? 'selected' : '' %>><%= t('set.density.' + k) %></option>
+          <% }); %>
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="cap"><%= t('set.perf') %></span>
+        <select name="perf">
+          <% lookKinds.perf.values.forEach(function (k) { %>
+            <option value="<%= k %>" <%= k === look.perf ? 'selected' : '' %>><%= t('set.perf.' + k) %></option>
+          <% }); %>
+        </select>
+      </label>
+    </div>
 
     <div class="form-actions">
       <button class="btn primary" type="submit"><svg class="ico"><use href="#i-check"/></svg><%= t('set.save') %></button>

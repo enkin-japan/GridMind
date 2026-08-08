@@ -17,6 +17,17 @@ const UI_LANGS = CODES.map((code) => ({ code, label: LOCALES[code]['lang.name'] 
 
 const THEMES = ['auto', 'light', 'dark'];
 
+// 見た目の好み。値と既定を1か所にまとめ、ここを増やせば設定画面も cookie も追従する。
+// 片基（配色）は増えても構造は変えない。世界そのものは選択肢にしない。
+const LOOK = {
+  stock:   { values: ['standard', 'tungsten', 'daylight', 'contrast'], def: 'standard', attr: 'data-stock' },
+  density: { values: ['comfortable', 'compact'], def: 'comfortable', attr: 'data-density' },
+  perf:    { values: ['on', 'off'], def: 'on', attr: 'data-perf' },
+};
+const LOOK_KEYS = Object.keys(LOOK);
+
+function isLook(kind, v) { return LOOK[kind] && LOOK[kind].values.indexOf(v) >= 0; }
+
 function isLang(v) { return CODES.indexOf(v) >= 0; }
 function isTheme(v) { return THEMES.indexOf(v) >= 0; }
 
@@ -65,6 +76,26 @@ function pickTheme(req, user) {
   return 'auto';
 }
 
+// 片基・密度・送り穴。アカウント → cookie → 既定。
+function pickLook(req, user) {
+  const out = {};
+  for (const kind of LOOK_KEYS) {
+    const own = user && user[kind];
+    if (isLook(kind, own)) { out[kind] = own; continue; }
+    const c = cookie(req, 'gm_' + kind);
+    out[kind] = isLook(kind, c) ? c : LOOK[kind].def;
+  }
+  return out;
+}
+
+// <html> に付ける属性。既定のものは付けない（既定は素の :root が持っている）。
+function lookAttrs(look) {
+  return LOOK_KEYS
+    .filter((k) => look[k] && look[k] !== LOOK[k].def)
+    .map((k) => ` ${LOOK[k].attr}="${look[k]}"`)
+    .join('');
+}
+
 // {name} を差しこむ。値が無いキーはそのまま残す（消すと文が壊れて原因が見えない）。
 function fill(str, vars) {
   if (!vars) return str;
@@ -90,4 +121,5 @@ function clientDict(lang) {
   return out;
 }
 
-module.exports = { LOCALES, CODES, DEFAULT, UI_LANGS, THEMES, isLang, isTheme, pickLang, pickTheme, t, fill, clientDict };
+module.exports = { LOCALES, CODES, DEFAULT, UI_LANGS, THEMES, LOOK, LOOK_KEYS,
+  isLang, isTheme, isLook, pickLang, pickTheme, pickLook, lookAttrs, t, fill, clientDict };

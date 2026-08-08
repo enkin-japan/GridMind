@@ -19,7 +19,7 @@ function findByUsername(username) {
 }
 
 function findById(id) {
-  return get('SELECT id, username, plan, out_lang, ui_lang, theme, created_at FROM users WHERE id = ?', [id]);
+  return get('SELECT id, username, plan, out_lang, ui_lang, theme, stock, density, perf, created_at FROM users WHERE id = ?', [id]);
 }
 
 function verifyPassword(user, password) {
@@ -32,8 +32,11 @@ async function setOutLang(userId, lang) {
 }
 
 // 画面の言語と表示テーマを保存する。null / 'auto' は「決め打ちしない」の意。
-async function setDisplay(userId, { uiLang, theme }) {
-  await run('UPDATE users SET ui_lang = ?, theme = ? WHERE id = ?', [uiLang || null, theme || 'auto', userId]);
+async function setDisplay(userId, { uiLang, theme, stock, density, perf }) {
+  await run(
+    'UPDATE users SET ui_lang = ?, theme = ?, stock = ?, density = ?, perf = ? WHERE id = ?',
+    [uiLang || null, theme || 'auto', stock || 'standard', density || 'comfortable', perf || 'on', userId]
+  );
 }
 
 // プランを変更する（'free' | 'pro'）。

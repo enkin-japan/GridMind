@@ -327,6 +327,10 @@ Hover does not lift anything. It changes background, border colour, or text colo
 
 **The Three-State Theme Rule.** Dark is not only a system preference. The light tokens live on bare `:root`; the dark tokens are written **twice** — once under `@media (prefers-color-scheme: dark)` guarded as `:root:not([data-theme='light'])`, and once as `:root[data-theme='dark']`. The server stamps `data-theme` on `<html>` only when the user has chosen light or dark, so an unset preference still follows the room, and an explicit choice wins in both directions. Never define a colour only inside the media block.
 
+**The Stock Rule.** The palette has a second axis: *stock* (`data-stock`), four measured film stocks — standard, tungsten (warm room light), daylight (cool), high contrast. A stock replaces only the material and ink tokens: bench, panel, well, perf, ink, ink-2, edge, edge-2, tape. **It never touches the three wax colours.** Wax is opaque pigment, so red still means cut, blue still means splice and amber still means warn in every stock — a semantic colour that shifted per stock would stop being semantic. Every stock ships only after all eighteen pairs measure clean in both light and dark; the high-contrast stock deliberately trades the material step down to 1.12:1 and lets the rules carry the structure, which is the same doctrine read from the other end.
+
+**The Recess-Or-Rule Rule.** A well is a recess, shown by going darker than its surround. On a stock whose ground is already pure black there is nowhere darker to go, so the recess is marked by a rule instead — `.ctr` and the table head take their border from `edge-2`, not from `well`. Depth is a rule *plus* a step; when the step is unavailable the rule takes the whole load.
+
 **The Dark Machine Rule.** Machine parts — the rail, counter plates, gate head, progress troughs, table header rows, the slate plate — use `{colors.well}` and `{colors.on-film}` in both themes. They are not surfaces that respond to the room; they are the equipment.
 
 ## Shapes
@@ -407,6 +411,10 @@ Butted square cells, 38×38px minimum, panel fill with a bench-edge border and t
 ### Prose (note body)
 
 Max 74ch. Headings carry an edge rule beneath. **Unordered list bullets are 7px squares, not discs** — sprocket holes; nested levels become 1px outlined squares. Links are wax blue with a 1px underline that becomes a solid wax-blue block with panel-coloured text on hover. Inline code sits on the bench with an edge border; code blocks are wells with `{colors.on-film}` text. An empty body renders as a dashed placement zone carrying the honest message that nothing was extractable.
+
+### Reader options
+
+Two switches change comfort without changing the world. **Density** (`data-density`) scales the eight spacing tokens by ~0.75 and tightens control heights and body line-height to 1.6; the body *type size* is never touched. **Sprocket holes** (`data-perf`) removes the perforation overlays from the roll's edge column and from both bars, leaving the dark film edge itself — the structure stays, the texture goes. Neither switch alters layout topology, component vocabulary or colour semantics: they are settings, not skins.
 
 ### Motion
 
