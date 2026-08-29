@@ -60,9 +60,22 @@ app.use((req, res) => {
 });
 
 // エラーハンドラ
+// 例外の中身をそのまま画面に出すと、内部の事情が利用者に漏れる。
+// 記録には残し、画面には画面の言語で決まった文言だけを出す。
+// なお localize より前で落ちると t() が無いので、その場合と描画自体に
+// 失敗した場合は、何も返せなくならないよう素のテキストに落とす。
 app.use((err, req, res, next) => {
   console.error(err);
-  res.status(500).render('error', { title: 'Error', message: err.message });
+  res.status(500);
+  const plain = () => res.type('text/plain; charset=utf-8').send('Internal Server Error');
+  if (typeof res.locals.t !== 'function') return plain();
+  res.render('error', { titleKey: 'err.500', messageKey: 'err.500.body' }, (e, html) => {
+    if (e) {
+      console.error(e);
+      return plain();
+    }
+    res.send(html);
+  });
 });
 
 // DB 初期化 → サーバ起動

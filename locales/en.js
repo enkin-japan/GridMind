@@ -146,6 +146,8 @@ module.exports = {
   'err.404': '404',
   'err.404.note': 'That note does not exist.',
   'err.404.page': 'That page does not exist.',
+  'err.500': 'Error',
+  'err.500.body': 'Something went wrong while handling your request. Please wait a moment and try again.',
   'err.home': 'Back to notes',
   'err.title.required': 'A title is required.',
   'err.username.min': 'The username must be at least 3 characters.',

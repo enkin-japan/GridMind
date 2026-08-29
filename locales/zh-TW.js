@@ -147,6 +147,8 @@ module.exports = {
   'err.404': '404',
   'err.404.note': '找不到這篇筆記。',
   'err.404.page': '找不到這個頁面。',
+  'err.500': '發生錯誤',
+  'err.500.body': '處理過程中出了問題。請稍等一下再試一次。',
   'err.home': '回到筆記',
   'err.title.required': '標題必須填寫。',
   'err.username.min': '使用者名稱至少 3 個字元。',

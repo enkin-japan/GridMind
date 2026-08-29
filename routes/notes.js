@@ -448,7 +448,12 @@ router.post('/:id/edit', validate, async (req, res, next) => {
 // --- 削除 ---
 router.post('/:id/delete', async (req, res, next) => {
   try {
-    await notes.remove(req.params.id, req.session.userId);
+    // 戻り値を見ないと、他人のノートIDを指定されても黙ってホームへ戻してしまい、
+    // 「消えた」のか「そもそも自分のものではない」のかが区別できない。
+    const ok = await notes.remove(req.params.id, req.session.userId);
+    if (!ok) {
+      return res.status(404).render('error', { titleKey: 'err.404', messageKey: 'err.404.note' });
+    }
     res.redirect('/');
   } catch (e) {
     next(e);

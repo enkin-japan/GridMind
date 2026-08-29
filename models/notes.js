@@ -60,19 +60,26 @@ async function create({ title, body_md = '', summary = null, source_type = 'past
 }
 
 // 更新。所有権を確認してから行う。
-async function update(id, { title, body_md = '', summary = null, tagNames = [] }, userId) {
-  const owned = await get('SELECT id FROM notes WHERE id = ? AND user_id = ?', [id, userId]);
+//
+// summary を渡さなかったときは、今ある要約をそのまま残す。
+// 編集フォームは要約欄を持たないため、既定値 null で上書きしていると、
+// 本文をちょっと直しただけで、取り込みのときに書けた要約が消えてしまう。
+// 統合の確定など、要約を明示的に渡す呼び出しはこれまでどおり上書きする。
+async function update(id, { title, body_md = '', summary, tagNames = [] }, userId) {
+  const owned = await get('SELECT id, summary FROM notes WHERE id = ? AND user_id = ?', [id, userId]);
   if (!owned) return false; // 他人のノートは触らせない
+  const nextSummary = summary === undefined ? owned.summary : summary;
   await run(
     `UPDATE notes SET title = ?, body_md = ?, body_text = ?, summary = ?, updated_at = ?
       WHERE id = ? AND user_id = ?`,
-    [title, body_md, toPlainText(body_md), summary, now(), id, userId]
+    [title, body_md, toPlainText(body_md), nextSummary, now(), id, userId]
   );
   await tags.setForNote(id, tagNames);
   await links.syncForNote(id, body_md, userId);
   await links.resolveTitle(title, id, userId);
   // 本文が変わったのでベクトルも作り直す。
-  await saveVector(id, userId, { title, summary, body_text: toPlainText(body_md), tags: tagNames }, null);
+  await saveVector(id, userId,
+    { title, summary: nextSummary, body_text: toPlainText(body_md), tags: tagNames }, null);
   return true;
 }
 

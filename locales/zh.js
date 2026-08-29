@@ -146,6 +146,8 @@ module.exports = {
   'err.404': '404',
   'err.404.note': '找不到这篇笔记。',
   'err.404.page': '找不到这个页面。',
+  'err.500': '出错了',
+  'err.500.body': '处理过程中出了问题。请稍等一下再试一次。',
   'err.home': '回到笔记',
   'err.title.required': '标题必须填写。',
   'err.username.min': '用户名至少 3 个字符。',

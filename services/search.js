@@ -6,15 +6,23 @@ const tags = require('../models/tags');
 
 const PAGE_SIZE = 8;
 
-// キーワード検索（タイトル・本文・タグに部分一致）＋ タグ絞り込み ＋ ページネーション。
+// LIKE では % と _ が「なんでも一致」の記号として働くため、
+// 検索語に含まれていたらただの文字として扱わせる。
+// これをしないと「100%」で検索したときに、%が何にでも当たってしまう。
+function escapeLike(s) {
+  return String(s).replace(/[\\%_]/g, (m) => '\\' + m);
+}
+
+// キーワード検索（タイトルと本文に部分一致）＋ タグ絞り込み（完全一致）＋ ページネーション。
 // 必ず userId で作用域を限定する。
 async function keyword({ q = '', tag = '', page = 1, userId } = {}) {
   const where = ['n.user_id = ?'];
   const params = [userId];
 
   if (q) {
-    where.push('(n.title LIKE ? OR n.body_text LIKE ?)');
-    params.push(`%${q}%`, `%${q}%`);
+    where.push("(n.title LIKE ? ESCAPE '\\' OR n.body_text LIKE ? ESCAPE '\\')");
+    const like = `%${escapeLike(q)}%`;
+    params.push(like, like);
   }
   if (tag) {
     where.push(
