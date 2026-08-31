@@ -136,7 +136,7 @@ async function liveRun(ctx) {
   await gate.scrollIntoViewIfNeeded();
   await shot(page, '07_gate_early');
 
-  // 知識点の一覧を開き、本文が流れているところをもう1枚。
+  // 知識項目の一覧を開き、本文が流れているところをもう1枚。
   await page.waitForTimeout(11000);
   const inv = page.locator('#ingest-inv');
   if (await inv.count()) await inv.evaluate((el) => { el.open = true; });

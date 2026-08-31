@@ -1,4 +1,4 @@
-// 設定 Controller：プラン・今月の使用量・既定の出力言語。ログイン必須。
+// 設定 Controller：プラン・今月の使用量・既定の出力言語・見た目の設定。ログイン必須。
 // API キーはサービス側が持つため、この画面には出てこない。
 const express = require('express');
 const router = express.Router();

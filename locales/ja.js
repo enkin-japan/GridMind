@@ -41,7 +41,7 @@ module.exports = {
   'note.delete': '削除',
   'note.delete.confirm': 'このノートを削除しますか？',
   'note.summary': '要約',
-  'note.empty': 'この資料からは知識点を取り出せませんでした。中身が知識ではなかった場合、空のまま残すのが正しい結果です。',
+  'note.empty': 'この資料からは知識項目を取り出せませんでした。中身が知識ではなかった場合、空のまま残すのが正しい結果です。',
 
   // --- ノートの編集 ---
   'form.new': '新規ノート',
@@ -72,9 +72,9 @@ module.exports = {
   'import.nfiles': '{n} 件を選択中',
   'set.unit.short': '回',
   'import.submit': '取り込む',
-  'import.bin': '拾い出した知識点',
+  'import.bin': '拾い出した知識項目',
 
-  // --- 二次整理 ---
+  // --- 再整理 ---
   'rec.title': '2本を見くらべる',
   'rec.lede': 'いま取り込んだ知識が、既存のノート「{title}」とかなり重なっています。2本を並べたので、どう扱うかを決めてください。',
   'rec.new': '新規（取り込み）',
@@ -115,7 +115,7 @@ module.exports = {
   'set.display.h': '画面の言語と表示',
   'set.display.body': 'ここで決めるのは画面の見た目です。ノートを何語で書くかは上の「知識の出力言語」で決めます。',
   'set.uilang': '画面の言語',
-  'set.stock': '片基',
+  'set.stock': 'フィルム',
   'set.stock.standard': '標準',
   'set.stock.tungsten': 'タングステン（暖かい室内灯）',
   'set.stock.daylight': 'デイライト（涼しい）',
@@ -188,7 +188,7 @@ module.exports = {
   'js.batch.goto': 'ホームに移動します…',
   'js.unit': '件',
   'stage.ready': '準備しています',
-  'stage.inventory': '知識点を洗い出しています',
+  'stage.inventory': '知識項目を洗い出しています',
   'stage.writeup': '本文を書いています',
   'stage.meta': '見出しと要約をつくっています',
   'stage.single': '知識を取り出しています',

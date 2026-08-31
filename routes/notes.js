@@ -16,8 +16,8 @@ const quota = require('../services/quota');
 const embed = require('../services/embed');
 const { renderMarkdown } = require('../services/render');
 
-// 実測では図の多い講義資料が 15MB 近くまで行く（1件は上限まで残り 3KB だった）。
-// 余裕を持たせつつ、際限なく受けないよう上限は残す。
+// 図の多い講義資料は大きい。以前の上限 15MB に対し、残り 3KB まで迫った資料があったため
+// 40MB へ引き上げた（7748abd）。余裕は持たせつつ、際限なく受けないよう上限自体は残す。
 const MAX_UPLOAD_MB = Number(process.env.MAX_UPLOAD_MB) || 40;
 const upload = multer({
   dest: path.join(__dirname, '..', 'uploads'),
@@ -239,7 +239,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
       console.error('[ingest] ベクトル生成に失敗:', e.message);
     }
 
-    // 二次整理：関連する既存ノートを探す
+    // 再整理：関連する既存ノートを探す
     const isBatch = String(req.body.batch || '') === '1'; // 複数ファイルの一括処理は非対話
     const related = await relate.findRelated(userId, staged, { vec: stagedEmb ? stagedEmb.vec : null });
     const top = related[0];
@@ -276,7 +276,7 @@ router.post('/ingest', uploadSingle, async (req, res, next) => {
   }
 });
 
-// --- 二次整理：対照ページ（高関連の新旧を並べて確認）---
+// --- 再整理：対照ページ（高関連の新旧を並べて確認）---
 router.get('/reconcile', async (req, res, next) => {
   const userId = req.session.userId;
   const p = req.session.pending;

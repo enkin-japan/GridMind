@@ -53,9 +53,5 @@ function missing(userId = null) {
   return all(sql, userId ? [embed.MODEL, userId] : [embed.MODEL]);
 }
 
-async function count(userId) {
-  const r = await get('SELECT COUNT(*) AS c FROM embeddings WHERE user_id = ?', [userId]);
-  return (r && r.c) || 0;
-}
 
-module.exports = { save, remove, forUser, missing, count };
+module.exports = { save, remove, forUser, missing };

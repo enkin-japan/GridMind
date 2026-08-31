@@ -2,6 +2,8 @@
 // course 第9・10章の Express + express-session 構成に倣う。
 // MVC：views=View / routes=Controller / models・services=Model。
 require('dotenv').config();
+// .env の中身をここで確かめる。書き間違いのまま既定値で動きだすのを防ぐ。
+require('./config').check();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
@@ -25,12 +27,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 利用者が増えるとメモリも増え続けるため、SQLite に保存する。
 const SQLiteStore = require('connect-sqlite3')(session);
 // リバースプロキシ配下でも本当の接続元・プロトコルを見る（secure cookie の判定に必要）。
-if (process.env.TRUST_PROXY) app.set('trust proxy', 1);
+if (process.env.TRUST_PROXY === '1') app.set('trust proxy', 1);
 
 app.use(
   session({
     store: new SQLiteStore({ db: 'sessions.db', dir: path.join(__dirname, 'db') }),
-    secret: process.env.SESSION_SECRET || 'gridmind-dev-secret',
+    secret: process.env.SESSION_SECRET, // 未記入なら config.check() が起動を止める
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -79,8 +81,9 @@ app.use((err, req, res, next) => {
 });
 
 // DB 初期化 → サーバ起動
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '127.0.0.1';
+// どちらも config.check() が必須にしているので、ここに逃げ道は要らない。
+const PORT = process.env.PORT;
+const HOST = process.env.HOST;
 db.init()
   .then(() => {
     janitor.start(); // アップロードの取り残しを定期的に掃除する

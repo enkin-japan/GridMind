@@ -20,7 +20,7 @@ const UI_LANGS = CODES.map((code) => ({ code, label: LOCALES[code]['lang.name'] 
 const THEMES = ['auto', 'light', 'dark'];
 
 // 見た目の好み。値と既定を1か所にまとめ、ここを増やせば設定画面も cookie も追従する。
-// 片基（配色）は増えても構造は変えない。世界そのものは選択肢にしない。
+// フィルム（配色）は増えても構造は変えない。世界そのものは選択肢にしない。
 const LOOK = {
   stock:   { values: ['standard', 'tungsten', 'daylight', 'contrast'], def: 'standard', attr: 'data-stock' },
   density: { values: ['comfortable', 'compact'], def: 'comfortable', attr: 'data-density' },
@@ -64,7 +64,7 @@ function fromHeader(header = '') {
   return null;
 }
 
-// cookie は express 標準では解かれないので、必要な2つだけ自前で取り出す。
+// cookie は express 標準では解かれないので、必要なものだけ自前で取り出す。
 function cookie(req, name) {
   const raw = req.headers.cookie;
   if (!raw) return null;
@@ -92,7 +92,7 @@ function pickTheme(req, user) {
   return 'auto';
 }
 
-// 片基・密度・送り穴。アカウント → cookie → 既定。
+// フィルム・密度・送り穴。アカウント → cookie → 既定。
 function pickLook(req, user) {
   const out = {};
   for (const kind of LOOK_KEYS) {
@@ -152,7 +152,7 @@ function noteLang(outLang, text) {
   return sniffScript(text);
 }
 
-// 画面側へ渡すぶんだけ取り出す（js. と stage. の2群）。
+// 画面側へ渡すぶんだけ取り出す（js. と stage. の2群、および import.nfiles）。
 function clientDict(lang) {
   const table = LOCALES[lang] || LOCALES[DEFAULT];
   const base = LOCALES[DEFAULT];

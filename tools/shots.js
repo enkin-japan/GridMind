@@ -5,7 +5,7 @@
 //   SHOT_W=390 node tools/shots.js … 幅を変える（細い画面の確認）
 //
 // Playwright のブラウザは落とさず、入っている Chrome をそのまま動かす。
-// 使う前に: npm i -D playwright-core
+// playwright-core は devDependencies に入っているので npm i だけでよい。
 //   置き場所を選ばないよう、いくつか探してから読みこむ。
 function loadPlaywright() {
   const tries = ['playwright-core', 'playwright', process.env.PLAYWRIGHT_PATH].filter(Boolean);

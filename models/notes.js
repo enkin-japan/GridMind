@@ -1,4 +1,4 @@
-// ノート（知識条目）の CRUD。GridMind の中核 Model。すべて user_id で作用域を限定する。
+// ノート（1本の知識のまとまり）の CRUD。GridMind の中核 Model。すべて user_id で作用域を限定する。
 const { run, get } = require('./db');
 const tags = require('./tags');
 const links = require('../services/links');
@@ -103,9 +103,5 @@ async function remove(id, userId) {
   return true;
 }
 
-async function count(userId) {
-  const row = await get('SELECT COUNT(*) AS c FROM notes WHERE user_id = ?', [userId]);
-  return row.c;
-}
 
-module.exports = { create, update, findById, remove, count, toPlainText };
+module.exports = { create, update, findById, remove, toPlainText };

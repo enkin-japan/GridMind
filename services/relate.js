@@ -1,4 +1,4 @@
-// 二次整理：新しい知識と既存ノートの関連度を求める（本人の範囲内）。
+// 再整理：新しい知識と既存ノートの関連度を求める（本人の範囲内）。
 //
 //   HIGH  以上 → 対照ページ（ユーザーが 関連 or 統合 を選ぶ）
 //   MEDIUM以上 → 自動で [[リンク]] を付ける
@@ -61,7 +61,7 @@ function hasStrongEvidence({ mention, sim, cover }) {
 // 類似度からの加点（弱い手がかり）。
 function simBonus(sim) {
   if (sim >= 0.6) return 3;
-  if (sim >= 0.42) return 2; // 別分野の上限 0.35 より上に置く
+  if (sim >= 0.42) return 2; // 別分野の上限 0.41（上の実測）より上に置く
   return 0;
 }
 

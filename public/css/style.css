@@ -128,9 +128,9 @@
 
 
 /* ===========================================================================
-   片基（フィルムストック）
-   室内灯と素材だけを替える。蝋の3色は顔料なので、どの片基でも動かさない
-   ——「赤＝切る／青＝つなぐ／黄＝気をつける」が片基ごとに変わったら、
+   フィルム
+   室内灯と素材だけを替える。蝋の3色は顔料なので、どのフィルムでも動かさない
+   ——「赤＝切る／青＝つなぐ／黄＝気をつける」がフィルムごとに変わったら、
    職務が職務でなくなる。全ペアを実測して通したものだけを置く。
    =========================================================================== */
 
@@ -729,14 +729,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 
 .tape-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--s5); }
 
-.filter-note {
-  display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap;
-  margin: 0 0 var(--s4);
-  padding: 9px 14px;
-  border: 1px solid var(--edge-2);
-  font-size: var(--t-sm);
-}
-
 /* ===========================================================================
    ロール（ノート一覧）
    カードの並びではなく、1本のフィルム。左の送り穴は途切れず流れ、
@@ -1064,7 +1056,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 .gate-out.done::after { animation: none; opacity: 0; }
 @keyframes blink { to { visibility: hidden; } }
 
-/* トリムビン：拾い出した知識点が1本ずつ、穴で吊り下がっていく。 */
+/* トリムビン：拾い出した知識項目が1本ずつ、穴で吊り下がっていく。 */
 .bin > summary,
 .tags > summary {
   cursor: pointer;
@@ -1171,7 +1163,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--wax-blue); }
 }
 
 /* ===========================================================================
-   A巻・B巻（二次整理）
+   A巻・B巻（再整理）
    新旧を並べるのは、素材を2本ならべて繋ぎ目を決める作業そのもの。
    =========================================================================== */
 .compare { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); margin: var(--s5) 0; }

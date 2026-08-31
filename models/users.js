@@ -1,7 +1,8 @@
 // ユーザー（アカウント）の永続化。パスワードは bcrypt でハッシュして保存する。
 //
 // OpenAI の API キーはサービス側（サーバの環境変数）が持ち、利用者には見せない。
-// 利用者が管理するのは「プラン」と「出力言語」だけ。
+// 利用者が管理するのは、プラン・既定の出力言語・見た目の設定（画面の言語・明暗・
+// フィルム・密度・送り穴）の3系統。
 const bcrypt = require('bcryptjs');
 const { run, get } = require('./db');
 
@@ -26,7 +27,7 @@ function verifyPassword(user, password) {
   return bcrypt.compare(password, user.password_hash);
 }
 
-// 既定の出力言語を保存する（'auto' | 'ja' | 'en' | 'zh' | 'ko'）。
+// 既定の出力言語を保存する（'auto' | 'ja' | 'en' | 'zh' | 'zh-TW' | 'ko'）。
 async function setOutLang(userId, lang) {
   await run('UPDATE users SET out_lang = ? WHERE id = ?', [lang || 'auto', userId]);
 }

@@ -26,7 +26,6 @@
       if (!btn) return;
       if (btn.dataset.busy) { e.preventDefault(); return; }         // 二重送信ブロック
       btn.dataset.busy = '1';
-      btn.dataset.label = btn.innerHTML;
       btn.innerHTML = T('js.processing');
       setTimeout(function () { btn.disabled = true; }, 0);          // 送信開始後に無効化
     });
@@ -194,7 +193,7 @@
     });
   }
 
-  // 拾い出した知識点を、トリムビンに1本ずつ吊るす。
+  // 拾い出した知識項目を、トリムビンに1本ずつ吊るす。
   function hangTrims(items, count) {
     invNEl.textContent = count + ' ' + T('js.unit');
     invListEl.innerHTML = '';

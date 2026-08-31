@@ -61,15 +61,18 @@ cp .env.example .env
 
 ### Environment variables (`.env`)
 
-Only the first three are required. `.env.example` documents every optional knob with the measurements behind its default.
+`PORT`, `HOST` and `SESSION_SECRET` are required — startup aborts without them, and also on a malformed
+value (`PORT=abc`, `AI_TWO_STAGE=true`). Everything else is optional; `.env.example` documents each knob
+with the measurements behind its default.
 
 | Variable | Purpose |
 |---|---|
-| `OPENAI_API_KEY` | The service's own key. Used for both extraction and embeddings. **Required.** |
+| `PORT` | Port to listen on. **Required.** |
+| `HOST` | Bind address. **Required.** `127.0.0.1` for loopback only; `0.0.0.0` to expose on all interfaces. |
 | `SESSION_SECRET` | Signing secret for `express-session`. **Required.** |
+| `OPENAI_API_KEY` | The service's own key, used for both extraction and embeddings. Optional at startup, but
+  without it ingest only stores the converted text and warns. |
 | `OPENAI_MODEL` | Model used for extraction (default `gpt-5.6-luna`). |
-| `PORT` | Port to listen on (default `3000`). |
-| `HOST` | Bind address (default `127.0.0.1`, loopback only). Set `0.0.0.0` to expose on all interfaces. |
 | `AI_TWO_STAGE` | `1` to list the knowledge points first, then write them up. Measured +74% knowledge for +74% cost on documents under 15,000 characters. |
 | `PLAN_FREE_INGESTS` / `PLAN_FREE_DOC_CHARS` | Free-tier caps (default 30 ingests per month, 20,000 characters per file). |
 | `PLAN_PRO_INGESTS` / `PLAN_PRO_DOC_CHARS` | Pro-tier caps (default 500 / 60,000). |
@@ -108,7 +111,8 @@ services/         # ai, embed, ingest (MarkItDown pool), janitor, links,
 routes/           # controllers: auth, index (home), notes, settings
 views/            # EJS templates + partials
 public/           # css / client js
-tools/            # md_worker.py (Python worker), seed.js, embed_backfill.js
+tools/            # md_worker.py (Python worker), seed.js, embed_backfill.js,
+                  #   shots.js / doc_shots.js (headless capture), deliverables/
 docs/             # architecture & execution notes
 ```
 

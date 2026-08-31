@@ -1,6 +1,6 @@
 // ベクトル（埋め込み）の生成と比較。
 //
-// 二次整理の関連づけは、もともと「文字列がそのまま含まれるか」で判定していた。
+// 再整理の関連づけは、もともと「文字列がそのまま含まれるか」で判定していた。
 // しかし AI が見出しや言葉づかいを整えて書き直すため、内容は近いのに文字列は
 // 一致しない、という組み合わせが普通に起きる（例：「HTTP基礎」と「HTTPとHTTPSの基本」）。
 // 文章の意味をベクトルにして角度を比べれば、書き方が違っても近さが分かる。
@@ -16,10 +16,10 @@ const ENABLED = process.env.EMBEDDING_ENABLED !== '0';
 // 1件あたりに渡す文字数の上限（長すぎる本文は先頭だけで十分に特徴が出る）。
 const MAX_CHARS = Number(process.env.EMBEDDING_MAX_CHARS) || 8000;
 
-function clientFor(key) {
-  const k = key || SERVER_KEY;
-  if (!k) throw new Error('NO_KEY');
-  return new OpenAI({ apiKey: k });
+// キーはサービス側が持つ（BYOK は廃止済み）。
+function clientFor() {
+  if (!SERVER_KEY) throw new Error('NO_KEY');
+  return new OpenAI({ apiKey: SERVER_KEY });
 }
 
 // ノートからベクトルの元になる文章を作る（見出しと要約は特徴が強いので前に置く）。
@@ -33,12 +33,12 @@ function textForNote({ title = '', summary = '', body_text = '', body_md = '', t
 
 // 文章をベクトルにする。使えないときは null を返す（呼び出し側は従来の判定に落ちる）。
 // 戻り値: { vec: Float32Array, model, dim, usage } | null
-async function embed(text, { key } = {}) {
+async function embed(text) {
   if (!ENABLED) return null;
   const input = String(text || '').slice(0, MAX_CHARS).trim();
   if (!input) return null;
   try {
-    const res = await clientFor(key).embeddings.create({ model: MODEL, input });
+    const res = await clientFor().embeddings.create({ model: MODEL, input });
     const arr = res.data[0].embedding;
     return {
       vec: Float32Array.from(arr),
@@ -55,13 +55,13 @@ async function embed(text, { key } = {}) {
 
 // 複数まとめて生成する（1回のリクエストに複数入れられるので、まとめた方が速く安い）。
 // 戻り値: 入力と同じ並びの配列（失敗した要素は null）。
-async function embedMany(texts, { key, batchSize = 64 } = {}) {
+async function embedMany(texts, { batchSize = 64 } = {}) {
   if (!ENABLED) return texts.map(() => null);
   const out = new Array(texts.length).fill(null);
   for (let i = 0; i < texts.length; i += batchSize) {
     const slice = texts.slice(i, i + batchSize).map((t) => String(t || '').slice(0, MAX_CHARS).trim() || ' ');
     try {
-      const res = await clientFor(key).embeddings.create({ model: MODEL, input: slice });
+      const res = await clientFor().embeddings.create({ model: MODEL, input: slice });
       for (const item of res.data) {
         const arr = item.embedding;
         out[i + item.index] = { vec: Float32Array.from(arr), model: MODEL, dim: arr.length };

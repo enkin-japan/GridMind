@@ -39,7 +39,9 @@ async function columnExists(table, col) {
 // --- スキーマ初期化 ---
 // ARCHITECTURE.md §6 のデータモデルに対応。起動時に一度だけ実行する。
 async function init() {
-  // ユーザー（アカウント）。OpenAI の API キーはサービス側が持つので、ここには保存しない。
+  // ユーザー（アカウント）。OpenAI の API キーはサービス側（環境変数）が持つので、
+  // ここには保存しない。BYOK をやめた際に api_key_enc / api_model は使わなくなったが、
+  // 既存の DB に残っている列は消していない（SQLite の列削除は作り直しになるため）。
   await run(`
     CREATE TABLE IF NOT EXISTS users (
       id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,7 +51,7 @@ async function init() {
       out_lang      TEXT NOT NULL DEFAULT 'auto',  -- 既定の出力言語（ノートの中身）
       ui_lang       TEXT,                          -- 画面の言語。null なら毎回ブラウザから決める
       theme         TEXT NOT NULL DEFAULT 'auto',  -- 'auto' | 'light' | 'dark'
-      stock         TEXT NOT NULL DEFAULT 'standard',    -- 片基（配色）
+      stock         TEXT NOT NULL DEFAULT 'standard',    -- フィルム（配色）
       density       TEXT NOT NULL DEFAULT 'comfortable', -- 余白の詰めかた
       perf          TEXT NOT NULL DEFAULT 'on',          -- 送り穴を出すか
       created_at    TEXT NOT NULL
@@ -108,7 +110,7 @@ async function init() {
   `);
   await run('CREATE INDEX IF NOT EXISTS idx_usage_user_period ON usage_log (user_id, period)');
 
-  // ノートの意味ベクトル（二次整理の関連づけに使う）。
+  // ノートの意味ベクトル（再整理の関連づけに使う）。
   // vec は Float32 の並びを BLOB にしたもの。model と dim も持たせておき、
   // 後でモデルを変えたときに「作り直しが必要な行」を見分けられるようにする。
   await run(`
@@ -151,7 +153,7 @@ async function init() {
   if (!(await columnExists('users', 'theme'))) {
     await run("ALTER TABLE users ADD COLUMN theme TEXT NOT NULL DEFAULT 'auto'");
   }
-  // --- マイグレーション：見た目の好み（片基・密度・送り穴）---
+  // --- マイグレーション：見た目の好み（フィルム・密度・送り穴）---
   for (const [col, def] of [['stock', 'standard'], ['density', 'comfortable'], ['perf', 'on']]) {
     if (!(await columnExists('users', col))) {
       await run(`ALTER TABLE users ADD COLUMN ${col} TEXT NOT NULL DEFAULT '${def}'`);

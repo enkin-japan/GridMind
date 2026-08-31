@@ -11,10 +11,15 @@ const OpenAI = require('openai');
 // サービス側の既定キーとモデル。
 const SERVER_KEY = process.env.OPENAI_API_KEY || null;
 const DEFAULT_MODEL = process.env.OPENAI_MODEL || 'gpt-5.6-luna';
-// まとめ直し（と単発整理）に使うモデル。
-// 図の多い資料では文字の取り出しが崩れ、ラベルと数値が入れちがったまま
-// もっともらしい文が出てくる。これに気づけるかはモデルの力に依るため、
-// 最後の1回だけ上位モデルを使えるようにしておく（入力は抽出済みの知識点だけなので安い）。
+// 仕上げに使うモデルの差し替え口。未設定なら全段階で OPENAI_MODEL を使う。
+//
+// もとは既定が gpt-4o-mini だったころ、図の多い資料でラベルと数値が入れちがった誤りを
+// 見抜けず、仕上げだけ gpt-4o に渡すために作った逃げ道だった（7748abd）。
+// その後 340e584 で同じ資料を測り直したところ、gpt-4o は誤りごと正しい数値まで消したのに対し、
+// gpt-5.6-luna は誤りだけを消した。既定を luna にしたので、この目的で gpt-4o へ上げる理由はもう無い。
+//
+// 渡す量は経路によって違う。分割経路のまとめ直しは抽出済みの知識項目だけだが、
+// 二段構えの書き上げと短い資料の単発整理では、資料本文がまるごと渡る（こちらは高い）。
 const FINAL_MODEL = process.env.AI_FINAL_MODEL || null;
 
 // モデルごとの価格（100万トークンあたりの米ドル）。
@@ -30,7 +35,8 @@ const PRICES = {
   'gpt-5.6-terra': { in: 2, cached: 0.2, out: 12 },
   'gpt-5.6-sol': { in: 5, cached: 0.5, out: 30 },
 };
-const FALLBACK_PRICE = { in: 0.15, cached: 0.075, out: 0.6 };
+// 単価表に無いモデルを指定されたときの控え。既定モデル（luna）の単価に合わせる。
+const FALLBACK_PRICE = { in: 0.2, cached: 0.02, out: 1.2 };
 
 function priceOf(model) {
   return PRICES[model] || PRICES[String(model).replace(/-\d{4}-\d{2}-\d{2}$/, '')] || FALLBACK_PRICE;
@@ -107,7 +113,7 @@ async function mapWithLimit(items, limit, fn) {
 // 見落としやすいものだけを、いちばん最後にもう一度置いて効かせる。
 const TAIL_CHECKLIST = [
   '',
-  'Before you answer, check these three things:',
+  'Before you answer, check the following:',
   '1. Every line states a fact a reader could learn. Delete agenda, task instructions, and topic-only pointers.',
   '2. No fragment, and no number that contradicts another number in the same note. When two figures cannot both be true, keep only one.',
   '3. No three bullets in a row start with the same term or stem. Where they do, merge them into one bullet that keeps every fact.',
@@ -169,11 +175,13 @@ function stripFence(text) {
 // 出力言語の選択肢。auto は「原文と同じ言語」。
 const LANGUAGES = {
   auto: { label: '原文のまま', instruction: null, code: null },
-  ja: { label: '日本語', instruction: 'Japanese (日本語)', code: 'ja' },
-  en: { label: 'English', instruction: 'English', code: 'en' },
-  zh: { label: '简体中文', instruction: 'Simplified Chinese (简体中文)', code: 'zh' },
-  'zh-TW': { label: '正體中文', instruction: 'Traditional Chinese (正體中文, Taiwan usage)', code: 'zh-TW' },
-  ko: { label: '한국어', instruction: 'Korean (한국어)', code: 'ko' },
+  ja: { label: '日本語', instruction: 'Japanese (日本語)', code: 'ja', detect: 'ja' },
+  en: { label: 'English', instruction: 'English', code: 'en', detect: 'en' },
+  zh: { label: '简体中文', instruction: 'Simplified Chinese (简体中文)', code: 'zh', detect: 'zh' },
+  // detect が 'zh' なのは誤りではない。簡体と正體は文字体系が同じで detectLang では
+  // 見分けられないため、ここでは「漢字で書かれているか」までを確かめる。
+  'zh-TW': { label: '正體中文', instruction: 'Traditional Chinese (正體中文, Taiwan usage)', code: 'zh-TW', detect: 'zh' },
+  ko: { label: '한국어', instruction: 'Korean (한국어)', code: 'ko', detect: 'ko' },
 };
 
 // ---------------------------------------------------------------------------
@@ -299,9 +307,6 @@ function languageRule(langKey) {
   ].join('\n');
 }
 
-// 1回で処理する場合のプロンプト（本文だけを Markdown で出させる）。
-// 本文を JSON の中に入れると、モデルが途中でオブジェクトを閉じてしまい
-// 「JSON としては正しいが中身が切れている」状態を検知できないため、本文は素のテキストで受け取る。
 // 知識を扱うすべてのプロンプトの先頭に、まったく同じ文面・同じ順序で置く共通ブロック。
 //
 // 【なぜ先頭にそろえるか】
@@ -310,7 +315,7 @@ function languageRule(langKey) {
 // 以前は各プロンプトが別々の一文で始まっていたため、そこで前置きが分かれてしまい、
 // 実測でも 分割抽出 937 / まとめ直し 1023 トークンと、どちらも基準に届かなかった
 // （まとめ直しは 1 トークン足りないだけだった）。
-// 共通の規則をそのまま先頭にそろえることで、4種類の呼び出しが同じ前置きを共有できる。
+// 共通の規則をそのまま先頭にそろえることで、5種類の呼び出しが同じ前置きを共有できる。
 const COMMON_PREFIX = [
   'You are a strict knowledge assistant for a personal knowledge base.',
   'Your job is always the same: keep the knowledge, drop everything else, and write it densely.',
@@ -329,6 +334,9 @@ const COMMON_PREFIX = [
 // 出力言語の指示は各プロンプトの最後に置く。
 // 言語ごとに文面が変わるため、途中に入れるとそこから先が言語ごとに別扱いになり、
 // 共有できる前置きが短くなってしまう。
+// 1回で処理する場合のプロンプト（本文だけを Markdown で出させる）。
+// 本文を JSON の中に入れると、モデルが途中でオブジェクトを閉じてしまい
+// 「JSON としては正しいが中身が切れている」状態を検知できないため、本文は素のテキストで受け取る。
 function singleBodyPrompt(langKey) {
   return [
     COMMON_PREFIX,
@@ -365,7 +373,7 @@ function singleBodyPrompt(langKey) {
 // 2回目は資料本文ごとキャッシュに乗る（luna なら $0.20 → $0.02 /1M）。
 // ---------------------------------------------------------------------------
 
-// 1段目：知識点の洗い出しだけをさせる。書き込ませない。
+// 1段目：知識項目の洗い出しだけをさせる。書き込ませない。
 function inventoryInstruction(langKey) {
   return [
     '--- TASK (stage 1 of 2) ---',
@@ -418,7 +426,7 @@ function writeUpInstruction(langKey, inventory) {
 }
 
 // 二段構えで本文を作る。戻り値: { bodyMd, usage, inventory }
-async function twoStageBody({ key, model, lang, source, onProgress }) {
+async function twoStageBody({ model, lang, source, onProgress }) {
   // prompt_cache_key は資料ごとに変えると配信先が散らばり、
   // かえって共通の前置きにも当たらなくなった（命中 12% → 6%）。指定しない。
   // 2回の呼び出しで完全に同じにする部分。ここがキャッシュに乗る。
@@ -437,7 +445,6 @@ async function twoStageBody({ key, model, lang, source, onProgress }) {
 
   say({ stage: 'inventory', phase: 'start' });
   const s1 = await callText({
-    key,
     model,
     messages: [...head, { role: 'user', content: inventoryInstruction(lang) }],
     maxTokens: 3000,
@@ -452,7 +459,6 @@ async function twoStageBody({ key, model, lang, source, onProgress }) {
 
   say({ stage: 'writeup', phase: 'start' });
   const s2 = await callText({
-    key,
     model: FINAL_MODEL || model,
     messages: [...head, { role: 'user', content: writeUpInstruction(lang, inventory) + TAIL_CHECKLIST }],
     maxTokens: 10000,
@@ -484,7 +490,7 @@ function metaPrompt(langKey) {
   ].join('\n');
 }
 
-// 分割処理の第1段：断片から知識点だけを拾う（整形はまだしない）。
+// 分割処理の第1段：断片から知識項目だけを拾う（整形はまだしない）。
 function chunkPrompt(langKey) {
   return [
     COMMON_PREFIX,
@@ -505,7 +511,7 @@ function chunkPrompt(langKey) {
   ].join('\n');
 }
 
-// 分割処理の第2段：拾い集めた知識点を1つのノートにまとめ直す。
+// 分割処理の第2段：拾い集めた知識項目を1つのノートにまとめ直す。
 function consolidatePrompt(langKey) {
   return [
     COMMON_PREFIX,
@@ -514,7 +520,7 @@ function consolidatePrompt(langKey) {
     'You are given knowledge points extracted from consecutive parts of ONE document.',
     'Organize them into a single coherent note body.',
     '- Keep EVERY distinct knowledge point. Removing a real point is a failure.',
-    '- Remove exact and near duplicates that appear across parts (the parts overlap slightly).',
+    '- Remove exact and near duplicates that appear across parts.',
     '- NEVER add, infer, or explain anything that is not in the given points.',
     '',
     'STRUCTURE:',
@@ -558,15 +564,18 @@ function detectLang(text) {
 // ---------------------------------------------------------------------------
 // OpenAI 呼び出しの共通処理
 // ---------------------------------------------------------------------------
-function clientFor(key) {
-  const k = key || SERVER_KEY;
-  if (!k) throw new Error('NO_KEY');
-  return new OpenAI({ apiKey: k });
+// キーはサービス側が持つ（BYOK は廃止済み）。
+// config.check() は OPENAI_API_KEY 未設定でも起動を止めないので、
+// 実際に呼ぼうとしたここが唯一の検出点になる。
+function clientFor() {
+  if (!SERVER_KEY) throw new Error('NO_KEY');
+  return new OpenAI({ apiKey: SERVER_KEY });
 }
 
 // 世代によって使えるパラメータが違う。
 //   ・従来（gpt-4 系）: max_tokens / temperature を指定できる
-//   ・新しい世代（gpt-5 系・o 系）: max_completion_tokens を使い、temperature は既定値のみ
+//   ・新しい世代（gpt-5 系・o 系）: max_completion_tokens を使う。temperature は
+//     reasoning_effort='none' のときだけ指定でき、それ以外では 400 になる
 // 指定を間違えると 400 で弾かれるため、モデル名で振り分ける。
 function isNextGen(model) {
   return /^(gpt-5|o[1-9])/.test(String(model));
@@ -637,14 +646,13 @@ function usageOf(u, model) {
 // そこを流しながら画面に出せるようにするための入口。
 // 逐次受け取りでは既定で usage が返ってこないため、stream_options で明示的に要求する。
 // これを忘れると費用の記録が全部ゼロになる。
-async function callRaw({ key, model, system, user, messages, maxTokens, json, cacheKey, onDelta }) {
-  const client = clientFor(key);
+async function callRaw({ model, system, user, messages, maxTokens, json, onDelta }) {
+  const client = clientFor();
   const m = model || DEFAULT_MODEL;
   const opts = {
     model: m,
     ...paramsFor(m, maxTokens, json),
     // 同じ前置きの呼び出しを同じ配信先へ寄せてキャッシュに当たりやすくする。
-    ...(cacheKey ? { prompt_cache_key: cacheKey } : {}),
     // messages を直接渡せるようにしてある。二段構えの取り出しでは
     // 「共通の前置き＋資料本文」までをまったく同じ並びにして、
     // 2回目の呼び出しで資料本文ごとキャッシュに乗せるために使う。
@@ -689,12 +697,12 @@ async function callRaw({ key, model, system, user, messages, maxTokens, json, ca
 // JSON モードで呼び出す。
 // 出力が長さ上限で切れると JSON が壊れて丸ごと失われるため、
 // 切れていたら上限を増やして1回だけやり直す。
-async function callJson({ key, model, system, user, maxTokens = 6000 }) {
+async function callJson({ model, system, user, maxTokens = 6000 }) {
   let usage = ZERO_USAGE;
   let lastErr = null;
 
   for (const limit of [maxTokens, Math.min(maxTokens * 2, 16000)]) {
-    const r = await callRaw({ key, model, system, user, maxTokens: limit, json: true });
+    const r = await callRaw({ model, system, user, maxTokens: limit, json: true });
     usage = addUsage(usage, r.usage);
     if (!r.truncated) {
       try {
@@ -711,9 +719,9 @@ async function callJson({ key, model, system, user, maxTokens = 6000 }) {
 }
 
 // 素のテキストで呼び出す（分割抽出の第1段で使う）。
-// JSON にしないので、途中で切れても「そこまでの知識点」は使える＝全滅しない。
-async function callText({ key, model, system, user, messages, maxTokens = 8000, cacheKey, onDelta }) {
-  const r = await callRaw({ key, model, system, user, messages, maxTokens, json: false, cacheKey, onDelta });
+// JSON にしないので、途中で切れても「そこまでの知識項目」は使える＝全滅しない。
+async function callText({ model, system, user, messages, maxTokens = 8000, onDelta }) {
+  const r = await callRaw({ model, system, user, messages, maxTokens, json: false, onDelta });
   if (r.truncated) console.warn('[ai] 断片の抽出が上限で切れました（途中までを採用します）。');
   return r;
 }
@@ -755,7 +763,7 @@ function costOf(usage) {
 // 長い資料の分割
 // ---------------------------------------------------------------------------
 // 見出しや空行の切れ目を優先して、CHUNK_SIZE 前後の断片に分ける。
-// 文脈が途切れないよう、断片の末尾を少しだけ次へ重ねる。
+// 断片どうしは重ねない。切れ目で入る取りこぼしは、まとめ直しの段で拾う。
 function splitIntoChunks(text, size = CHUNK_SIZE) {
   const lines = String(text).split('\n');
   const chunks = [];
@@ -791,10 +799,10 @@ function splitIntoChunks(text, size = CHUNK_SIZE) {
 // ---------------------------------------------------------------------------
 
 // markdown（またはプレーンテキスト）を構造化ノートに整理する。
-// opts: { key, model, lang, onProgress }
+// opts: { model, lang, onProgress }
 // 返り値: { title, body_md, summary, tags, usage, chunks, langOk }
 async function structure(markdown, opts = {}) {
-  const { key, model = DEFAULT_MODEL, lang = 'auto', onProgress } = opts;
+  const { model = DEFAULT_MODEL, lang = 'auto', onProgress } = opts;
   const source = String(markdown).slice(0, MAX_DOC_CHARS);
   if (!source.trim()) throw new Error('EMPTY_INPUT');
   const say = (e) => { if (onProgress) onProgress(e); };
@@ -805,14 +813,13 @@ async function structure(markdown, opts = {}) {
 
   if (source.length <= SINGLE_CALL_LIMIT && TWO_STAGE) {
     // --- 二段構え：先に洗い出し、次に埋める ---
-    const r = await twoStageBody({ key, model, lang, source, onProgress });
+    const r = await twoStageBody({ model, lang, source, onProgress });
     usage = addUsage(usage, r.usage);
     bodyMd = r.bodyMd;
   } else if (source.length <= SINGLE_CALL_LIMIT) {
     // --- 短い資料：1回で整理する ---
     say({ stage: 'single', phase: 'start' });
     const r = await callText({
-      key,
       model: FINAL_MODEL || model,
       system: singleBodyPrompt(lang),
       user:
@@ -840,7 +847,6 @@ async function structure(markdown, opts = {}) {
         //     現行     476行 116秒 $0.0628
         //     二段構え 394行 169秒 $0.0995  （行数 -17%、費用 +58%、時間 +46%）
         const r = await callText({
-          key,
           model,
           system: chunkPrompt(lang),
           user:
@@ -874,8 +880,6 @@ async function structure(markdown, opts = {}) {
 
     say({ stage: 'consolidate', phase: 'start' });
     const r2 = await callText({
-      key,
-      model,
       model: FINAL_MODEL || model,
       system: consolidatePrompt(lang),
       user:
@@ -899,7 +903,6 @@ async function structure(markdown, opts = {}) {
   let meta = { title: 'Untitled', summary: null, tags: [] };
   try {
     const { json, usage: u3 } = await callJson({
-      key,
       model,
       system: metaPrompt(lang),
       user: '<note-body>\n' + bodyMd.slice(0, CHUNK_SIZE) + '\n</note-body>',
@@ -921,23 +924,22 @@ async function structure(markdown, opts = {}) {
   const result = { ...meta, body_md: bodyMd, chunks };
 
   // --- 言語の護欄：指定と違う言語で返ってきたら1回だけ言い直させる ---
-  const check = await enforceLanguage(result, { key, model, lang });
+  const check = await enforceLanguage(result, { model, lang });
   return { ...check.result, usage: addUsage(usage, check.usage), chunks, langOk: check.ok };
 }
 
 // 出力言語が指定どおりか判定し、違えば翻訳し直す（1回だけ）。
-async function enforceLanguage(result, { key, model, lang }) {
+async function enforceLanguage(result, { model, lang }) {
   const target = LANGUAGES[lang];
-  if (!target || !target.code) return { result, usage: ZERO_USAGE, ok: true }; // auto は判定しない
+  if (!target || !target.detect) return { result, usage: ZERO_USAGE, ok: true }; // auto は判定しない
   if (!result.body_md || !result.body_md.trim()) return { result, usage: ZERO_USAGE, ok: true };
 
   const got = detectLang(result.body_md);
-  if (got === target.code || got === 'unknown') return { result, usage: ZERO_USAGE, ok: true };
+  if (got === target.detect || got === 'unknown') return { result, usage: ZERO_USAGE, ok: true };
 
-  console.warn(`[ai] 出力言語が不一致（期待:${target.code} / 実際:${got}）。翻訳し直します。`);
+  console.warn(`[ai] 出力言語が不一致（期待:${target.detect} / 実際:${got}）。翻訳し直します。`);
   try {
     const { json, usage } = await callJson({
-      key,
       model,
       system: [
         'You are a translator for a knowledge base.',
@@ -962,7 +964,7 @@ async function enforceLanguage(result, { key, model, lang }) {
       summary: json.summary ? json.summary.toString().trim() : result.summary,
       tags: normalizeTags(json.tags).length ? normalizeTags(json.tags) : result.tags,
     };
-    const ok = detectLang(fixed.body_md) === target.code;
+    const ok = detectLang(fixed.body_md) === target.detect;
     return { result: fixed, usage, ok };
   } catch (e) {
     console.error('[ai] 言語の修正に失敗:', e.message);
@@ -995,9 +997,8 @@ function mergePrompt(langKey) {
 }
 
 async function merge(oldNote, newNote, opts = {}) {
-  const { key, model = DEFAULT_MODEL, lang = 'auto' } = opts;
+  const { model = DEFAULT_MODEL, lang = 'auto' } = opts;
   const { json, usage } = await callJson({
-    key,
     model,
     system: mergePrompt(lang),
     user:

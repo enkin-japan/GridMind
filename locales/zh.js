@@ -74,7 +74,7 @@ module.exports = {
   'import.submit': '导入',
   'import.bin': '拾取到的知识点',
 
-  // --- 二次整理 ---
+  // --- 再整理 ---
   'rec.title': '两卷并排看',
   'rec.lede': '刚导入的知识和已有笔记「{title}」重合得很多。两卷都摆在下面，你来决定怎么处理。',
   'rec.new': '新导入',

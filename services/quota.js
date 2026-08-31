@@ -76,7 +76,8 @@ async function usageFor(userId) {
 
 // 取り込みを実行してよいか確かめる。
 // docChars を渡すと1ファイルの文字数上限も見る（変換後に呼ぶ）。
-// 戻り値: { ok: true, plan, usage } / { ok: false, reason, message, plan, usage }
+// 戻り値: { ok: true, plan, usage } / { ok: false, reason, messageKey, messageVars, plan, usage }
+// 文言そのものではなく鍵と差し込み値で返す。画面の言語は呼び出し側で決まるため。
 async function check(user, docChars = 0) {
   const plan = planOf(user);
   const usage = await usageFor(user.id);

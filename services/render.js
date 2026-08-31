@@ -1,6 +1,6 @@
-// Markdown → HTML レンダリング。detail 画面で使う。
+// Markdown → HTML レンダリング。ノートの詳細画面と、再整理の対照ページで使う。
 // 手順：[[リンク]] を解決 → marked で HTML 化 → 軽量サニタイズ。
-// 本格的な XSS 対策（DOMPurify 等）は今後の強化項目（ARCHITECTURE 危険リスト参照）。
+// 本格的な XSS 対策（DOMPurify 等）は今後の課題として残している。
 const { marked } = require('marked');
 const links = require('./links');
 

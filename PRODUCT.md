@@ -45,7 +45,7 @@ Three commitments a neighbouring "AI summarizer" could not truthfully copy:
 - Accounts with per-user isolation (register / login / logout).
 - Notes as Markdown: create, read, update, delete.
 - AI ingest from an uploaded file or pasted text, producing body, title, summary, and tags.
-- Output-language selection: source language, Japanese, English, Simplified Chinese, Korean.
+- Output-language selection: source language, Japanese, English, Simplified Chinese, Traditional Chinese, Korean.
 - Keyword search (title and body), tag filtering, pagination.
 - Wiki-links `[[Note]]` with backlinks.
 - Re-integration: side-by-side compare, link or merge, editable merge preview.
@@ -82,9 +82,11 @@ Three commitments a neighbouring "AI summarizer" could not truthfully copy:
 ## Evidence on Hand
 
 - **Real source material** — `testFiles/` holds actual lecture decks from three subjects (Node.js web development, business fundamentals, IoT). This is the corpus the extraction was tuned and measured against, including the diagram-heavy IoT decks.
-- **Screens** — `screenshots/` holds captures of seven screens.
+- **Screens** — `screenshots/` holds 21 captures, covering every screen in both the light and dark themes
+  and all five interface languages.
 - **Measured data** — per-stage timings, extraction density measurements, and per-ingest costs are recorded in code comments and commit messages.
-- **Course deliverables** — `instruction/` holds the submitted planning and presentation documents.
+- **Course deliverables** — `templates/` holds the submitted planning, UI-spec and presentation documents;
+  `instruction/` holds the blank forms and samples handed out by the course.
 
 **Absences that future work must not fabricate:** there are no external users, no testimonials, no usage statistics, no press coverage, no published pricing, and no uptime, security-certification, or deployment claims. The repository is private and has had no outside visitors.
 

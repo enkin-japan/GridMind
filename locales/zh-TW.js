@@ -74,7 +74,7 @@ module.exports = {
   'import.submit': '匯入',
   'import.bin': '撿出的知識點',
 
-  // --- 二次整理 ---
+  // --- 再整理 ---
   'rec.title': '兩捲並排看',
   'rec.lede': '剛匯入的知識和既有筆記「{title}」重疊得很多。兩捲都擺在下面，由你決定怎麼處理。',
   'rec.new': '新匯入',
